@@ -49,7 +49,7 @@ export const SelectField: React.FC<SelectFieldProps> = ({
         }}
         value={field.value || ''}
         name={field.name}
-        required={isRequired}
+        {...(typeof isRequired === 'boolean' ? { required: isRequired } : {})}
       >
         {children}
       </Select>

@@ -35,6 +35,8 @@ export const useCreateMaterialMutation = (
       if (options?.onSuccess) {
         return options.onSuccess(...args);
       }
+
+      return undefined;
     },
   });
 };
@@ -73,6 +75,8 @@ export const useCreateColorMutation = (
       if (options?.onSuccess) {
         return options.onSuccess(...args);
       }
+
+      return undefined;
     },
   });
 };

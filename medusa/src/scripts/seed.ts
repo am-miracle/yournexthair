@@ -29,6 +29,32 @@ import {
 import type FashionModuleService from '../modules/fashion/service';
 import type { MaterialModelType } from '../modules/fashion/models/material';
 
+function requireDefined<T>(value: T | undefined, message: string): T {
+  if (value === undefined) {
+    throw new Error(message);
+  }
+
+  return value;
+}
+
+function requireFirst<T>(values: T[], message: string): T {
+  return requireDefined(values[0], message);
+}
+
+function requireFound<T>(
+  values: T[],
+  predicate: (value: T) => boolean,
+  message: string,
+): T {
+  const value = values.find(predicate);
+
+  if (!value) {
+    throw new Error(message);
+  }
+
+  return value;
+}
+
 async function getImageUrlContent(url: string) {
   const response = await fetch(url);
 
@@ -59,7 +85,10 @@ export default async function seedDemoData({ container }: ExecArgs) {
   const countries = ['hr', 'gb', 'de', 'dk', 'se', 'fr', 'es', 'it'];
 
   logger.info('Seeding store data...');
-  const [store] = await storeModuleService.listStores();
+  const store = requireFirst(
+    await storeModuleService.listStores(),
+    'Expected at least one store to exist before seeding demo data.',
+  );
   let defaultSalesChannel = await salesChannelModuleService.listSalesChannels({
     name: 'Default Sales Channel',
   });
@@ -79,6 +108,10 @@ export default async function seedDemoData({ container }: ExecArgs) {
     });
     defaultSalesChannel = salesChannelResult;
   }
+  const defaultSalesChannelId = requireFirst(
+    defaultSalesChannel,
+    'Expected a default sales channel to exist before seeding demo data.',
+  ).id;
 
   logger.info('Seeding region data...');
   const { result: regionResult } = await createRegionsWorkflow(container).run({
@@ -93,7 +126,10 @@ export default async function seedDemoData({ container }: ExecArgs) {
       ],
     },
   });
-  const region = regionResult[0];
+  const region = requireFirst(
+    regionResult,
+    'Expected a region to be created while seeding demo data.',
+  );
   logger.info('Finished seeding regions.');
 
   await updateStoresWorkflow(container).run({
@@ -109,7 +145,7 @@ export default async function seedDemoData({ container }: ExecArgs) {
             currency_code: 'usd',
           },
         ],
-        default_sales_channel_id: defaultSalesChannel[0].id,
+        default_sales_channel_id: defaultSalesChannelId,
         default_region_id: region.id,
       },
     },
@@ -140,7 +176,10 @@ export default async function seedDemoData({ container }: ExecArgs) {
       ],
     },
   });
-  const stockLocation = stockLocationResult[0];
+  const stockLocation = requireFirst(
+    stockLocationResult,
+    'Expected a stock location to be created while seeding demo data.',
+  );
 
   await remoteLink.create({
     [Modules.STOCK_LOCATION]: {
@@ -163,7 +202,10 @@ export default async function seedDemoData({ container }: ExecArgs) {
         ],
       },
     });
-  const shippingProfile = shippingProfileResult[0];
+  const shippingProfile = requireFirst(
+    shippingProfileResult,
+    'Expected a shipping profile to be created while seeding demo data.',
+  );
 
   const fulfillmentSet = await fulfillmentModuleService.createFulfillmentSets({
     name: 'European Warehouse delivery',
@@ -208,6 +250,10 @@ export default async function seedDemoData({ container }: ExecArgs) {
       },
     ],
   });
+  const fulfillmentServiceZone = requireFirst(
+    fulfillmentSet.service_zones,
+    'Expected a shipping fulfillment service zone to be created.',
+  );
 
   await remoteLink.create({
     [Modules.STOCK_LOCATION]: {
@@ -224,7 +270,7 @@ export default async function seedDemoData({ container }: ExecArgs) {
         name: 'Standard Shipping',
         price_type: 'flat',
         provider_id: 'manual_manual',
-        service_zone_id: fulfillmentSet.service_zones[0].id,
+        service_zone_id: fulfillmentServiceZone.id,
         shipping_profile_id: shippingProfile.id,
         type: {
           label: 'Standard',
@@ -262,7 +308,7 @@ export default async function seedDemoData({ container }: ExecArgs) {
         name: 'Express Shipping',
         price_type: 'flat',
         provider_id: 'manual_manual',
-        service_zone_id: fulfillmentSet.service_zones[0].id,
+        service_zone_id: fulfillmentServiceZone.id,
         shipping_profile_id: shippingProfile.id,
         type: {
           label: 'Express',
@@ -319,6 +365,10 @@ export default async function seedDemoData({ container }: ExecArgs) {
         },
       ],
     });
+  const pickupServiceZone = requireFirst(
+    pickupFulfillmentSet.service_zones,
+    'Expected a pickup fulfillment service zone to be created.',
+  );
 
   await remoteLink.create({
     [Modules.STOCK_LOCATION]: {
@@ -335,7 +385,7 @@ export default async function seedDemoData({ container }: ExecArgs) {
         name: 'Denmark Store Pickup',
         price_type: 'flat',
         provider_id: 'manual_manual',
-        service_zone_id: pickupFulfillmentSet.service_zones[0].id,
+        service_zone_id: pickupServiceZone.id,
         shipping_profile_id: shippingProfile.id,
         type: {
           label: 'Denmark Store Pickup',
@@ -377,7 +427,7 @@ export default async function seedDemoData({ container }: ExecArgs) {
   await linkSalesChannelsToStockLocationWorkflow(container).run({
     input: {
       id: stockLocation.id,
-      add: [defaultSalesChannel[0].id],
+      add: [defaultSalesChannelId],
     },
   });
   logger.info('Finished seeding stock location data.');
@@ -396,12 +446,15 @@ export default async function seedDemoData({ container }: ExecArgs) {
       ],
     },
   });
-  const publishableApiKey = publishableApiKeyResult[0];
+  const publishableApiKey = requireFirst(
+    publishableApiKeyResult,
+    'Expected a publishable API key to be created while seeding demo data.',
+  );
 
   await linkSalesChannelsToApiKeyWorkflow(container).run({
     input: {
       id: publishableApiKey.id,
-      add: [defaultSalesChannel[0].id],
+      add: [defaultSalesChannelId],
     },
   });
   logger.info('Finished seeding publishable API key data.');
@@ -428,6 +481,21 @@ export default async function seedDemoData({ container }: ExecArgs) {
       ],
     },
   });
+  const oneSeaterCategoryId = requireFound(
+    categoryResult,
+    (category) => category.name === 'One seater',
+    'Expected "One seater" product category to exist.',
+  ).id;
+  const twoSeaterCategoryId = requireFound(
+    categoryResult,
+    (category) => category.name === 'Two seater',
+    'Expected "Two seater" product category to exist.',
+  ).id;
+  const threeSeaterCategoryId = requireFound(
+    categoryResult,
+    (category) => category.name === 'Three seater',
+    'Expected "Three seater" product category to exist.',
+  ).id;
 
   const [sofasImage, armChairsImage] = await uploadFilesWorkflow(container)
     .run({
@@ -474,6 +542,16 @@ export default async function seedDemoData({ container }: ExecArgs) {
       ],
     },
   });
+  const sofasProductTypeId = requireFound(
+    productTypes,
+    (productType) => productType.value === 'Sofas',
+    'Expected "Sofas" product type to exist.',
+  ).id;
+  const armChairsProductTypeId = requireFound(
+    productTypes,
+    (productType) => productType.value === 'Arm Chairs',
+    'Expected "Arm Chairs" product type to exist.',
+  ).id;
 
   const [
     scandinavianSimplicityImage,
@@ -763,6 +841,26 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
       ],
     },
   });
+  const scandinavianSimplicityCollectionId = requireFound(
+    collections,
+    (collection) => collection.handle === 'scandinavian-simplicity',
+    'Expected "scandinavian-simplicity" collection to exist.',
+  ).id;
+  const modernLuxeCollectionId = requireFound(
+    collections,
+    (collection) => collection.handle === 'modern-luxe',
+    'Expected "modern-luxe" collection to exist.',
+  ).id;
+  const bohoChicCollectionId = requireFound(
+    collections,
+    (collection) => collection.handle === 'boho-chic',
+    'Expected "boho-chic" collection to exist.',
+  ).id;
+  const timelessClassicsCollectionId = requireFound(
+    collections,
+    (collection) => collection.handle === 'timeless-classics',
+    'Expected "timeless-classics" collection to exist.',
+  ).id;
 
   const materials: MaterialModelType[] =
     await fashionModuleService.createMaterials([
@@ -782,87 +880,112 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
         name: 'Microfiber',
       },
     ]);
+  const velvetMaterialId = requireFound(
+    materials,
+    (material) => material.name === 'Velvet',
+    'Expected "Velvet" material to exist.',
+  ).id;
+  const linenMaterialId = requireFound(
+    materials,
+    (material) => material.name === 'Linen',
+    'Expected "Linen" material to exist.',
+  ).id;
+  const boucleMaterialId = requireFound(
+    materials,
+    (material) => material.name === 'Boucle',
+    'Expected "Boucle" material to exist.',
+  ).id;
+  const leatherMaterialId = requireFound(
+    materials,
+    (material) => material.name === 'Leather',
+    'Expected "Leather" material to exist.',
+  ).id;
+  const microfiberMaterialId = requireFound(
+    materials,
+    (material) => material.name === 'Microfiber',
+    'Expected "Microfiber" material to exist.',
+  ).id;
 
   await fashionModuleService.createColors([
     // Velvet
     {
       name: 'Black',
       hex_code: '#4C4D4E',
-      material_id: materials.find((m) => m.name === 'Velvet').id,
+      material_id: velvetMaterialId,
     },
     {
       name: 'Purple',
       hex_code: '#904C94',
-      material_id: materials.find((m) => m.name === 'Velvet').id,
+      material_id: velvetMaterialId,
     },
     // Linen
     {
       name: 'Green',
       hex_code: '#438849',
-      material_id: materials.find((m) => m.name === 'Linen').id,
+      material_id: linenMaterialId,
     },
     {
       name: 'Light Gray',
       hex_code: '#B1B1B1',
-      material_id: materials.find((m) => m.name === 'Linen').id,
+      material_id: linenMaterialId,
     },
     {
       name: 'Yellow',
       hex_code: '#F1BD37',
-      material_id: materials.find((m) => m.name === 'Linen').id,
+      material_id: linenMaterialId,
     },
     {
       name: 'Red',
       hex_code: '#CD1F23',
-      material_id: materials.find((m) => m.name === 'Linen').id,
+      material_id: linenMaterialId,
     },
     {
       name: 'Blue',
       hex_code: '#475F8A',
-      material_id: materials.find((m) => m.name === 'Linen').id,
+      material_id: linenMaterialId,
     },
     // Microfiber
     {
       name: 'Orange',
       hex_code: '#EF7218',
-      material_id: materials.find((m) => m.name === 'Microfiber').id,
+      material_id: microfiberMaterialId,
     },
     {
       name: 'Dark Gray',
       hex_code: '#4A4A4A',
-      material_id: materials.find((m) => m.name === 'Microfiber').id,
+      material_id: microfiberMaterialId,
     },
     {
       name: 'Black',
       hex_code: '#282828',
-      material_id: materials.find((m) => m.name === 'Microfiber').id,
+      material_id: microfiberMaterialId,
     },
     // Boucle
     {
       name: 'Beige',
       hex_code: '#C8BCB3',
-      material_id: materials.find((m) => m.name === 'Boucle').id,
+      material_id: boucleMaterialId,
     },
     {
       name: 'White',
       hex_code: '#EAEAEA',
-      material_id: materials.find((m) => m.name === 'Boucle').id,
+      material_id: boucleMaterialId,
     },
     {
       name: 'Light Gray',
       hex_code: '#C3C0BE',
-      material_id: materials.find((m) => m.name === 'Boucle').id,
+      material_id: boucleMaterialId,
     },
     // Leather
     {
       name: 'Violet',
       hex_code: '#B1ABBF',
-      material_id: materials.find((m) => m.name === 'Leather').id,
+      material_id: leatherMaterialId,
     },
     {
       name: 'Beige',
       hex_code: '#A79D9B',
-      material_id: materials.find((m) => m.name === 'Leather').id,
+      material_id: leatherMaterialId,
     },
   ]);
 
@@ -899,11 +1022,9 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
           handle: 'astrid-curve',
           description:
             'The Astrid Curve combines flowing curves and cozy, textured fabric for a truly bohemian vibe. Its relaxed design adds character and comfort, perfect for eclectic living spaces with a free-spirited charm.',
-          category_ids: [
-            categoryResult.find((cat) => cat.name === 'Three seater').id,
-          ],
-          collection_id: collections.find((c) => c.handle === 'boho-chic').id,
-          type_id: productTypes.find((pt) => pt.value === 'Sofas').id,
+          category_ids: [threeSeaterCategoryId],
+          collection_id: bohoChicCollectionId,
+          type_id: sofasProductTypeId,
           status: ProductStatus.PUBLISHED,
           images: astridCurveImages,
           options: [
@@ -958,7 +1079,7 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
           ],
           sales_channels: [
             {
-              id: defaultSalesChannel[0].id,
+              id: defaultSalesChannelId,
             },
           ],
         },
@@ -999,13 +1120,9 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
           handle: 'belime-estate',
           description:
             'The Belime Estate exudes classic sophistication with its tufted back and rich fabric. Its luxurious look and enduring comfort make it a perfect fit for traditional, elegant interiors.',
-          category_ids: [
-            categoryResult.find((cat) => cat.name === 'Two seater').id,
-          ],
-          collection_id: collections.find(
-            (c) => c.handle === 'timeless-classics',
-          ).id,
-          type_id: productTypes.find((pt) => pt.value === 'Sofas').id,
+          category_ids: [twoSeaterCategoryId],
+          collection_id: timelessClassicsCollectionId,
+          type_id: sofasProductTypeId,
           status: ProductStatus.PUBLISHED,
           images: belimeEstateImages,
           options: [
@@ -1079,7 +1196,7 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
           ],
           sales_channels: [
             {
-              id: defaultSalesChannel[0].id,
+              id: defaultSalesChannelId,
             },
           ],
         },
@@ -1120,13 +1237,9 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
           handle: 'cypress-retreat',
           description:
             'The Cypress Retreat is a nod to traditional design with its elegant lines and durable, high-quality upholstery. A timeless choice, it offers long-lasting comfort and a refined aesthetic for any home.',
-          category_ids: [
-            categoryResult.find((cat) => cat.name === 'Three seater').id,
-          ],
-          collection_id: collections.find(
-            (c) => c.handle === 'timeless-classics',
-          ).id,
-          type_id: productTypes.find((pt) => pt.value === 'Sofas').id,
+          category_ids: [threeSeaterCategoryId],
+          collection_id: timelessClassicsCollectionId,
+          type_id: sofasProductTypeId,
           status: ProductStatus.PUBLISHED,
           images: cypressRetreatImages,
           options: [
@@ -1181,7 +1294,7 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
           ],
           sales_channels: [
             {
-              id: defaultSalesChannel[0].id,
+              id: defaultSalesChannelId,
             },
           ],
         },
@@ -1222,11 +1335,9 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
           handle: 'everly-estate',
           description:
             'The Everly Estate offers a blend of modern elegance and plush luxury, with its sleek lines and soft velvet upholstery. Perfect for upscale interiors, it exudes sophistication and comfort in equal measure.',
-          category_ids: [
-            categoryResult.find((cat) => cat.name === 'Two seater').id,
-          ],
-          collection_id: collections.find((c) => c.handle === 'modern-luxe').id,
-          type_id: productTypes.find((pt) => pt.value === 'Sofas').id,
+          category_ids: [twoSeaterCategoryId],
+          collection_id: modernLuxeCollectionId,
+          type_id: sofasProductTypeId,
           status: ProductStatus.PUBLISHED,
           images: everlyEstateImages,
           options: [
@@ -1281,7 +1392,7 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
           ],
           sales_channels: [
             {
-              id: defaultSalesChannel[0].id,
+              id: defaultSalesChannelId,
             },
           ],
         },
@@ -1322,13 +1433,9 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
           handle: 'havenhill-estate',
           description:
             'The Havenhill Estate brings a touch of traditional charm with its elegant curves and classic silhouette. Upholstered in durable, luxurious fabric, it’s a timeless piece that combines comfort and style, fitting seamlessly into any sophisticated home.',
-          category_ids: [
-            categoryResult.find((cat) => cat.name === 'One seater').id,
-          ],
-          collection_id: collections.find(
-            (c) => c.handle === 'timeless-classics',
-          ).id,
-          type_id: productTypes.find((pt) => pt.value === 'Arm Chairs').id,
+          category_ids: [oneSeaterCategoryId],
+          collection_id: timelessClassicsCollectionId,
+          type_id: armChairsProductTypeId,
           status: ProductStatus.PUBLISHED,
           images: havenhillEstateImages,
           options: [
@@ -1383,7 +1490,7 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
           ],
           sales_channels: [
             {
-              id: defaultSalesChannel[0].id,
+              id: defaultSalesChannelId,
             },
           ],
         },
@@ -1424,11 +1531,9 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
           handle: 'monaco-flair',
           description:
             'The Monaco Flair combines sleek metallic accents with rich fabric, delivering a bold, luxurious statement. Its minimalist design and deep seating make it a standout piece for modern living rooms.',
-          category_ids: [
-            categoryResult.find((cat) => cat.name === 'Three seater').id,
-          ],
-          collection_id: collections.find((c) => c.handle === 'modern-luxe').id,
-          type_id: productTypes.find((pt) => pt.value === 'Sofas').id,
+          category_ids: [threeSeaterCategoryId],
+          collection_id: modernLuxeCollectionId,
+          type_id: sofasProductTypeId,
           status: ProductStatus.PUBLISHED,
           images: monacoFlairImages,
           options: [
@@ -1502,7 +1607,7 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
           ],
           sales_channels: [
             {
-              id: defaultSalesChannel[0].id,
+              id: defaultSalesChannelId,
             },
           ],
         },
@@ -1543,13 +1648,9 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
           handle: 'nordic-breeze',
           description:
             'The Nordic Breeze is a refined expression of Scandinavian minimalism, with its crisp silhouette and airy aesthetic. Crafted for both comfort and simplicity, it’s perfect for creating a serene living space.',
-          category_ids: [
-            categoryResult.find((cat) => cat.name === 'One seater').id,
-          ],
-          collection_id: collections.find(
-            (c) => c.handle === 'scandinavian-simplicity',
-          ).id,
-          type_id: productTypes.find((pt) => pt.value === 'Arm Chairs').id,
+          category_ids: [oneSeaterCategoryId],
+          collection_id: scandinavianSimplicityCollectionId,
+          type_id: armChairsProductTypeId,
           status: ProductStatus.PUBLISHED,
           images: nordicBreezeImages,
           options: [
@@ -1623,7 +1724,7 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
           ],
           sales_channels: [
             {
-              id: defaultSalesChannel[0].id,
+              id: defaultSalesChannelId,
             },
           ],
         },
@@ -1664,13 +1765,9 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
           handle: 'nordic-haven',
           description:
             'The Nordic Haven features clean lines and soft textures, embodying the essence of Scandinavian design. Its natural tones and minimalist frame bring effortless serenity and comfort to any home.',
-          category_ids: [
-            categoryResult.find((cat) => cat.name === 'Three seater').id,
-          ],
-          collection_id: collections.find(
-            (c) => c.handle === 'scandinavian-simplicity',
-          ).id,
-          type_id: productTypes.find((pt) => pt.value === 'Sofas').id,
+          category_ids: [threeSeaterCategoryId],
+          collection_id: scandinavianSimplicityCollectionId,
+          type_id: sofasProductTypeId,
           status: ProductStatus.PUBLISHED,
           images: nordicHavenImages,
           options: [
@@ -1744,7 +1841,7 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
           ],
           sales_channels: [
             {
-              id: defaultSalesChannel[0].id,
+              id: defaultSalesChannelId,
             },
           ],
         },
@@ -1785,13 +1882,9 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
           handle: 'oslo-drift',
           description:
             'The Oslo Drift is designed for ultimate relaxation, with soft, supportive cushions and a sleek, modern frame. Its understated elegance and neutral tones make it an ideal fit for contemporary, minimalist homes.',
-          category_ids: [
-            categoryResult.find((cat) => cat.name === 'Two seater').id,
-          ],
-          collection_id: collections.find(
-            (c) => c.handle === 'scandinavian-simplicity',
-          ).id,
-          type_id: productTypes.find((pt) => pt.value === 'Sofas').id,
+          category_ids: [twoSeaterCategoryId],
+          collection_id: scandinavianSimplicityCollectionId,
+          type_id: sofasProductTypeId,
           status: ProductStatus.PUBLISHED,
           images: osloDriftImages,
           options: [
@@ -1865,7 +1958,7 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
           ],
           sales_channels: [
             {
-              id: defaultSalesChannel[0].id,
+              id: defaultSalesChannelId,
             },
           ],
         },
@@ -1906,13 +1999,9 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
           handle: 'oslo-serenity',
           description:
             'The Oslo Serenity embodies Scandinavian minimalism with clean lines and a soft, neutral palette. Its tailored silhouette and plush cushions deliver a balance of simplicity and comfort, making it perfect for those who value understated elegance.',
-          category_ids: [
-            categoryResult.find((cat) => cat.name === 'Two seater').id,
-          ],
-          collection_id: collections.find(
-            (c) => c.handle === 'scandinavian-simplicity',
-          ).id,
-          type_id: productTypes.find((pt) => pt.value === 'Sofas').id,
+          category_ids: [twoSeaterCategoryId],
+          collection_id: scandinavianSimplicityCollectionId,
+          type_id: sofasProductTypeId,
           status: ProductStatus.PUBLISHED,
           images: osloSerenityImages,
           options: [
@@ -1967,7 +2056,7 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
           ],
           sales_channels: [
             {
-              id: defaultSalesChannel[0].id,
+              id: defaultSalesChannelId,
             },
           ],
         },
@@ -2008,11 +2097,9 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
           handle: 'paloma-haven',
           description:
             'Minimalistic designs, neutral colors, and high-quality textures. Perfect for those who seek comfort with a clean and understated aesthetic. This collection brings the essence of Scandinavian elegance to your living room.',
-          category_ids: [
-            categoryResult.find((cat) => cat.name === 'One seater').id,
-          ],
-          collection_id: collections.find((c) => c.handle === 'modern-luxe').id,
-          type_id: productTypes.find((pt) => pt.value === 'Arm Chairs').id,
+          category_ids: [oneSeaterCategoryId],
+          collection_id: modernLuxeCollectionId,
+          type_id: armChairsProductTypeId,
           status: ProductStatus.PUBLISHED,
           images: palomaHavenImages,
           options: [
@@ -2086,7 +2173,7 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
           ],
           sales_channels: [
             {
-              id: defaultSalesChannel[0].id,
+              id: defaultSalesChannelId,
             },
           ],
         },
@@ -2127,11 +2214,9 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
           handle: 'savannah-grove',
           description:
             'The Savannah Grove captures the essence of boho style with its relaxed, oversized form and eclectic fabric choices. Designed for both comfort and personality, it’s the ideal piece for those who seek a cozy, free-spirited vibe in their living spaces.',
-          category_ids: [
-            categoryResult.find((cat) => cat.name === 'One seater').id,
-          ],
-          collection_id: collections.find((c) => c.handle === 'boho-chic').id,
-          type_id: productTypes.find((pt) => pt.value === 'Arm Chairs').id,
+          category_ids: [oneSeaterCategoryId],
+          collection_id: bohoChicCollectionId,
+          type_id: armChairsProductTypeId,
           status: ProductStatus.PUBLISHED,
           images: savannahGroveImages,
           options: [
@@ -2205,7 +2290,7 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
           ],
           sales_channels: [
             {
-              id: defaultSalesChannel[0].id,
+              id: defaultSalesChannelId,
             },
           ],
         },
@@ -2246,13 +2331,9 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
           handle: 'serena-meadow',
           description:
             'The Serena Meadow combines a classic silhouette with modern comfort, offering a relaxed yet polished look. Its soft upholstery and subtle curves bring a timeless elegance to any living room.',
-          category_ids: [
-            categoryResult.find((cat) => cat.name === 'Two seater').id,
-          ],
-          collection_id: collections.find(
-            (c) => c.handle === 'timeless-classics',
-          ).id,
-          type_id: productTypes.find((pt) => pt.value === 'Sofas').id,
+          category_ids: [twoSeaterCategoryId],
+          collection_id: timelessClassicsCollectionId,
+          type_id: sofasProductTypeId,
           status: ProductStatus.PUBLISHED,
           images: serenaMeadowImages,
           options: [
@@ -2326,7 +2407,7 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
           ],
           sales_channels: [
             {
-              id: defaultSalesChannel[0].id,
+              id: defaultSalesChannelId,
             },
           ],
         },
@@ -2367,11 +2448,9 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
           handle: 'sutton-royale',
           description:
             'The Sutton Royale blends eclectic design with classic bohemian comfort, featuring soft, tufted fabric and a wide, welcoming frame. Its unique style adds a touch of vintage flair to any space.',
-          category_ids: [
-            categoryResult.find((cat) => cat.name === 'Two seater').id,
-          ],
-          collection_id: collections.find((c) => c.handle === 'boho-chic').id,
-          type_id: productTypes.find((pt) => pt.value === 'Sofas').id,
+          category_ids: [twoSeaterCategoryId],
+          collection_id: bohoChicCollectionId,
+          type_id: sofasProductTypeId,
           status: ProductStatus.PUBLISHED,
           images: suttonRoyaleImages,
           options: [
@@ -2426,7 +2505,7 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
           ],
           sales_channels: [
             {
-              id: defaultSalesChannel[0].id,
+              id: defaultSalesChannelId,
             },
           ],
         },
@@ -2467,11 +2546,9 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
           handle: 'velar-loft',
           description:
             'The Velar Loft offers a refined blend of modern design and opulent comfort. Upholstered in rich fabric with sleek metallic accents, this sofa delivers both luxury and a contemporary edge, making it a striking centerpiece for sophisticated interiors.',
-          category_ids: [
-            categoryResult.find((cat) => cat.name === 'One seater').id,
-          ],
-          collection_id: collections.find((c) => c.handle === 'modern-luxe').id,
-          type_id: productTypes.find((pt) => pt.value === 'Arm Chairs').id,
+          category_ids: [oneSeaterCategoryId],
+          collection_id: modernLuxeCollectionId,
+          type_id: armChairsProductTypeId,
           status: ProductStatus.PUBLISHED,
           images: velarLoftImages,
           options: [
@@ -2526,7 +2603,7 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
           ],
           sales_channels: [
             {
-              id: defaultSalesChannel[0].id,
+              id: defaultSalesChannelId,
             },
           ],
         },
@@ -2567,11 +2644,9 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
           handle: 'velora-luxe',
           description:
             'The Velora Luxe brings a touch of luxury to bohemian design with its bold patterns and plush comfort. Its oversized shape and inviting cushions make it an ideal centerpiece for laid-back, stylish interiors.',
-          category_ids: [
-            categoryResult.find((cat) => cat.name === 'Three seater').id,
-          ],
-          collection_id: collections.find((c) => c.handle === 'boho-chic').id,
-          type_id: productTypes.find((pt) => pt.value === 'Sofas').id,
+          category_ids: [threeSeaterCategoryId],
+          collection_id: bohoChicCollectionId,
+          type_id: sofasProductTypeId,
           status: ProductStatus.PUBLISHED,
           images: veloraLuxeImages,
           options: [
@@ -2626,7 +2701,7 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
           ],
           sales_channels: [
             {
-              id: defaultSalesChannel[0].id,
+              id: defaultSalesChannelId,
             },
           ],
         },

@@ -9,8 +9,8 @@ export const SubmitButton: React.FC<React.ComponentProps<typeof Button>> = (
     <Button
       {...props}
       type="submit"
-      isLoading={isSubmitting || props.isLoading}
-      disabled={isSubmitting || props.disabled}
+      isLoading={Boolean(isSubmitting || props.isLoading)}
+      disabled={Boolean(isSubmitting || props.disabled)}
     />
   );
 };
