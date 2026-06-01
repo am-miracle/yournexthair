@@ -2,11 +2,11 @@ import { useParams, usePathname } from "next/navigation"
 
 export const useCountryCode = (
   countryOptions?: {
-    country: string | undefined
+    country: string
     region: string
-    label: string | undefined
+    label: string
   }[]
-) => {
+): string | undefined => {
   const pathName = usePathname()
   const params = useParams()
 
@@ -17,9 +17,9 @@ export const useCountryCode = (
   if (countryOptions) {
     // Check if the path contains a country code and update the current path
     const pathParts = pathName.replace(/^\//, "").split("/")
+    const firstPathPart = pathParts[0]
 
-    if (pathParts.length > 1) {
-      const firstPathPart = pathParts[0]
+    if (pathParts.length > 1 && firstPathPart) {
       const country = countryOptions.find(
         (country) => country.country === firstPathPart
       )
@@ -30,9 +30,12 @@ export const useCountryCode = (
     }
   } else {
     const pathParts = pathName.replace(/^\//, "").split("/")
+    const firstPathPart = pathParts[0]
 
-    if (pathParts.length > 1 && pathParts[0].length === 2) {
-      return pathParts[0]
+    if (pathParts.length > 1 && firstPathPart && firstPathPart.length === 2) {
+      return firstPathPart
     }
   }
+
+  return undefined
 }

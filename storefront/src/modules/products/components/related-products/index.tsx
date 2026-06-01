@@ -9,10 +9,7 @@ type RelatedProductsProps = {
   countryCode: string
 }
 
-export default async function RelatedProducts({
-  product,
-  countryCode,
-}: RelatedProductsProps) {
+export default async function RelatedProducts({ product, countryCode }: RelatedProductsProps) {
   const region = await getRegion(countryCode)
 
   if (!region) {
@@ -38,9 +35,7 @@ export default async function RelatedProducts({
     queryParams,
     countryCode,
   }).then(({ response }) => {
-    return response.products.filter(
-      (responseProduct) => responseProduct.id !== product.id
-    )
+    return response.products.filter((responseProduct) => responseProduct.id !== product.id)
   })
 
   if (!products.length) {
@@ -51,14 +46,12 @@ export default async function RelatedProducts({
     <>
       <Layout>
         <LayoutColumn className="mt-26 md:mt-36">
-          <h4 className="text-md md:text-2xl mb-8 md:mb-16">
-            Related products
-          </h4>
+          <h4 className="text-md md:text-2xl mb-8 md:mb-16">Related products</h4>
         </LayoutColumn>
       </Layout>
       <Layout className="gap-y-10 md:gap-y-16">
         {products.map((product) => (
-          <LayoutColumn key={product.id} className="!col-span-6 md:!col-span-4">
+          <LayoutColumn key={product.id} className="col-span-6! md:col-span-4!">
             <Product product={product} />
           </LayoutColumn>
         ))}

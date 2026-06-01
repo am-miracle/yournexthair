@@ -1,6 +1,4 @@
 "use client"
-
-import * as React from "react"
 import { SubmitButton } from "@modules/common/components/submit-button"
 import { Form, InputField } from "@/components/Forms"
 import { LocalizedLink } from "@/components/LocalizedLink"
@@ -12,7 +10,7 @@ import { useRouter } from "next/navigation"
 import { emailFormSchema } from "@modules/checkout/components/email"
 
 const loginFormSchema = z.object({
-  email: z.string().email(),
+  email: z.email(),
   password: z.string().min(6),
 })
 
@@ -36,7 +34,7 @@ export const LoginForm = withReactQueryProvider<{
             router.push(res.redirectUrl || "/")
           }
         },
-      }
+      },
     )
   }
   return (
@@ -58,13 +56,11 @@ export const LoginForm = withReactQueryProvider<{
         <LocalizedLink
           href="/auth/forgot-password"
           variant="underline"
-          className="self-start !pb-0 text-grayscale-500 leading-none"
+          className="self-start pb-0! text-grayscale-500 leading-none"
         >
           Forgot password?
         </LocalizedLink>
-        {!data?.success && (
-          <p className="text-red-primary text-sm">{data?.message}</p>
-        )}
+        {!data?.success && <p className="text-red-primary text-sm">{data?.message}</p>}
         <SubmitButton isLoading={isPending}>Log in</SubmitButton>
       </div>
     </Form>

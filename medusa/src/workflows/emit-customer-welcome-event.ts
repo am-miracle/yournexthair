@@ -6,7 +6,7 @@ import { emitEventStep } from '@medusajs/medusa/core-flows';
 
 const emitCustomerWelcomeEvent = createWorkflow(
   'emit-customer-welcome-event',
-  function (input: { id: string }) {
+  (input: { id: string }) => {
     emitEventStep({
       eventName: 'customer.welcome',
       data: {

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { defineWidgetConfig } from '@medusajs/admin-sdk';
-import { DetailWidgetProps, AdminCollection } from '@medusajs/framework/types';
+import type { DetailWidgetProps, AdminCollection } from '@medusajs/framework/types';
 import { Container, Heading, Button, Drawer, Text } from '@medusajs/ui';
 import { PencilSquare } from '@medusajs/icons';
 import { z } from 'zod';
@@ -132,9 +132,9 @@ const CollectionDetailsWidget = ({
     fetch(`/admin/custom/collections/${data.id}/details`, {
       credentials: 'include',
     })
-      .then((res) => res.json())
-      .then((json) => {
-        setDetails(json);
+      .then((res) => res.json() as Promise<unknown>)
+      .then((json: unknown) => {
+        setDetails(json as z.infer<typeof detailsFormSchema>);
       })
       .catch((e) => {
         console.error(e);

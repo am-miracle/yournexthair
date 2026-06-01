@@ -1,5 +1,6 @@
 import { Metadata } from "next"
 
+import { withDefinedProp } from "@lib/util/optional-props"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import StoreTemplate from "@modules/store/templates"
 
@@ -27,20 +28,18 @@ export default async function StorePage({ searchParams, params }: Params) {
 
   return (
     <StoreTemplate
-      sortBy={sortBy}
-      page={page}
       countryCode={countryCode}
-      collection={
-        !collection
-          ? undefined
-          : Array.isArray(collection)
-            ? collection
-            : [collection]
-      }
-      category={
+      {...withDefinedProp("sortBy", sortBy)}
+      {...withDefinedProp("page", page)}
+      {...withDefinedProp(
+        "collection",
+        !collection ? undefined : Array.isArray(collection) ? collection : [collection]
+      )}
+      {...withDefinedProp(
+        "category",
         !category ? undefined : Array.isArray(category) ? category : [category]
-      }
-      type={!type ? undefined : Array.isArray(type) ? type : [type]}
+      )}
+      {...withDefinedProp("type", !type ? undefined : Array.isArray(type) ? type : [type])}
     />
   )
 }

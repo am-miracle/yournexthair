@@ -1,6 +1,95 @@
-@import "tailwindcss/base";
-@import "tailwindcss/components";
-@import "tailwindcss/utilities";
+@import "tailwindcss";
+
+@plugin "tailwindcss-radix";
+@plugin "tailwindcss-animate";
+
+@source inline("{xs:,sm:,md:,lg:,xl:,}col-start-{1..13}");
+@source inline("{xs:,sm:,md:,lg:,xl:,}col-end-{1..13}");
+
+@theme {
+  --font-inter:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
+    "Noto Color Emoji";
+
+  --color-black: #050505;
+  --color-white: #fdfdfd;
+  --color-grayscale-800: #1f1f20;
+  --color-grayscale-700: #3a3a3b;
+  --color-grayscale-600: #545457;
+  --color-grayscale-500: #808080;
+  --color-grayscale-400: #a3a3a3;
+  --color-grayscale-300: #bbbbbb;
+  --color-grayscale-200: #d1d1d1;
+  --color-grayscale-100: #e7e7e7;
+  --color-grayscale-50: #f4f4f4;
+  --color-grayscale-30: #f8f8f9;
+  --color-grayscale-20: #fbfbfb;
+  --color-red-900: #bd3207;
+  --color-red-primary: #df4718;
+  --color-yellow: #ffefb7;
+  --color-fg-subtle: rgba(82, 82, 91, 1);
+  --color-fg-subtle-dark: rgba(161, 161, 170, 1);
+  --color-fg-base: rgba(24, 24, 27, 1);
+  --color-fg-base-dark: rgba(244, 244, 245, 1);
+  --color-bg-field: rgba(250, 250, 250, 1);
+  --color-bg-field-dark: rgba(255, 255, 255, 0.04);
+  --color-bg-field-hover: rgba(244, 244, 245, 1);
+  --color-bg-field-hover-dark: rgba(255, 255, 255, 0.08);
+  --color-border-base: rgba(228, 228, 231, 1);
+  --color-border-base-dark: rgba(255, 255, 255, 0.08);
+  --color-fg-muted: rgba(161, 161, 170, 1);
+  --color-fg-muted-dark: rgba(113, 113, 122, 1);
+
+  --text-3xl: 3.5rem;
+  --text-3xl--line-height: 1.4;
+  --text-2xl: 3rem;
+  --text-2xl--line-height: 1.4;
+  --text-xl: 2.5rem;
+  --text-xl--line-height: 1.4;
+  --text-lg: 2rem;
+  --text-lg--line-height: 1.4;
+  --text-md: 1.5rem;
+  --text-md--line-height: 1.4;
+  --text-sm: 1.125rem;
+  --text-sm--line-height: 1.4;
+  --text-base: 1rem;
+  --text-base--line-height: 1.4;
+  --text-xs: 0.75rem;
+  --text-xs--line-height: 1.4;
+  --text-2xs: 0.625rem;
+  --text-2xs--line-height: 1.4;
+
+  --radius-2xs: 2px;
+  --radius-xs: 4px;
+  --radius-md: 24px;
+  --radius-lg: 30px;
+
+  --breakpoint-xs: 25rem;
+  --breakpoint-2xl: 87.5rem;
+
+  --shadow-modal: 0px 0px 40px -16px rgba(0, 0, 0, 0.2);
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@utility no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  &::-webkit-scrollbar-track {
+    background-color: transparent;
+  }
+}
 
 @layer base {
   html {
@@ -14,22 +103,6 @@
   h5,
   h6 {
     @apply font-medium;
-  }
-}
-
-@layer utilities {
-  /* Chrome, Safari and Opera */
-  .no-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
-
-  .no-scrollbar::-webkit-scrollbar-track {
-    background-color: transparent;
-  }
-
-  .no-scrollbar {
-    -ms-overflow-style: none; /* IE and Edge */
-    scrollbar-width: none; /* Firefox */
   }
 }
 

@@ -4,10 +4,11 @@ import type { HttpTypes } from "@medusajs/types"
 import { twMerge } from "tailwind-merge"
 
 import PlaceholderImage from "@modules/common/icons/placeholder-image"
+import { withDefinedProp } from "@lib/util/optional-props"
 
 type ThumbnailProps = {
-  thumbnail?: HttpTypes.StoreProduct["thumbnail"]
-  images?: HttpTypes.StoreProduct["images"]
+  thumbnail?: string | null | undefined
+  images?: HttpTypes.StoreProduct["images"] | undefined
   size?: "small" | "medium" | "large" | "full" | "square" | "3/4"
   isFeatured?: boolean
   className?: string
@@ -29,26 +30,23 @@ const Thumbnail: React.FC<ThumbnailProps> = ({
       className={twMerge(
         "relative w-full overflow-hidden",
         className,
-        isFeatured && "aspect-[11/14]",
-        !isFeatured && size !== "square" && size !== "3/4" && "aspect-[9/16]",
-        size === "square" && "aspect-[1/1]",
-        size === "3/4" && "aspect-[3/4]",
-        size === "small" && "w-[180px]",
-        size === "medium" && "w-[290px]",
-        size === "large" && "w-[440px]",
-        size === "full" && "w-full"
+        isFeatured && "aspect-11/14",
+        !isFeatured && size !== "square" && size !== "3/4" && "aspect-9/16",
+        size === "square" && "aspect-square",
+        size === "3/4" && "aspect-3/4",
+        size === "small" && "w-180px",
+        size === "medium" && "w-290px",
+        size === "large" && "w-440px",
+        size === "full" && "w-full",
       )}
       data-testid={dataTestid}
     >
-      <ImageOrPlaceholder image={initialImage} size={size} />
+      <ImageOrPlaceholder {...withDefinedProp("image", initialImage)} size={size} />
     </div>
   )
 }
 
-const ImageOrPlaceholder = ({
-  image,
-  size,
-}: Pick<ThumbnailProps, "size"> & { image?: string }) => {
+const ImageOrPlaceholder = ({ image, size }: Pick<ThumbnailProps, "size"> & { image?: string }) => {
   return image ? (
     <Image
       src={image}

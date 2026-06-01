@@ -3,6 +3,7 @@ import { HttpTypes } from "@medusajs/types"
 import Image from "next/image"
 
 import { collectionMetadataCustomFieldsSchema } from "@lib/util/collections"
+import { withDefinedProp } from "@lib/util/optional-props"
 import SkeletonProductGrid from "@modules/skeletons/templates/skeleton-product-grid"
 import RefinementList from "@modules/store/components/refinement-list"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
@@ -30,7 +31,7 @@ export default async function CollectionTemplate({
   const pageNumber = page ? parseInt(page) : 1
 
   const collectionDetails = collectionMetadataCustomFieldsSchema.safeParse(
-    collection.metadata ?? {}
+    collection.metadata ?? {},
   )
 
   const [categories, types, region] = await Promise.all([
@@ -41,7 +42,7 @@ export default async function CollectionTemplate({
 
   return (
     <>
-      <div className="max-md:mt-18 relative aspect-[2/1] md:h-screen w-full max-w-full mb-8 md:mb-19">
+      <div className="max-md:mt-18 relative aspect-2/1 md:h-screen w-full max-w-full mb-8 md:mb-19">
         <Image
           src={
             collectionDetails.data?.collection_page_image?.url ||
@@ -73,7 +74,6 @@ export default async function CollectionTemplate({
                     .map((p) => p.trim())
                     .filter(Boolean)
                     .map((p, i) => (
-                      // eslint-disable-next-line react/no-array-index-key
                       <p key={i}>{p}</p>
                     ))}
                 </div>
@@ -85,35 +85,33 @@ export default async function CollectionTemplate({
         sortBy={sortBy}
         title={collection.title}
         categories={Object.fromEntries(
-          categories.product_categories.map((c) => [c.handle, c.name])
+          categories.product_categories.map((c) => [c.handle, c.name]),
         )}
-        category={category}
-        types={Object.fromEntries(
-          types.productTypes.map((t) => [t.value, t.value])
-        )}
-        type={type}
+        types={Object.fromEntries(types.productTypes.map((t) => [t.value, t.value]))}
+        {...withDefinedProp("category", category)}
+        {...withDefinedProp("type", type)}
       />
       <Suspense fallback={<SkeletonProductGrid />}>
         {region && (
           <PaginatedProducts
-            sortBy={sortBy}
             page={pageNumber}
             collectionId={collection.id}
             countryCode={countryCode}
-            categoryId={
-              !category
-                ? undefined
-                : categories.product_categories
+            {...withDefinedProp("sortBy", sortBy)}
+            {...withDefinedProp(
+              "categoryId",
+              category
+                ? categories.product_categories
                     .filter((c) => category.includes(c.handle))
                     .map((c) => c.id)
-            }
-            typeId={
-              !type
-                ? undefined
-                : types.productTypes
-                    .filter((t) => type.includes(t.value))
-                    .map((t) => t.id)
-            }
+                : undefined,
+            )}
+            {...withDefinedProp(
+              "typeId",
+              type
+                ? types.productTypes.filter((t) => type.includes(t.value)).map((t) => t.id)
+                : undefined,
+            )}
           />
         )}
       </Suspense>

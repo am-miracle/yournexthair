@@ -1,5 +1,4 @@
-import { first } from "lodash"
-import { seedGiftcard, seedUser } from "../../data/seed"
+import { seedGiftcard } from "../../data/seed"
 import { test, expect } from "../../index"
 
 test.describe("Gift card tests", async () => {

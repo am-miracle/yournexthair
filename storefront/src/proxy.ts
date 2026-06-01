@@ -14,11 +14,8 @@ const regionMapCache = {
 async function getRegionMap() {
   const { regionMap, regionMapUpdated } = regionMapCache
 
-  if (
-    !regionMap.keys().next().value ||
-    regionMapUpdated < Date.now() - 3600 * 1000
-  ) {
-    // Fetch regions from Medusa. We can't use the JS client here because middleware is running on Edge and the client needs a Node environment.
+  if (!regionMap.keys().next().value || regionMapUpdated < Date.now() - 3600 * 1000) {
+    // Fetch regions from Medusa. We can't use the JS client here because proxy runs separately from render code.
     const { regions } = await fetch(`${BACKEND_URL}/store/regions`, {
       headers: {
         "x-publishable-api-key": PUBLISHABLE_API_KEY!,
@@ -33,7 +30,6 @@ async function getRegionMap() {
       notFound()
     }
 
-    // Create a map of country codes to regions.
     regions.forEach((region: HttpTypes.StoreRegion) => {
       region.countries?.forEach((c) => {
         regionMapCache.regionMap.set(c.iso_2 ?? "", region)
@@ -46,21 +42,14 @@ async function getRegionMap() {
   return regionMapCache.regionMap
 }
 
-/**
- * Fetches regions from Medusa and sets the region cookie.
- * @param request
- * @param response
- */
 async function getCountryCode(
   request: NextRequest,
-  regionMap: Map<string, HttpTypes.StoreRegion | number>
-) {
+  regionMap: Map<string, HttpTypes.StoreRegion | number>,
+): Promise<string | undefined> {
   try {
-    let countryCode
+    let countryCode: string | undefined
 
-    const vercelCountryCode = request.headers
-      .get("x-vercel-ip-country")
-      ?.toLowerCase()
+    const vercelCountryCode = request.headers.get("x-vercel-ip-country")?.toLowerCase()
 
     const urlCountryCode = request.nextUrl.pathname.split("/")[1]?.toLowerCase()
 
@@ -75,33 +64,30 @@ async function getCountryCode(
     }
 
     return countryCode
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
     if (process.env.NODE_ENV === "development") {
       console.error(
-        "Middleware.ts: Error getting the country code. Did you set up regions in your Medusa Admin and define a NEXT_PUBLIC_MEDUSA_BACKEND_URL environment variable?"
+        "proxy.ts: Error getting the country code. Did you set up regions in your Medusa Admin and define a NEXT_PUBLIC_MEDUSA_BACKEND_URL environment variable?",
       )
     }
+
+    return undefined
   }
 }
 
-/**
- * Middleware to handle region selection and onboarding status.
- */
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const regionMap = await getRegionMap()
   const countryCode = regionMap && (await getCountryCode(request, regionMap))
+  const firstPathSegment = request.nextUrl.pathname.split("/")[1]
 
   const urlHasCountryCode =
-    countryCode && request.nextUrl.pathname.split("/")[1].includes(countryCode)
+    !!countryCode && !!firstPathSegment?.includes(countryCode)
 
-  // check if one of the country codes is in the url
   if (urlHasCountryCode) {
     return NextResponse.next()
   }
 
-  const redirectPath =
-    request.nextUrl.pathname === "/" ? "" : request.nextUrl.pathname
+  const redirectPath = request.nextUrl.pathname === "/" ? "" : request.nextUrl.pathname
 
   const queryString = request.nextUrl.search ? request.nextUrl.search : ""
 
@@ -109,7 +95,6 @@ export async function middleware(request: NextRequest) {
 
   let response = NextResponse.redirect(redirectUrl, 307)
 
-  // If no country code is set, we redirect to the relevant region.
   if (!urlHasCountryCode && countryCode) {
     redirectUrl = `${request.nextUrl.origin}/${countryCode}${redirectPath}${queryString}`
     response = NextResponse.redirect(`${redirectUrl}`, 307)
@@ -119,7 +104,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    "/((?!api|_next/static|favicon.ico|_next/image|images|robots.txt).*)",
-  ],
+  matcher: ["/((?!api|_next/static|favicon.ico|_next/image|images|robots.txt).*)"],
 }

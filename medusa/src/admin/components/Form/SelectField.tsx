@@ -1,5 +1,5 @@
 import { Label, clx, Select } from '@medusajs/ui';
-import { useController, ControllerRenderProps } from 'react-hook-form';
+import { useController, type ControllerRenderProps } from 'react-hook-form';
 
 export interface SelectFieldProps {
   className?: string;

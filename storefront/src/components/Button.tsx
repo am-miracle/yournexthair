@@ -5,17 +5,18 @@ import { twJoin, twMerge } from "tailwind-merge"
 import * as ReactAria from "react-aria-components"
 import Link, { LinkProps } from "next/link"
 import { Icon, IconNames } from "@/components/Icon"
+import { withDefinedProp } from "@lib/util/optional-props"
 
 export type ButtonOwnProps = {
-  isFullWidth?: boolean
-  iconName?: IconNames
-  iconPosition?: "start" | "end"
-  isVisuallyDisabled?: boolean
-  isLoading?: boolean
-  loadingText?: string
-  size?: "sm" | "md"
-  spinnerPosition?: "start" | "end"
-  variant?: "ghost" | "outline" | "solid" | "link" | "unstyled"
+  isFullWidth?: boolean | undefined
+  iconName?: IconNames | undefined
+  iconPosition?: "start" | "end" | undefined
+  isVisuallyDisabled?: boolean | undefined
+  isLoading?: boolean | undefined
+  loadingText?: string | undefined
+  size?: "sm" | "md" | undefined
+  spinnerPosition?: "start" | "end" | undefined
+  variant?: "ghost" | "outline" | "solid" | "link" | "unstyled" | undefined
 }
 
 export const getButtonClassNames = ({
@@ -90,7 +91,7 @@ export const Button: React.FC<ButtonProps> = ({
   <ReactAria.Button
     {...rest}
     type={type}
-    isPending={isLoading}
+    {...withDefinedProp("isPending", isLoading)}
     className={twMerge(
       getButtonClassNames({
         isFullWidth,

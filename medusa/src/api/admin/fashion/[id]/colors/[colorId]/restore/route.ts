@@ -1,18 +1,20 @@
-import { MedusaRequest, MedusaResponse } from '@medusajs/framework';
-import FashionModuleService from '../../../../../../../modules/fashion/service';
+import type { MedusaRequest, MedusaResponse } from '@medusajs/framework';
+import type FashionModuleService from '../../../../../../../modules/fashion/service';
 import { FASHION_MODULE } from '../../../../../../../modules/fashion';
 
 export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
   const fashionModuleService: FashionModuleService =
     req.scope.resolve(FASHION_MODULE);
 
-  await fashionModuleService.retrieveMaterial(req.params.id, {
+  const { id, colorId } = req.params as { id: string; colorId: string };
+
+  await fashionModuleService.retrieveMaterial(id, {
     withDeleted: true,
   });
 
-  await fashionModuleService.restoreColors(req.params.colorId);
+  await fashionModuleService.restoreColors(colorId);
 
-  const color = await fashionModuleService.retrieveColor(req.params.colorId, {
+  const color = await fashionModuleService.retrieveColor(colorId, {
     withDeleted: true,
   });
 

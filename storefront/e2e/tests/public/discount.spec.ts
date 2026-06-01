@@ -1,4 +1,4 @@
-import { seedDiscount, seedUser } from "../../data/seed"
+import { seedDiscount } from "../../data/seed"
 import { test, expect } from "../../index"
 
 test.describe("Discount tests", async () => {

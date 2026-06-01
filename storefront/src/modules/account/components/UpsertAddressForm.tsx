@@ -6,6 +6,7 @@ import { CountrySelectProps } from "@modules/checkout/components/country-select"
 import { CountrySelectField, Form, InputField } from "@/components/Forms"
 import { UiCloseButton } from "@/components/Dialog"
 import { z } from "zod"
+import { withDefinedProp, withNonNullProp } from "@lib/util/optional-props"
 import { SubmitButton } from "@modules/common/components/submit-button"
 import { customerAddressSchema, useAddressMutation } from "hooks/customer"
 import { withReactQueryProvider } from "@lib/util/react-query"
@@ -43,29 +44,29 @@ export const UpsertAddressForm = withReactQueryProvider<{
     <Form
       onSubmit={onSubmit}
       schema={customerAddressSchema}
-      defaultValues={{
-        first_name: defaultValues?.first_name,
-        last_name: defaultValues?.last_name,
-        company: defaultValues?.company,
-        address_1: defaultValues?.address_1,
-        address_2: defaultValues?.address_2,
-        phone: defaultValues?.phone,
-        city: defaultValues?.city,
-        postal_code: defaultValues?.postal_code,
-        country_code: defaultValues?.country_code,
-        province: defaultValues?.province,
-      }}
+      {...withDefinedProp(
+        "defaultValues",
+        defaultValues
+          ? {
+              ...withDefinedProp("first_name", defaultValues.first_name),
+              ...withDefinedProp("last_name", defaultValues.last_name),
+              ...withNonNullProp("company", defaultValues.company),
+              ...withDefinedProp("address_1", defaultValues.address_1),
+              ...withNonNullProp("address_2", defaultValues.address_2),
+              ...withNonNullProp("phone", defaultValues.phone),
+              ...withDefinedProp("city", defaultValues.city),
+              ...withDefinedProp("postal_code", defaultValues.postal_code),
+              ...withDefinedProp("country_code", defaultValues.country_code),
+              ...withNonNullProp("province", defaultValues.province),
+            }
+          : undefined,
+      )}
     >
-      {({ setValue, watch }) => {
+      {({ watch, formState }) => {
         const watchedValues = watch()
         const isDisabled =
           !Object.values(watchedValues).some((value) => value) ||
-          (defaultValues
-            ? !Object.entries(watchedValues).some(
-                ([key, value]) =>
-                  defaultValues[key as keyof typeof defaultValues] !== value
-              )
-            : false)
+          !formState.isDirty
         return (
           <>
             <p className="text-md mb-8 md:mb-10">
@@ -145,11 +146,9 @@ export const UpsertAddressForm = withReactQueryProvider<{
                 />
                 <CountrySelectField
                   selectProps={{
-                    region: region ?? undefined,
-                    defaultSelectedKey: defaultValues?.country_code,
+                    ...withDefinedProp("region", region),
+                    ...withNonNullProp("defaultValue", defaultValues?.country_code),
                     autoComplete: "country",
-                    onSelectionChange: (value) =>
-                      setValue("country_code", `${value}`),
                   }}
                   name="country_code"
                   className="flex-1"

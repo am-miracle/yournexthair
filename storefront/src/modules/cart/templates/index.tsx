@@ -3,7 +3,7 @@ import EmptyCartMessage from "@modules/cart/components/empty-cart-message"
 import ItemsTemplate from "@modules/cart/templates/items"
 import Summary from "@modules/cart/templates/summary"
 import { Layout, LayoutColumn } from "@/components/Layout"
-import { useCart } from "hooks/cart"
+import { useCart } from "@/hooks/cart"
 import { withReactQueryProvider } from "@lib/util/react-query"
 import SkeletonCartPage from "@modules/skeletons/templates/skeleton-cart-page"
 

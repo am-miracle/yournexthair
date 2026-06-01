@@ -1,8 +1,8 @@
 import { Module } from '@medusajs/utils';
 import Loader from './loader';
-import { MeiliSearchService } from './service';
+import { MeilisearchService } from './service';
 
 export default Module('meilisearchService', {
-  service: MeiliSearchService,
+  service: MeilisearchService,
   loaders: [Loader],
 });

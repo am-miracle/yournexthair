@@ -28,27 +28,33 @@ const CountrySelect: React.FC<CountrySelectProps> = ({
       return []
     }
 
-    return region.countries?.map((country) => ({
-      value: country.iso_2,
-      label: country.display_name,
-    }))
+    return (
+      region.countries
+        ?.flatMap((country) => {
+          if (!country?.iso_2 || !country.display_name) {
+            return []
+          }
+
+          return [
+            {
+              value: country.iso_2,
+              label: country.display_name,
+            },
+          ]
+        }) ?? []
+    )
   }, [region])
 
   return (
-    <ReactAria.Select
-      aria-label="Select country"
-      {...props}
-      placeholder={placeholder}
-    >
-      <UiSelectButton className="!h-14">
+    <ReactAria.Select aria-label="Select country" {...props} placeholder={placeholder}>
+      <UiSelectButton className="h-14!">
         <UiSelectValue className="text-base" />
         <UiSelectIcon />
       </UiSelectButton>
       <ReactAria.Popover className="w-[--trigger-width]">
         <UiSelectListBox>
-          {countryOptions?.map(({ value, label }, index) => (
-            // eslint-disable-next-line react/no-array-index-key
-            <UiSelectListBoxItem key={index} id={value}>
+          {countryOptions.map(({ value, label }) => (
+            <UiSelectListBoxItem key={value} id={value}>
               {label}
             </UiSelectListBoxItem>
           ))}

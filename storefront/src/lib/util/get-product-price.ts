@@ -52,6 +52,10 @@ export function getProductPrice({
         )
       })[0]
 
+    if (!cheapestVariant) {
+      return null
+    }
+
     return getPricesForVariant(cheapestVariant)
   }
 

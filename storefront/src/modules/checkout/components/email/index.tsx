@@ -1,6 +1,5 @@
 "use client"
 
-import React from "react"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { twJoin } from "tailwind-merge"
 import { z } from "zod"
@@ -16,18 +15,13 @@ import ErrorMessage from "@modules/checkout/components/error-message"
 import { useCustomer } from "hooks/customer"
 import { useSetEmail } from "hooks/cart"
 import { StoreCart } from "@medusajs/types"
+import { withDefinedProp } from "@/lib/util/optional-props"
 
 export const emailFormSchema = z.object({
-  email: z.string().min(3).email("Enter a valid email address."),
+  email: z.email("Enter a valid email address.").min(3),
 })
 
-const Email = ({
-  countryCode,
-  cart,
-}: {
-  countryCode: string
-  cart: StoreCart
-}) => {
+const Email = ({ countryCode, cart }: { countryCode: string; cart: StoreCart }) => {
   const searchParams = useSearchParams()
   const router = useRouter()
   const pathname = usePathname()
@@ -47,7 +41,7 @@ const Email = ({
             router.push(pathname + "?step=delivery", { scroll: false })
           }
         },
-      }
+      },
     )
   }
 
@@ -57,10 +51,7 @@ const Email = ({
         <div className="flex justify-between flex-wrap gap-5 flex-1">
           <div>
             <p
-              className={twJoin(
-                "transition-fontWeight duration-75",
-                isOpen && "font-semibold"
-              )}
+              className={twJoin("transition-[font-weight] duration-75", isOpen && "font-semibold")}
             >
               1. Email
             </p>
@@ -79,10 +70,7 @@ const Email = ({
                           redirectUrl={`/${countryCode}/checkout?step=delivery`}
                           handleCheckout={onSubmit}
                         />
-                        <UiCloseButton
-                          variant="ghost"
-                          className="absolute top-4 right-6 p-0"
-                        >
+                        <UiCloseButton variant="ghost" className="absolute top-4 right-6 p-0">
                           <Icon name="close" className="w-6 h-6" />
                         </UiCloseButton>
                       </UiDialog>
@@ -126,14 +114,10 @@ const Email = ({
                   }}
                   data-testid="shipping-email-input"
                 />
-                <SubmitButton
-                  className="mt-8"
-                  isLoading={isPending}
-                  isDisabled={!formValue}
-                >
+                <SubmitButton className="mt-8" isLoading={isPending} isDisabled={!formValue}>
                   Next
                 </SubmitButton>
-                <ErrorMessage error={data?.error} />
+                <ErrorMessage {...withDefinedProp("error", data?.error)} />
               </>
             )
           }}

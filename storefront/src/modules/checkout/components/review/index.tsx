@@ -27,10 +27,10 @@ const Review = ({ cart }: { cart: StoreCart }) => {
       <div className="flex justify-between mb-6 md:mb-8 border-t border-grayscale-200 pt-8 mt-8">
         <div>
           <p
-            className={twJoin(
-              "transition-fontWeight duration-75",
-              isOpen && "font-semibold"
-            )}
+              className={twJoin(
+                "transition-[font-weight] duration-75",
+                isOpen && "font-semibold"
+              )}
           >
             5. Review
           </p>

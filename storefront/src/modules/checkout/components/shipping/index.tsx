@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { useRouter, useSearchParams, usePathname } from "next/navigation"
 import { twJoin } from "tailwind-merge"
 import { convertToLocale } from "@lib/util/money"
@@ -24,12 +24,20 @@ const Shipping = ({ cart }: { cart: StoreCart }) => {
 
   const isOpen = searchParams.get("step") === "shipping"
 
+  const [prevIsOpen, setPrevIsOpen] = useState(isOpen)
+  if (prevIsOpen !== isOpen) {
+    setPrevIsOpen(isOpen)
+    setError(null)
+  }
+
   const { data: availableShippingMethods } = useCartShippingMethods(cart.id)
 
   const { mutate, isPending } = useSetShippingMethod({ cartId: cart.id })
   const selectedShippingMethod = availableShippingMethods?.find(
     (method) => method.id === cart.shipping_methods?.[0]?.shipping_option_id
   )
+  const selectedShippingMethodId: string | null = selectedShippingMethod?.id ?? null
+  const shippingMethodOptions = availableShippingMethods ?? []
 
   const handleSubmit = () => {
     router.push(pathname + "?step=payment", { scroll: false })
@@ -42,19 +50,15 @@ const Shipping = ({ cart }: { cart: StoreCart }) => {
     )
   }
 
-  useEffect(() => {
-    setError(null)
-  }, [isOpen])
-
   return (
     <>
       <div className="flex justify-between mb-6 md:mb-8 border-t border-grayscale-200 pt-8 mt-8">
         <div>
           <p
-            className={twJoin(
-              "transition-fontWeight duration-75",
-              isOpen && "font-semibold"
-            )}
+              className={twJoin(
+                "transition-[font-weight] duration-75",
+                isOpen && "font-semibold"
+              )}
           >
             3. Shipping
           </p>
@@ -74,7 +78,7 @@ const Shipping = ({ cart }: { cart: StoreCart }) => {
           )}
       </div>
       {isOpen ? (
-        availableShippingMethods?.length === 0 ? (
+        shippingMethodOptions.length === 0 ? (
           <div>
             <p className="text-red-900">
               There are no shipping methods available for your location. Please
@@ -85,11 +89,11 @@ const Shipping = ({ cart }: { cart: StoreCart }) => {
           <div>
             <UiRadioGroup
               className="flex flex-col gap-4 mb-8"
-              value={selectedShippingMethod?.id}
+              value={selectedShippingMethodId}
               onChange={set}
               aria-label="Shipping methods"
             >
-              {availableShippingMethods?.map((option) => (
+              {shippingMethodOptions.map((option) => (
                 <UiRadio
                   key={option.id}
                   variant="outline"

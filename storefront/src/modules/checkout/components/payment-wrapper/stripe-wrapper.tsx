@@ -6,8 +6,8 @@ import { HttpTypes } from "@medusajs/types"
 
 type StripeWrapperProps = {
   paymentSession: HttpTypes.StorePaymentSession
-  stripeKey?: string
-  stripePromise: Promise<Stripe | null> | null
+  stripeKey: string
+  stripePromise: Promise<Stripe | null>
   children: React.ReactNode
 }
 
@@ -17,10 +17,6 @@ const StripeWrapper: React.FC<StripeWrapperProps> = ({
   stripePromise,
   children,
 }) => {
-  const options: StripeElementsOptions = {
-    clientSecret: paymentSession!.data?.client_secret as string | undefined,
-  }
-
   if (!stripeKey) {
     throw new Error(
       "Stripe key is missing. Set NEXT_PUBLIC_STRIPE_KEY environment variable."
@@ -33,10 +29,16 @@ const StripeWrapper: React.FC<StripeWrapperProps> = ({
     )
   }
 
-  if (!paymentSession?.data?.client_secret) {
+  const clientSecret = paymentSession?.data?.client_secret
+
+  if (typeof clientSecret !== "string" || clientSecret.length === 0) {
     throw new Error(
       "Stripe client secret is missing. Cannot initialize Stripe."
     )
+  }
+
+  const options: StripeElementsOptions = {
+    clientSecret,
   }
 
   return (

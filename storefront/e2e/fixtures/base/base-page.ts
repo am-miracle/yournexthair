@@ -26,7 +26,7 @@ export class BasePage {
     this.categoriesList = page.getByTestId("footer-categories")
   }
 
-  async clickCategoryLink(category: string) {
+  async clickCategoryLink(_category: string) {
     const link = this.categoriesList.getByTestId("category-link")
     await link.click()
   }

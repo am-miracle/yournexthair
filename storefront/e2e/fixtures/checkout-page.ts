@@ -281,7 +281,7 @@ export class CheckoutPage extends BasePage {
     }
   }
 
-  async getDiscount(code: string) {
+  async getDiscount(_code: string) {
     const discount = this.discountRow
     const amount = discount.getByTestId("discount-amount")
     return {

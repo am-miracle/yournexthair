@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { LinkProps } from "next/link"
-import { useCountryCode } from "hooks/country-code"
+import { useCountryCode } from "@/hooks/country-code"
 import { Link, LinkOwnProps } from "@/components/Link"
 import { ButtonLink, ButtonOwnProps } from "@/components/Button"
 

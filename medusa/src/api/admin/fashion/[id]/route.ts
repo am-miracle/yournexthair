@@ -1,49 +1,52 @@
-import { MedusaRequest, MedusaResponse } from '@medusajs/framework';
-import { z } from '@medusajs/framework/zod';
-import FashionModuleService from '../../../../modules/fashion/service';
-import { FASHION_MODULE } from '../../../../modules/fashion';
+import type { MedusaRequest, MedusaResponse } from "@medusajs/framework"
+import { z } from "@medusajs/framework/zod"
+import type FashionModuleService from "../../../../modules/fashion/service"
+import { FASHION_MODULE } from "../../../../modules/fashion"
 
 export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
-  const fashionModuleService: FashionModuleService =
-    req.scope.resolve(FASHION_MODULE);
+  const { id } = req.params as { id: string; colorId: string }
 
-  const material = await fashionModuleService.retrieveMaterial(req.params.id, {
-    relations: ['colors'],
+  const fashionModuleService: FashionModuleService = req.scope.resolve(FASHION_MODULE)
+
+  const material = await fashionModuleService.retrieveMaterial(id, {
+    relations: ["colors"],
     withDeleted: true,
-  });
+  })
 
-  res.status(200).json(material);
-};
+  res.status(200).json(material)
+}
 
 const updateMaterialBodySchema = z.object({
   name: z.string().min(1),
-});
+})
 
 export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
-  const fashionModuleService: FashionModuleService =
-    req.scope.resolve(FASHION_MODULE);
+  const { id } = req.params as { id: string; colorId: string }
 
-  const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
-  const validatedData = updateMaterialBodySchema.parse(body);
+  const fashionModuleService: FashionModuleService = req.scope.resolve(FASHION_MODULE)
+
+  const body: unknown = typeof req.body === "string" ? JSON.parse(req.body) : req.body
+  const validatedData = updateMaterialBodySchema.parse(body)
 
   const material = await fashionModuleService.updateMaterials({
     ...validatedData,
-    id: req.params.id,
-  });
+    id,
+  })
 
-  res.status(200).json(material);
-};
+  res.status(200).json(material)
+}
 
 export const DELETE = async (req: MedusaRequest, res: MedusaResponse) => {
-  const fashionModuleService: FashionModuleService =
-    req.scope.resolve(FASHION_MODULE);
+  const { id } = req.params as { id: string; colorId: string }
 
-  await fashionModuleService.softDeleteMaterials(req.params.id);
+  const fashionModuleService: FashionModuleService = req.scope.resolve(FASHION_MODULE)
 
-  const material = await fashionModuleService.retrieveMaterial(req.params.id, {
-    relations: ['colors'],
+  await fashionModuleService.softDeleteMaterials(id)
+
+  const material = await fashionModuleService.retrieveMaterial(id, {
+    relations: ["colors"],
     withDeleted: true,
-  });
+  })
 
-  res.status(200).json(material);
-};
+  res.status(200).json(material)
+}

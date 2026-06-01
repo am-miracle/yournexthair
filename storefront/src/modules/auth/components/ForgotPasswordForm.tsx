@@ -8,7 +8,7 @@ import { LocalizedButtonLink } from "@/components/LocalizedLink"
 import { z } from "zod"
 
 const forgotPasswordFormSchema = z.object({
-  email: z.string().min(3).email(),
+  email: z.email().min(3),
 })
 
 export const ForgotPasswordForm: React.FC = () => {
@@ -25,14 +25,9 @@ export const ForgotPasswordForm: React.FC = () => {
   if (formState.state === "success") {
     return (
       <>
-        <h1 className="text-xl md:text-2xl mb-8">
-          Your password is waiting for you!
-        </h1>
+        <h1 className="text-xl md:text-2xl mb-8">Your password is waiting for you!</h1>
         <div className="mb-8">
-          <p>
-            We&apos;ve sent you an email with further instructions on retrieving
-            your account.
-          </p>
+          <p>We&apos;ve sent you an email with further instructions on retrieving your account.</p>
         </div>
         <LocalizedButtonLink href="/" isFullWidth>
           Back to home page
@@ -46,19 +41,12 @@ export const ForgotPasswordForm: React.FC = () => {
       <h1 className="text-xl md:text-2xl mb-8">Forgot password?</h1>
       <div className="mb-8">
         <p>
-          Enter your email address below and we will send you instructions on
-          how to reset your password.
+          Enter your email address below and we will send you instructions on how to reset your
+          password.
         </p>
       </div>
-      <InputField
-        placeholder="Email"
-        name="email"
-        className="flex-1 mb-8"
-        type="email"
-      />
-      {formState.state === "error" && (
-        <p className="text-red-primary text-sm">{formState.error}</p>
-      )}
+      <InputField placeholder="Email" name="email" className="flex-1 mb-8" type="email" />
+      {formState.state === "error" && <p className="text-red-primary text-sm">{formState.error}</p>}
       <SubmitButton isFullWidth>Reset your password</SubmitButton>
     </Form>
   )

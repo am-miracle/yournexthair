@@ -43,10 +43,7 @@ export default async function SearchPage({ params, searchParams }: Props) {
             sortBy="created_at"
             page={pageNumber}
             countryCode={countryCode}
-            collectionId={undefined}
-            categoryId={undefined}
             productsIds={results.hits.map((h) => h.id)}
-            typeId={undefined}
           />
         )}
       </Suspense>

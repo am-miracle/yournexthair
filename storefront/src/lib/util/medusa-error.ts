@@ -1,4 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function medusaError(error: any): never {
   if (error.response) {
     // The request was made and the server responded with a status code

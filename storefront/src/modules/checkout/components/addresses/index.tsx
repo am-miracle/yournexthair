@@ -4,54 +4,16 @@ import * as React from "react"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { twJoin } from "tailwind-merge"
 import compareAddresses from "@lib/util/compare-addresses"
+import { withDefinedProp } from "@lib/util/optional-props"
+import { addressesFormSchema, type AddressesFormValues, useSetShippingAddress } from "@/hooks/cart"
 import { SubmitButton } from "@modules/common/components/submit-button"
 import BillingAddress from "@modules/checkout/components/billing_address"
 import ErrorMessage from "@modules/checkout/components/error-message"
 import ShippingAddress from "@modules/checkout/components/shipping-address"
 import { Button } from "@/components/Button"
 import { Form } from "@/components/Forms"
-import { z } from "zod"
 import { useCustomer } from "hooks/customer"
-import { useSetShippingAddress } from "hooks/cart"
 import { StoreCart } from "@medusajs/types"
-
-const addressesFormSchema = z
-  .object({
-    shipping_address: z.object({
-      first_name: z.string().min(1),
-      last_name: z.string().min(1),
-      company: z.string().optional(),
-      address_1: z.string().min(1),
-      address_2: z.string().optional(),
-      city: z.string().min(1),
-      postal_code: z.string().min(1),
-      province: z.string().optional(),
-      country_code: z.string().min(2),
-      phone: z.string().optional(),
-    }),
-  })
-  .and(
-    z.discriminatedUnion("same_as_billing", [
-      z.object({
-        same_as_billing: z.literal("on"),
-      }),
-      z.object({
-        same_as_billing: z.literal("off").optional(),
-        billing_address: z.object({
-          first_name: z.string().min(1),
-          last_name: z.string().min(1),
-          company: z.string().optional(),
-          address_1: z.string().min(1),
-          address_2: z.string().optional(),
-          city: z.string().min(1),
-          postal_code: z.string().min(1),
-          province: z.string().optional(),
-          country_code: z.string().min(2),
-          phone: z.string().optional(),
-        }),
-      }),
-    ])
-  )
 
 const Addresses = ({ cart }: { cart: StoreCart }) => {
   const searchParams = useSearchParams()
@@ -60,17 +22,14 @@ const Addresses = ({ cart }: { cart: StoreCart }) => {
 
   const isOpen = searchParams.get("step") === "delivery"
 
-  const [sameAsBilling, setSameAsBilling] = React.useState(true)
+  const [sameAsBilling, setSameAsBilling] = React.useState(() => {
+    if (cart?.shipping_address && cart?.billing_address) {
+      return compareAddresses(cart.shipping_address, cart.billing_address)
+    }
+    return true
+  })
 
   const { data: customer } = useCustomer()
-
-  React.useEffect(() => {
-    if (cart?.shipping_address && cart?.billing_address) {
-      setSameAsBilling(
-        compareAddresses(cart.shipping_address, cart.billing_address)
-      )
-    }
-  }, [cart?.billing_address, cart?.shipping_address])
 
   const toggleSameAsBilling = React.useCallback(() => {
     setSameAsBilling((prev) => !prev)
@@ -78,7 +37,7 @@ const Addresses = ({ cart }: { cart: StoreCart }) => {
 
   const { mutate, isPending, data } = useSetShippingAddress()
 
-  const onSubmit = (values: z.infer<typeof addressesFormSchema>) => {
+  const onSubmit = (values: AddressesFormValues) => {
     mutate(values, {
       onSuccess: (data) => {
         if (isOpen && data.success) {
@@ -96,10 +55,10 @@ const Addresses = ({ cart }: { cart: StoreCart }) => {
       <div className="flex justify-between mb-6 md:mb-8 border-t border-grayscale-200 pt-8 mt-8">
         <div>
           <p
-            className={twJoin(
-              "transition-fontWeight duration-75",
-              isOpen && "font-semibold"
-            )}
+              className={twJoin(
+                "transition-[font-weight] duration-75",
+                isOpen && "font-semibold"
+              )}
           >
             2. Delivery details
           </p>
@@ -193,7 +152,7 @@ const Addresses = ({ cart }: { cart: StoreCart }) => {
                 >
                   Next
                 </SubmitButton>
-                <ErrorMessage error={data?.error} />
+                <ErrorMessage {...withDefinedProp("error", data?.error)} />
               </>
             )
           }}

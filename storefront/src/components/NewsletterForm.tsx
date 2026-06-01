@@ -7,26 +7,20 @@ import { LocalizedLink } from "@/components/LocalizedLink"
 import { z } from "zod"
 
 const newsletterFormSchema = z.object({
-  email: z.string().min(3).email(),
+  email: z.email().min(3),
 })
 
-export const NewsletterForm: React.FC<{ className?: string }> = ({
-  className,
-}) => {
+export const NewsletterForm: React.FC<{ className?: string }> = ({ className }) => {
   const [isSubmitted, setIsSubmitted] = React.useState(false)
 
   return (
     <div className={className}>
       <h2 className="text-md md:text-lg mb-2 md:mb-1">Join our newsletter</h2>
       {isSubmitted ? (
-        <p className="max-md:text-xs">
-          Thank you for subscribing to our newsletter!
-        </p>
+        <p className="max-md:text-xs">Thank you for subscribing to our newsletter!</p>
       ) : (
         <>
-          <p className="max-md:text-xs mb-4">
-            We will also send you our discount coupons!
-          </p>
+          <p className="max-md:text-xs mb-4">We will also send you our discount coupons!</p>
           <Form
             onSubmit={() => {
               setIsSubmitted(true)
@@ -52,11 +46,7 @@ export const NewsletterForm: React.FC<{ className?: string }> = ({
           </Form>
           <p className="text-xs text-grayscale-500">
             By subscribing you agree to with our{" "}
-            <LocalizedLink
-              href="/privacy-policy"
-              variant="underline"
-              className="!pb-0"
-            >
+            <LocalizedLink href="/privacy-policy" variant="underline" className="pb-0!">
               Privacy Policy
             </LocalizedLink>{" "}
             and provide consent to receive updates from our company.

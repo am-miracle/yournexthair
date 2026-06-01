@@ -45,7 +45,15 @@ export const getCollectionByHandle = async function (
       next: { tags: ["collections"] },
       cache: "force-cache",
     })
-    .then(({ collections }) => collections[0])
+    .then(({ collections }) => {
+      const collection = collections[0]
+
+      if (!collection) {
+        throw new Error(`Collection not found for handle: ${handle}`)
+      }
+
+      return collection
+    })
 }
 
 export const getCollectionsWithProducts = async (

@@ -2,8 +2,8 @@
 
 import { z } from "zod"
 import { redirect } from "next/navigation"
-import { revalidateTag } from "next/cache"
 import { HttpTypes } from "@medusajs/types"
+import type { AuthLoginResponse } from "@medusajs/js-sdk"
 
 import { sdk } from "@lib/config"
 import {
@@ -17,7 +17,37 @@ import {
   loginFormSchema,
   signupFormSchema,
   updateCustomerFormSchema,
-} from "hooks/customer"
+} from "@/hooks/customer"
+
+const normalizePhone = (phone: string | null | undefined): string | null =>
+  phone?.trim() ? phone : null
+
+const getAuthToken = (
+  response: AuthLoginResponse
+): string | null => (typeof response === "string" ? response : null)
+
+const hasLocation = (
+  response: AuthLoginResponse
+): response is Extract<AuthLoginResponse, { location: string }> =>
+  typeof response === "object" &&
+  response !== null &&
+  "location" in response &&
+  typeof response.location === "string"
+
+const normalizeCustomerAddress = (
+  formData: z.infer<typeof customerAddressSchema>
+): HttpTypes.StoreAddAddress => ({
+  first_name: formData.first_name,
+  last_name: formData.last_name,
+  address_1: formData.address_1,
+  city: formData.city,
+  postal_code: formData.postal_code,
+  country_code: formData.country_code,
+  company: formData.company?.trim() ? formData.company : null,
+  address_2: formData.address_2?.trim() ? formData.address_2 : null,
+  province: formData.province?.trim() ? formData.province : null,
+  phone: normalizePhone(formData.phone),
+})
 
 export const getCustomer = async function () {
   return await sdk.client
@@ -40,19 +70,17 @@ export const updateCustomer = async function (
       {
         first_name: formData.first_name,
         last_name: formData.last_name,
-        phone: formData.phone ?? undefined,
+        phone: normalizePhone(formData.phone),
       },
       {},
       await getAuthHeaders()
     )
     .then(() => {
-      revalidateTag("customer")
       return {
         state: "success" as const,
       }
     })
     .catch(() => {
-      revalidateTag("customer")
       return {
         state: "error" as const,
         error: "Failed to update customer personal information",
@@ -74,7 +102,7 @@ export async function signup(formData: z.infer<typeof signupFormSchema>) {
         email: formData.email,
         first_name: formData.first_name,
         last_name: formData.last_name,
-        phone: formData.phone ?? undefined,
+        phone: normalizePhone(formData.phone),
       },
       {},
       customHeaders
@@ -85,25 +113,30 @@ export async function signup(formData: z.infer<typeof signupFormSchema>) {
       password: formData.password,
     })
 
-    if (typeof loginToken === "object") {
+    if (hasLocation(loginToken)) {
       redirect(loginToken.location)
 
       return { success: true, customer: createdCustomer }
     }
 
-    await setAuthToken(loginToken)
+    const authToken = getAuthToken(loginToken)
+    if (!authToken) {
+      return {
+        success: false,
+        error: "Additional authentication is required to complete sign up",
+      }
+    }
+
+    await setAuthToken(authToken)
 
     await sdk.client.fetch("/store/custom/customer/send-welcome-email", {
       method: "POST",
       headers: await getAuthHeaders(),
     })
 
-    revalidateTag("customer")
-
     const cartId = await getCartId()
     if (cartId) {
       await sdk.store.cart.transferCart(cartId, {}, await getAuthHeaders())
-      revalidateTag("cart")
     }
 
     return { success: true, customer: createdCustomer }
@@ -124,17 +157,23 @@ export async function login(formData: z.infer<typeof loginFormSchema>) {
       password: formData.password,
     })
 
-    if (typeof token === "object") {
+    if (hasLocation(token)) {
       return { success: true, redirectUrl: token.location }
     }
 
-    await setAuthToken(token)
-    revalidateTag("customer")
+    const authToken = getAuthToken(token)
+    if (!authToken) {
+      return {
+        success: false,
+        message: "Additional authentication is required to complete login",
+      }
+    }
+
+    await setAuthToken(authToken)
 
     const cartId = await getCartId()
     if (cartId) {
       await sdk.store.cart.transferCart(cartId, {}, await getAuthHeaders())
-      revalidateTag("cart")
     }
     return { success: true, redirectUrl: redirectUrl || "/" }
   } catch (error) {
@@ -148,7 +187,6 @@ export async function login(formData: z.infer<typeof loginFormSchema>) {
 export async function signout(countryCode: string) {
   await sdk.auth.logout()
   await removeAuthToken()
-  revalidateTag("customer")
   return countryCode
 }
 
@@ -157,31 +195,28 @@ export const addCustomerAddress = async (
 ) => {
   return sdk.store.customer
     .createAddress(
-      {
-        first_name: formData.first_name,
-        last_name: formData.last_name,
-        company: formData.company ?? undefined,
-        address_1: formData.address_1,
-        address_2: formData.address_2 ?? undefined,
-        city: formData.city,
-        postal_code: formData.postal_code,
-        province: formData.province ?? undefined,
-        country_code: formData.country_code,
-        phone: formData.phone ?? undefined,
-      },
+      normalizeCustomerAddress(formData),
       {},
       await getAuthHeaders()
     )
     .then(({ customer }) => {
-      revalidateTag("customer")
+      const createdAddress = customer.addresses.at(-1)
+
+      if (!createdAddress?.id) {
+        return {
+          addressId: "",
+          success: false,
+          error: "Failed to determine created customer address",
+        }
+      }
+
       return {
-        addressId: customer.addresses[customer.addresses.length - 1].id,
+        addressId: createdAddress.id,
         success: true,
         error: null,
       }
     })
     .catch((err) => {
-      revalidateTag("customer")
       return { addressId: "", success: false, error: err.toString() }
     })
 }
@@ -201,7 +236,6 @@ export const deleteCustomerAddress = async (
     .catch((err) => {
       return { success: false, error: err.toString() }
     })
-  revalidateTag("customer")
 }
 
 export const updateCustomerAddress = async (
@@ -215,27 +249,14 @@ export const updateCustomerAddress = async (
   return sdk.store.customer
     .updateAddress(
       addressId,
-      {
-        first_name: formData.first_name,
-        last_name: formData.last_name,
-        company: formData.company ?? undefined,
-        address_1: formData.address_1,
-        address_2: formData.address_2 ?? undefined,
-        city: formData.city,
-        postal_code: formData.postal_code,
-        province: formData.province ?? undefined,
-        country_code: formData.country_code,
-        phone: formData.phone ?? undefined,
-      },
+      normalizeCustomerAddress(formData),
       {},
       await getAuthHeaders()
     )
     .then(() => {
-      revalidateTag("customer")
       return { addressId, success: true, error: null }
     })
     .catch((err) => {
-      revalidateTag("customer")
       return { addressId, success: false, error: err.toString() }
     })
 }
@@ -275,7 +296,6 @@ const forgotPasswordSchema = z.object({
   new_password: z.string().min(6),
   confirm_new_password: z.string().min(6),
 })
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const baseSchema = z.discriminatedUnion("type", [
   resetPasswordFormSchema,
   forgotPasswordSchema,
@@ -295,7 +315,6 @@ export async function resetPassword(
         email: validatedState.email,
         password: formData.current_password,
       })
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       return {
         ...validatedState,
@@ -329,7 +348,6 @@ export async function resetPassword(
     })
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const forgotPasswordFormSchema = z.object({
   email: z.string().email(),
 })
@@ -372,11 +390,9 @@ export async function updateDefaultShippingAddress(addressId: string) {
       await getAuthHeaders()
     )
     .then(() => {
-      revalidateTag("customer")
       return { success: true, error: null }
     })
     .catch((err) => {
-      revalidateTag("customer")
       return { success: false, error: err.toString() }
     })
 }
@@ -396,11 +412,9 @@ export async function updateDefaultBillingAddress(addressId: string) {
       await getAuthHeaders()
     )
     .then(() => {
-      revalidateTag("customer")
       return { success: true, error: null }
     })
     .catch((err) => {
-      revalidateTag("customer")
       return { success: false, error: err.toString() }
     })
 }

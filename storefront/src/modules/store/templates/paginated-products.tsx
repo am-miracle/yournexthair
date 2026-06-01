@@ -6,8 +6,8 @@ import { Layout, LayoutColumn } from "@/components/Layout"
 import { NoResults } from "@modules/store/components/no-results.tsx"
 import { withReactQueryProvider } from "@lib/util/react-query"
 import * as React from "react"
-import { useStoreProducts } from "hooks/store"
 import SkeletonProductGrid from "@modules/skeletons/templates/skeleton-product-grid"
+import { useStoreProducts } from "@/hooks/store"
 
 const PRODUCT_LIMIT = 12
 function PaginatedProducts({
@@ -32,15 +32,11 @@ function PaginatedProducts({
   }
 
   if (collectionId) {
-    queryParams["collection_id"] = Array.isArray(collectionId)
-      ? collectionId
-      : [collectionId]
+    queryParams["collection_id"] = Array.isArray(collectionId) ? collectionId : [collectionId]
   }
 
   if (categoryId) {
-    queryParams["category_id"] = Array.isArray(categoryId)
-      ? categoryId
-      : [categoryId]
+    queryParams["category_id"] = Array.isArray(categoryId) ? categoryId : [categoryId]
   }
 
   if (typeId) {
@@ -67,11 +63,13 @@ function PaginatedProducts({
     if (!loadMoreRef.current) return
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && productsQuery.hasNextPage) {
+        const firstEntry = entries[0]
+
+        if (firstEntry?.isIntersecting && productsQuery.hasNextPage) {
           productsQuery.fetchNextPage()
         }
       },
-      { rootMargin: "100px" }
+      { rootMargin: "100px" },
     )
 
     observer.observe(loadMoreRef.current)
@@ -90,7 +88,7 @@ function PaginatedProducts({
           productsQuery?.data?.pages.flatMap((page) => {
             return page?.response?.products.map((p: StoreProduct) => {
               return (
-                <LayoutColumn key={p.id} className="md:!col-span-4 !col-span-6">
+                <LayoutColumn key={p.id} className="md:col-span-4! col-span-6!">
                   <ProductPreview product={p} />
                 </LayoutColumn>
               )

@@ -6,7 +6,7 @@ import { twJoin } from "tailwind-merge"
 import { useAsyncList } from "react-stately"
 import { Hit } from "meilisearch"
 import { useRouter, useSearchParams } from "next/navigation"
-import { useCountryCode } from "hooks/country-code"
+import { useCountryCode } from "@/hooks/country-code"
 import { MeiliSearchProductHit, searchClient } from "@lib/search-client"
 import { getProductPrice } from "@lib/util/get-product-price"
 import { getProductsById } from "@lib/data/products"
@@ -36,7 +36,7 @@ export const SearchField: React.FC<{
   isInputAlwaysShown?: boolean
 }> = ({ countryOptions, isInputAlwaysShown }) => {
   const router = useRouter()
-  const [isInputShown, setIsInputShown] = React.useState(false)
+  const [isInputShown, setIsInputShown] = React.useState(isInputAlwaysShown ?? false)
   const countryCode = useCountryCode()
   const region = countryOptions.find((co) => co.country === countryCode)?.region
   const searchParams = useSearchParams()
@@ -53,12 +53,12 @@ export const SearchField: React.FC<{
           signal,
         })
       const medusaProducts = await getProductsById({
-        ids: results.hits.map((h) => h.id),
+        ids: results.hits.map((h: MeiliSearchProductHit) => h.id),
         regionId: region!,
       })
 
       return {
-        items: results.hits.map((hit) => {
+        items: results.hits.map((hit: MeiliSearchProductHit) => {
           const product = medusaProducts.find((p) => p.id === hit.id)
           return {
             ...hit,
@@ -67,7 +67,7 @@ export const SearchField: React.FC<{
             }).cheapestPrice,
           }
         }),
-        filterText,
+        filterText: filterText ?? "",
       }
     },
     initialFilterText: searchQuery ?? "",
@@ -95,7 +95,7 @@ export const SearchField: React.FC<{
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [list.filterText, router, countryCode]
+    [list.filterText, router, countryCode],
   )
 
   React.useEffect(() => {
@@ -104,11 +104,6 @@ export const SearchField: React.FC<{
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchQuery])
-
-  React.useEffect(() => {
-    if (isInputAlwaysShown) setIsInputShown(true)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
 
   return (
     <div className="flex">
@@ -132,11 +127,11 @@ export const SearchField: React.FC<{
       >
         <div
           className={twJoin(
-            "overflow-hidden transition-width duration-500 h-full max-w-40 md:max-w-30",
-            isInputShown ? "w-full md:w-30" : "md:w-0"
+            "overflow-hidden transition-[width] duration-500 h-full max-w-40 md:max-w-30",
+            isInputShown ? "w-full md:w-30" : "md:w-0",
           )}
         >
-          <Input className="px-0 disabled:bg-transparent !py-0 h-7 md:h-6 max-md:border-0 border-black rounded-none border-t-0 border-x-0 group-data-[light=true]:md:border-white group-data-[sticky=true]:md:border-black ml-2 md:ml-1" />
+          <Input className="px-0 disabled:bg-transparent py-0! h-7 md:h-6 max-md:border-0 border-black rounded-none border-t-0 border-x-0 group-data-[light=true]:md:border-white group-data-[sticky=true]:md:border-black ml-2 md:ml-1" />
         </div>
         <ReactAria.Popover
           placement="bottom end"
@@ -153,20 +148,12 @@ export const SearchField: React.FC<{
                 id={item.handle}
                 href={`/${countryCode}/products/${item.handle}`}
               >
-                <Thumbnail
-                  thumbnail={item.thumbnail}
-                  size="3/4"
-                  className="w-20"
-                />
+                <Thumbnail thumbnail={item.thumbnail} size="3/4" className="w-20" />
                 <div>
                   <p className="text-base font-normal">{item.title}</p>
-                  <p className="text-grayscale-500 text-xs">
-                    {item.variants[0]}
-                  </p>
+                  <p className="text-grayscale-500 text-xs">{item.variants[0]}</p>
                 </div>
-                <p className="text-base font-semibold ml-auto">
-                  {item.price?.calculated_price}
-                </p>
+                <p className="text-base font-semibold ml-auto">{item.price?.calculated_price}</p>
               </ReactAria.ListBoxItem>
             )}
           </ReactAria.ListBox>

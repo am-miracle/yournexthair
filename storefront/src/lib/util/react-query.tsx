@@ -11,7 +11,6 @@ export const ReactQueryProvider: React.FC<{ children?: React.ReactNode }> = ({
   )
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export const withReactQueryProvider = <T extends {}>(
   Component: React.FC<T>
 ) => {

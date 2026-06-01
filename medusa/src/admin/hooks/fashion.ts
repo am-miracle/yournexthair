@@ -1,14 +1,10 @@
-import {
-  useMutation,
-  UseMutationOptions,
-  useQueryClient,
-} from '@tanstack/react-query';
+import { useMutation, useQueryClient, type UseMutationOptions } from '@tanstack/react-query';
 
 export const useCreateMaterialMutation = (
   options:
     | Omit<
         UseMutationOptions<
-          any,
+          unknown,
           Error,
           {
             name: string;
@@ -28,7 +24,7 @@ export const useCreateMaterialMutation = (
         method: 'POST',
         body: JSON.stringify(values),
         credentials: 'include',
-      }).then((res) => res.json());
+      }).then((res) => res.json() as Promise<unknown>);
     },
     ...options,
     onSuccess: async (...args) => {
@@ -48,7 +44,7 @@ export const useCreateColorMutation = (
   options:
     | Omit<
         UseMutationOptions<
-          any,
+          unknown,
           Error,
           { name: string; hex_code: string },
           unknown
@@ -66,7 +62,7 @@ export const useCreateColorMutation = (
         method: 'POST',
         body: JSON.stringify(values),
         credentials: 'include',
-      }).then((res) => res.json());
+      }).then((res) => res.json() as Promise<unknown>);
     },
     ...options,
     onSuccess: async (...args) => {

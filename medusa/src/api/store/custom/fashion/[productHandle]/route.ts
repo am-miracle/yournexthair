@@ -1,8 +1,8 @@
-import { MedusaRequest, MedusaResponse } from '@medusajs/framework';
+import type { MedusaRequest, MedusaResponse } from '@medusajs/framework';
 import { Modules } from '@medusajs/framework/utils';
-import { IProductModuleService } from '@medusajs/framework/types';
+import type { IProductModuleService } from '@medusajs/framework/types';
 import { FASHION_MODULE } from '../../../../../modules/fashion';
-import FashionModuleService from '../../../../../modules/fashion/service';
+import type FashionModuleService from '../../../../../modules/fashion/service';
 
 export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
   const productModuleService: IProductModuleService = req.scope.resolve(
@@ -11,15 +11,22 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
   const fashionModuleService: FashionModuleService =
     req.scope.resolve(FASHION_MODULE);
 
+  const { productHandle } = req.params as { productHandle: string };
+
   const [product] = await productModuleService.listProducts(
     {
-      handle: req.params.productHandle,
+      handle: productHandle,
     },
     {
       relations: ['options', 'variants', 'variants.options'],
       take: 1,
     },
   );
+
+  if (!product) {
+    res.status(404).json({ message: 'Product not found' });
+    return;
+  }
 
   const materialOption = product.options.find(
     (option) => option.title === 'Material',
@@ -53,7 +60,7 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
     if (!materialsAndColorsNamesTree.has(materialName)) {
       materialsAndColorsNamesTree.set(materialName, colorNames);
     } else {
-      const existingColorNames = materialsAndColorsNamesTree.get(materialName);
+      const existingColorNames = materialsAndColorsNamesTree.get(materialName) ?? [];
 
       materialsAndColorsNamesTree.set(
         materialName,
@@ -77,7 +84,7 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
       name: material.name,
       colors: material.colors
         .filter((color) =>
-          materialsAndColorsNamesTree.get(material.name).includes(color.name),
+          (materialsAndColorsNamesTree.get(material.name) ?? []).includes(color.name),
         )
         .map((color) => ({
           id: color.id,

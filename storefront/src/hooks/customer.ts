@@ -1,9 +1,4 @@
-import {
-  useMutation,
-  UseMutationOptions,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query"
+import { useMutation, UseMutationOptions, useQuery, useQueryClient } from "@tanstack/react-query"
 import {
   addCustomerAddress,
   deleteCustomerAddress,
@@ -29,7 +24,7 @@ export const useCustomer = () => {
 }
 
 export const loginFormSchema = z.object({
-  email: z.string().email(),
+  email: z.email(),
   password: z.string().min(6),
   redirect_url: z.string().optional().nullable(),
 })
@@ -39,7 +34,7 @@ export const useLogin = (
     { success: boolean; redirectUrl?: string; message?: string },
     Error,
     z.infer<typeof loginFormSchema>
-  >
+  >,
 ) => {
   const queryClient = useQueryClient()
 
@@ -56,9 +51,7 @@ export const useLogin = (
   })
 }
 
-export const useSignout = (
-  options?: UseMutationOptions<string, Error, string>
-) => {
+export const useSignout = (options?: UseMutationOptions<string, Error, string>) => {
   const queryClient = useQueryClient()
 
   return useMutation({
@@ -85,7 +78,7 @@ export const useUpdateCustomer = (
     { state: "error" | "success" | "initial"; error?: string },
     Error,
     z.infer<typeof updateCustomerFormSchema>
-  >
+  >,
 ) => {
   const queryClient = useQueryClient()
 
@@ -121,16 +114,14 @@ export const useAddressMutation = (
     { addressId: string; success: boolean; error: string | null },
     Error,
     z.infer<typeof customerAddressSchema>
-  >
+  >,
 ) => {
   const queryClient = useQueryClient()
 
   return useMutation({
     mutationKey: ["add-address", "update-address"],
     mutationFn: async (values: z.infer<typeof customerAddressSchema>) => {
-      return addressId
-        ? updateCustomerAddress(addressId, values)
-        : addCustomerAddress(values)
+      return addressId ? updateCustomerAddress(addressId, values) : addCustomerAddress(values)
     },
     onSuccess: async (...args) => {
       await queryClient.invalidateQueries({ queryKey: ["customer"] })
@@ -140,9 +131,7 @@ export const useAddressMutation = (
   })
 }
 
-export const useDeleteCustomerAddress = (
-  options?: UseMutationOptions<void, Error, string>
-) => {
+export const useDeleteCustomerAddress = (options?: UseMutationOptions<void, Error, string>) => {
   const queryClient = useQueryClient()
 
   return useMutation({
@@ -159,7 +148,7 @@ export const useDeleteCustomerAddress = (
 }
 
 export const signupFormSchema = z.object({
-  email: z.string().email(),
+  email: z.email(),
   first_name: z.string().min(1),
   last_name: z.string().min(1),
   phone: z.string().optional().nullable(),
@@ -171,7 +160,7 @@ export const useSignup = (
     { success: boolean; error?: string | null; customer?: StoreCustomer },
     Error,
     z.infer<typeof signupFormSchema>
-  >
+  >,
 ) => {
   const queryClient = useQueryClient()
 

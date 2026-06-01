@@ -4,6 +4,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { useCallback } from "react"
 
 import { Layout, LayoutColumn } from "@/components/Layout"
+import { withDefinedProp } from "@lib/util/optional-props"
 import { CategoryFilter } from "@modules/store/components/refinement-list/category-filter"
 import { CollectionFilter } from "@modules/store/components/refinement-list/collection-filter"
 import { MobileFilters } from "@modules/store/components/refinement-list/mobile-filters"
@@ -82,35 +83,35 @@ const RefinementList = ({
         </h2>
         <div className="flex justify-between gap-10">
           <MobileFilters
-            collections={collections}
-            collection={collection}
-            categories={categories}
-            category={category}
-            types={types}
-            type={type}
             setMultipleQueryParams={setMultipleQueryParams}
+            {...withDefinedProp("collections", collections)}
+            {...withDefinedProp("collection", collection)}
+            {...withDefinedProp("categories", categories)}
+            {...withDefinedProp("category", category)}
+            {...withDefinedProp("types", types)}
+            {...withDefinedProp("type", type)}
           />
           <MobileSort sortBy={sortBy} setQueryParams={setQueryParams} />
           <div className="flex justify-between gap-4 max-md:hidden">
             {typeof collections !== "undefined" && (
               <CollectionFilter
                 collections={collections}
-                collection={collection}
                 setQueryParams={setQueryParams}
+                {...withDefinedProp("collection", collection)}
               />
             )}
             {typeof categories !== "undefined" && (
               <CategoryFilter
                 categories={categories}
-                category={category}
                 setQueryParams={setQueryParams}
+                {...withDefinedProp("category", category)}
               />
             )}
             {typeof types !== "undefined" && (
               <TypeFilter
                 types={types}
-                type={type}
                 setQueryParams={setQueryParams}
+                {...withDefinedProp("type", type)}
               />
             )}
           </div>

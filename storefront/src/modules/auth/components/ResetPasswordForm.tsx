@@ -57,13 +57,7 @@ export const ChangePasswordForm: React.FC<{
     { email, token, state: "initial" }
   )
 
-  const [isModalOpen, setIsModalOpen] = React.useState(false)
-
-  React.useEffect(() => {
-    if (formState.state === "success") {
-      setIsModalOpen(true)
-    }
-  }, [formState])
+  const isModalOpen = formState.state === "success"
 
   const onSubmit = (values: z.infer<typeof resetPasswordFormSchema>) => {
     React.startTransition(() => formAction(values))

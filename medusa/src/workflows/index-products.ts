@@ -5,13 +5,13 @@ import {
   WorkflowResponse,
 } from '@medusajs/framework/workflows-sdk';
 import { Modules } from '@medusajs/framework/utils';
-import { ISearchService, ProductDTO } from '@medusajs/framework/types';
+import type { ISearchService, ProductDTO } from '@medusajs/framework/types';
 
 const retrieveProductsStep = createStep(
   {
     name: 'retrieveProductsStep',
   },
-  async (input: undefined, context) => {
+  async (_, context) => {
     const productModuleService = context.container.resolve(Modules.PRODUCT);
 
     const products = await productModuleService.listProducts(undefined, {
@@ -34,9 +34,9 @@ const indexProductsStep = createStep(
     name: 'indexProductsStep',
   },
   async (input: ProductDTO[], context) => {
-    const meilisearchService = context.container.resolve(
+    const meilisearchService: ISearchService = context.container.resolve(
       'meilisearchService',
-    ) as ISearchService;
+    );
     const result = await meilisearchService.addDocuments(
       'products',
       input,
@@ -55,8 +55,6 @@ export const indexProductsWorkflow = createWorkflow(
   },
   () => {
     const products = retrieveProductsStep();
-    const result = indexProductsStep(products);
-
-    return new WorkflowResponse(result);
+    return new WorkflowResponse(indexProductsStep(products));
   },
 );

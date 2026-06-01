@@ -15,7 +15,7 @@ import {
   updateStoresWorkflow,
   uploadFilesWorkflow,
 } from '@medusajs/medusa/core-flows';
-import {
+import type {
   ExecArgs,
   IFulfillmentModuleService,
   ISalesChannelModuleService,

@@ -50,7 +50,6 @@ export const getRegion = async function (countryCode: string) {
       : regionMap.get("us")
 
     return region
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (e) {
     return null
   }

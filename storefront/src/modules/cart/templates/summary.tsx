@@ -7,7 +7,7 @@ import CartTotals from "@modules/cart/components/cart-totals"
 import DiscountCode from "@modules/cart/components/discount-code"
 import { getCheckoutStep } from "@modules/cart/utils/getCheckoutStep"
 import { Icon } from "@/components/Icon"
-import { useCustomer } from "hooks/customer"
+import { useCustomer } from "@/hooks/customer"
 import { withReactQueryProvider } from "@lib/util/react-query"
 
 type SummaryProps = {
@@ -23,11 +23,7 @@ const Summary = ({ cart }: SummaryProps) => {
     <>
       <CartTotals cart={cart} className="lg:pt-8" />
       <DiscountCode cart={cart} />
-      <LocalizedButtonLink
-        href={"/checkout?step=" + step}
-        isFullWidth
-        className="mt-6"
-      >
+      <LocalizedButtonLink href={"/checkout?step=" + step} isFullWidth className="mt-6">
         Proceed to checkout
       </LocalizedButtonLink>
       {!customer && !isPending && (
@@ -35,11 +31,7 @@ const Summary = ({ cart }: SummaryProps) => {
           <Icon name="info" />
           <p>
             Already have an account? No worries, just{" "}
-            <LocalizedLink
-              href="/auth/login"
-              variant="underline"
-              className="text-black !p-0"
-            >
+            <LocalizedLink href="/auth/login" variant="underline" className="text-black p-0!">
               log in.
             </LocalizedLink>
           </p>

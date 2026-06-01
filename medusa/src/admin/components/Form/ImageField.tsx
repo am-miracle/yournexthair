@@ -1,5 +1,5 @@
 import { Label, Button, clx } from '@medusajs/ui';
-import { DropzoneProps, useDropzone } from 'react-dropzone';
+import { useDropzone, type DropzoneProps } from 'react-dropzone';
 import { useController, useFormContext } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -20,14 +20,11 @@ export interface ImageFieldValue {
   url: string;
 }
 
-export const imageFieldSchema = (params?: z.RawCreateParams) =>
-  z.object(
-    {
-      id: z.string(),
-      url: z.string().url(),
-    },
-    params,
-  );
+export const imageFieldSchema = () =>
+  z.object({
+    id: z.string(),
+    url: z.string().url(),
+  });
 
 export const ImageField: React.FC<ImageFieldProps> = ({
   className,

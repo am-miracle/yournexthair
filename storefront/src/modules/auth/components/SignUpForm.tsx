@@ -1,11 +1,9 @@
 "use client"
 
-import * as React from "react"
-
 import { SubmitButton } from "@modules/common/components/submit-button"
 import { Form, InputField } from "@/components/Forms"
 import { z } from "zod"
-import { signupFormSchema, useSignup } from "hooks/customer"
+import { signupFormSchema, useSignup } from "@/hooks/customer"
 import { withReactQueryProvider } from "@lib/util/react-query"
 
 export const SignUpForm = withReactQueryProvider(() => {
@@ -65,9 +63,7 @@ export const SignUpForm = withReactQueryProvider(() => {
               className=" flex-1"
               inputProps={{ autoComplete: "new-password" }}
             />
-            {data?.error && (
-              <p className="text-red-primary text-sm">{data.error}</p>
-            )}
+            {data?.error && <p className="text-red-primary text-sm">{data.error}</p>}
             <SubmitButton isDisabled={isDisabled} isPending={isPending}>
               Register
             </SubmitButton>

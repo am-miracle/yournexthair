@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useContext, useEffect, useMemo, useState } from "react"
+import { useCallback, useContext, useMemo, useState } from "react"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { CreditCard } from "@medusajs/icons"
 import { CardElement } from "@stripe/react-stripe-js"
@@ -70,9 +70,11 @@ const Payment = ({ cart }: { cart: StoreCart }) => {
     })
   }
 
-  useEffect(() => {
+  const [prevIsOpen, setPrevIsOpen] = useState(isOpen)
+  if (prevIsOpen !== isOpen) {
+    setPrevIsOpen(isOpen)
     setError(null)
-  }, [isOpen])
+  }
 
   const setPaymentMethod = useSetPaymentMethod()
 
@@ -91,12 +93,21 @@ const Payment = ({ cart }: { cart: StoreCart }) => {
   const paymentMethodId = activeSession?.data?.payment_method_id as string
   const { data: paymentMethod } = useGetPaymentMethod(paymentMethodId)
 
+  const [prevPaymentMethod, setPrevPaymentMethod] = useState(paymentMethod)
+  if (prevPaymentMethod !== paymentMethod) {
+    setPrevPaymentMethod(paymentMethod)
+    if (paymentMethod) {
+      setCardBrand(capitalize(paymentMethod?.card?.brand))
+      setCardComplete(true)
+    }
+  }
+
   const paymentReady =
     activeSession &&
     cart?.shipping_methods &&
     cart?.shipping_methods.length !== 0
 
-  const handleRemoveCard = useCallback(() => {
+  const handleRemoveCard = () => {
     if (!activeSession?.id) {
       return
     }
@@ -113,18 +124,10 @@ const Payment = ({ cart }: { cart: StoreCart }) => {
           onError: () => setError("Failed to remove card"),
         }
       )
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
       setError("Failed to remove card")
     }
-  }, [activeSession?.id, setPaymentMethod])
-
-  useEffect(() => {
-    if (paymentMethod) {
-      setCardBrand(capitalize(paymentMethod?.card?.brand))
-      setCardComplete(true)
-    }
-  }, [paymentMethod])
+  }
 
   if (!cart) {
     return null
@@ -134,10 +137,10 @@ const Payment = ({ cart }: { cart: StoreCart }) => {
       <div className="flex justify-between mb-6 md:mb-8 border-t border-grayscale-200 pt-8 mt-8">
         <div>
           <p
-            className={twJoin(
-              "transition-fontWeight duration-75",
-              isOpen && "font-semibold"
-            )}
+              className={twJoin(
+                "transition-[font-weight] duration-75",
+                isOpen && "font-semibold"
+              )}
           >
             4. Payment
           </p>
@@ -152,7 +155,7 @@ const Payment = ({ cart }: { cart: StoreCart }) => {
         {availablePaymentMethods?.length && (
           <>
             <UiRadioGroup
-              value={selectedPaymentMethod}
+              value={selectedPaymentMethod ?? null}
               onChange={setSelectedPaymentMethod}
               aria-label="Payment methods"
             >

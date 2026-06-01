@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { usePathname } from "next/navigation"
-import { useCountryCode } from "hooks/country-code"
+import { useCountryCode } from "@/hooks/country-code"
 
 export const HeaderWrapper: React.FC<{ children?: React.ReactNode }> = ({
   children,
@@ -10,7 +10,7 @@ export const HeaderWrapper: React.FC<{ children?: React.ReactNode }> = ({
   const pathName = usePathname()
   const countryCode = useCountryCode()
   const currentPath = countryCode
-    ? pathName.split(`/${countryCode}`)[1]
+    ? pathName.split(`/${countryCode}`)[1] ?? "/"
     : pathName
   const isPageWithHeroImage =
     !currentPath ||

@@ -2,7 +2,6 @@
 
 import * as React from "react"
 import { twJoin, twMerge } from "tailwind-merge"
-import { EmblaCarouselType } from "embla-carousel"
 import useEmblaCarousel from "embla-carousel-react"
 import { Icon } from "@/components/Icon"
 import { IconCircle } from "@/components/IconCircle"
@@ -26,8 +25,10 @@ export const Carousel: React.FC<CarouselProps> = ({
     skipSnaps: true,
     active: true,
   })
-  const [prevBtnDisabled, setPrevBtnDisabled] = React.useState(true)
-  const [nextBtnDisabled, setNextBtnDisabled] = React.useState(true)
+  const [, setTick] = React.useState(0)
+
+  const prevBtnDisabled = emblaApi ? !emblaApi.canScrollPrev() : true
+  const nextBtnDisabled = emblaApi ? !emblaApi.canScrollNext() : true
 
   const scrollPrev = React.useCallback(
     () => emblaApi && emblaApi.scrollPrev(),
@@ -37,18 +38,19 @@ export const Carousel: React.FC<CarouselProps> = ({
     () => emblaApi && emblaApi.scrollNext(),
     [emblaApi]
   )
-  const onSelect = React.useCallback((emblaApi: EmblaCarouselType) => {
-    setPrevBtnDisabled(!emblaApi.canScrollPrev())
-    setNextBtnDisabled(!emblaApi.canScrollNext())
-  }, [])
 
   React.useEffect(() => {
     if (!emblaApi) return
 
-    onSelect(emblaApi)
-    emblaApi.on("reInit", onSelect)
-    emblaApi.on("select", onSelect)
-  }, [emblaApi, onSelect])
+    const refresh = () => setTick((t) => t + 1)
+    emblaApi.on("reInit", refresh)
+    emblaApi.on("select", refresh)
+
+    return () => {
+      emblaApi.off("reInit", refresh)
+      emblaApi.off("select", refresh)
+    }
+  }, [emblaApi])
 
   return (
     <div className={twMerge("overflow-hidden", className)}>

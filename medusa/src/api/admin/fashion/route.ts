@@ -1,6 +1,6 @@
 import { z } from '@medusajs/framework/zod';
-import { MedusaRequest, MedusaResponse } from '@medusajs/framework';
-import FashionModuleService from '../../../modules/fashion/service';
+import type { MedusaRequest, MedusaResponse } from '@medusajs/framework';
+import type FashionModuleService from '../../../modules/fashion/service';
 import { FASHION_MODULE } from '../../../modules/fashion';
 
 const materialsListQuerySchema = z.object({
@@ -41,7 +41,7 @@ export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
   const fashionModuleService: FashionModuleService =
     req.scope.resolve(FASHION_MODULE);
 
-  const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+  const body: unknown = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
   const validatedData = createMaterialBodySchema.parse(body);
 
   const material = await fashionModuleService.createMaterials(validatedData);

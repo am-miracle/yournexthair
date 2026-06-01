@@ -7,6 +7,7 @@ import LineItemUnitPrice from "@modules/common/components/line-item-unit-price"
 import Thumbnail from "@modules/products/components/thumbnail"
 import { InputNumberField } from "@/components/InputNumberField"
 import { LocalizedLink } from "@/components/LocalizedLink"
+import { withDefinedProp } from "@lib/util/optional-props"
 import { twMerge } from "tailwind-merge"
 import { useLineItemQuantityUpdater } from "hooks/cart"
 import { withReactQueryProvider } from "@lib/util/react-query"
@@ -18,24 +19,18 @@ type ItemProps = {
 
 const Item = ({ item, className }: ItemProps) => {
   const { handle } = item.variant?.product ?? {}
-  const {
-    quantity,
-    error,
-    onQuantityChange,
-    onQuantityCommit,
-    onQuantityFocus,
-    onQuantityBlur,
-  } = useLineItemQuantityUpdater({
-    lineId: item.id,
-    initialQuantity: item.quantity,
-  })
+  const { quantity, error, onQuantityChange, onQuantityCommit, onQuantityFocus, onQuantityBlur } =
+    useLineItemQuantityUpdater({
+      lineId: item.id,
+      initialQuantity: item.quantity,
+    })
   const maxQuantity = item.variant ? getVariantItemsInStock(item.variant) : 0
 
   return (
     <div
       className={twMerge(
         "border-b border-grayscale-100 py-8 lg:last:pb-0 lg:last:border-b-0",
-        className
+        className,
       )}
     >
       <div className="flex gap-6">
@@ -47,12 +42,10 @@ const Item = ({ item, className }: ItemProps) => {
             className="w-25 sm:w-30"
           />
         </LocalizedLink>
-        <div className="flex-grow flex flex-col justify-between">
+        <div className="grow flex flex-col justify-between">
           <div>
             <h2 className="sm:text-md text-base font-normal">
-              <LocalizedLink href={`/products/${handle}`}>
-                {item.product_title}
-              </LocalizedLink>
+              <LocalizedLink href={`/products/${handle}`}>{item.product_title}</LocalizedLink>
             </h2>
             <p className="text-grayscale-500 text-xs sm:text-base max-sm:mb-4">
               {item.variant?.title}
@@ -79,8 +72,8 @@ const Item = ({ item, className }: ItemProps) => {
         </div>
       </div>
       <ErrorMessage
-        error={error?.message}
         data-testid="product-error-message"
+        {...withDefinedProp("error", error?.message)}
       />
     </div>
   )

@@ -29,6 +29,7 @@ const Wrapper: React.FC<WrapperProps> = ({ children, cart }) => {
   if (
     isStripe(paymentSession?.provider_id) &&
     paymentSession &&
+    stripeKey &&
     stripePromise
   ) {
     return (

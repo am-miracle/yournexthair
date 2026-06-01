@@ -4,7 +4,6 @@ axios.defaults.baseURL = process.env.CLIENT_SERVER || "http://localhost:9000"
 let region = undefined as any
 
 export async function seedData() {
-  const axios = getOrInitAxios()
   return {
     user: await seedUser(),
   }
@@ -31,6 +30,7 @@ export async function seedUser(email?: string, password?: string) {
       }
       throw e
     }
+    throw e
   }
 }
 

@@ -8,6 +8,7 @@ import { CollectionsSlider } from "@modules/store/components/collections-slider"
 import { getCollectionsList } from "@lib/data/collections"
 import { getCategoriesList } from "@lib/data/categories"
 import { getProductTypesList } from "@lib/data/product-types"
+import { withDefinedProp } from "@lib/util/optional-props"
 import PaginatedProducts from "@modules/store/templates/paginated-products"
 import { getRegion } from "@lib/data/regions"
 
@@ -42,44 +43,47 @@ const StoreTemplate = async ({
         collections={Object.fromEntries(
           collections.collections.map((c) => [c.handle, c.title])
         )}
-        collection={collection}
         categories={Object.fromEntries(
           categories.product_categories.map((c) => [c.handle, c.name])
         )}
-        category={category}
         types={Object.fromEntries(
           types.productTypes.map((t) => [t.value, t.value])
         )}
-        type={type}
         sortBy={sortBy}
+        {...withDefinedProp("collection", collection)}
+        {...withDefinedProp("category", category)}
+        {...withDefinedProp("type", type)}
       />
       <Suspense fallback={<SkeletonProductGrid />}>
         {region && (
           <PaginatedProducts
-            sortBy={sortBy}
             page={pageNumber}
             countryCode={countryCode}
-            collectionId={
-              !collection
-                ? undefined
-                : collections.collections
+            {...withDefinedProp("sortBy", sortBy)}
+            {...withDefinedProp(
+              "collectionId",
+              collection
+                ? collections.collections
                     .filter((c) => collection.includes(c.handle))
                     .map((c) => c.id)
-            }
-            categoryId={
-              !category
-                ? undefined
-                : categories.product_categories
+                : undefined
+            )}
+            {...withDefinedProp(
+              "categoryId",
+              category
+                ? categories.product_categories
                     .filter((c) => category.includes(c.handle))
                     .map((c) => c.id)
-            }
-            typeId={
-              !type
-                ? undefined
-                : types.productTypes
+                : undefined
+            )}
+            {...withDefinedProp(
+              "typeId",
+              type
+                ? types.productTypes
                     .filter((t) => type.includes(t.value))
                     .map((t) => t.id)
-            }
+                : undefined
+            )}
           />
         )}
       </Suspense>

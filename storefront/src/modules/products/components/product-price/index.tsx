@@ -1,4 +1,5 @@
 import { getProductPrice } from "@lib/util/get-product-price"
+import { withDefinedProp } from "@lib/util/optional-props"
 import { HttpTypes } from "@medusajs/types"
 
 export default function ProductPrice({
@@ -10,7 +11,7 @@ export default function ProductPrice({
 }) {
   const { cheapestPrice, variantPrice } = getProductPrice({
     product,
-    variantId: variant?.id,
+    ...withDefinedProp("variantId", variant?.id),
   })
 
   const selectedPrice = variant ? variantPrice : cheapestPrice

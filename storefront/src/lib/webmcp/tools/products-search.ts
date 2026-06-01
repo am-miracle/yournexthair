@@ -1,6 +1,7 @@
 import { getProductsListWithSort } from "@lib/data/products"
 import { MeiliSearchProductHit, searchClient } from "@lib/search-client"
 import { getProductPrice } from "@lib/util/get-product-price"
+import { withDefinedProp, withNonNullProp } from "@lib/util/optional-props"
 import { HttpTypes } from "@medusajs/types"
 import { WebMCPTool, WebMCPToolResult } from "../types"
 
@@ -39,6 +40,8 @@ interface ProductSearchData {
     }>
   }>
 }
+
+type ProductSearchItem = ProductSearchData["products"][number]
 
 export const productsSearch = async (
   params: ProductSearchInput
@@ -80,7 +83,7 @@ export const productsSearch = async (
     }
 
     if (results) {
-      queryParams["id"] = results.hits.map((h) => h.id)
+      queryParams["id"] = results.hits.map((h: MeiliSearchProductHit) => h.id)
     }
 
     if (params.sort === "latest_arrivals") {
@@ -101,7 +104,7 @@ export const productsSearch = async (
     return {
       ok: true,
       data: {
-        products: medusaProducts.response.products.map((product) => {
+        products: medusaProducts.response.products.map((product): ProductSearchItem => {
           const { cheapestPrice } = getProductPrice({
             product,
           })
@@ -110,31 +113,48 @@ export const productsSearch = async (
             id: product.id,
             title: product.title,
             handle: product.handle,
-            thumbnail: product.thumbnail ?? undefined,
-            price: cheapestPrice
-              ? {
-                  amount: cheapestPrice.calculated_price_number,
-                  currency_code: cheapestPrice.currency_code!,
-                }
-              : undefined,
-            variants: product.variants?.map((variant) => ({
-              id: variant.id,
-              title: variant.title ?? undefined,
-              inventory_quantity: variant.inventory_quantity,
-            })),
-            options: product.options?.map((option) => ({
-              id: option.id,
-              title: option.title,
-              values: option.values?.map((valopt) => ({
-                id: valopt.id,
-                value: valopt.value,
-              })),
-            })),
             category_ids:
               product.categories?.map((category) => category.id) ?? [],
             collection_ids: product.collection ? [product.collection.id] : [],
             tags: product.tags?.map((tag) => tag.value) ?? [],
-            type_id: product.type_id ?? undefined,
+            ...withNonNullProp("thumbnail", product.thumbnail),
+            ...(cheapestPrice
+              ? {
+                  price: {
+                    amount: cheapestPrice.calculated_price_number,
+                    currency_code: cheapestPrice.currency_code!,
+                  },
+                }
+              : {}),
+            ...(product.variants
+              ? {
+                  variants: product.variants.map((variant) => ({
+                    id: variant.id,
+                    ...withNonNullProp("title", variant.title),
+                    ...withDefinedProp(
+                      "inventory_quantity",
+                      variant.inventory_quantity,
+                    ),
+                  })),
+                }
+              : {}),
+            ...(product.options
+              ? {
+                  options: product.options.map((option) => ({
+                    id: option.id,
+                    title: option.title,
+                    ...(option.values
+                      ? {
+                          values: option.values.map((valopt) => ({
+                            id: valopt.id,
+                            value: valopt.value,
+                          })),
+                        }
+                      : {}),
+                  })),
+                }
+              : {}),
+            ...withNonNullProp("type_id", product.type_id),
           }
         }),
       },

@@ -1,6 +1,7 @@
 import { Suspense } from "react"
 import { getCartQuantity } from "@lib/data/cart"
 import { Icon, IconProps } from "@/components/Icon"
+import { withConditionalProp } from "@lib/util/optional-props"
 
 const CartIconWithQuantity: React.FC<
   Omit<IconProps, "status" | "name">
@@ -8,7 +9,11 @@ const CartIconWithQuantity: React.FC<
   const quantity = await getCartQuantity()
 
   return (
-    <Icon name="case" status={quantity > 0 ? quantity : undefined} {...props} />
+    <Icon
+      name="case"
+      {...withConditionalProp(quantity > 0, "status", quantity)}
+      {...props}
+    />
   )
 }
 

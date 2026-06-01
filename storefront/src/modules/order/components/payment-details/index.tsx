@@ -8,7 +8,7 @@ type PaymentDetailsProps = {
 }
 
 const PaymentDetails = ({ order }: PaymentDetailsProps) => {
-  const payment = order.payment_collections?.[0].payments?.[0]
+  const payment = order.payment_collections?.[0]?.payments?.[0]
 
   if (!payment) {
     return (
@@ -18,7 +18,7 @@ const PaymentDetails = ({ order }: PaymentDetailsProps) => {
 
   return (
     <p className="text-grayscale-500">
-      {paymentInfoMap[payment.provider_id].title}
+      {paymentInfoMap[payment.provider_id]?.title ?? payment.provider_id}
       <br />
       {isStripe(payment.provider_id) && payment.data?.card_last4
         ? `**** **** **** ${payment.data.card_last4}`

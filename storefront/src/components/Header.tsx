@@ -19,19 +19,30 @@ const CartDrawer = dynamic(
   { loading: () => <></> }
 )
 
+type CountryOption = {
+  country: string
+  region: string
+  label: string
+}
+
 export const Header: React.FC = async () => {
   const regions = await listRegions()
 
-  const countryOptions = regions
-    .map((r) => {
-      return (r.countries ?? []).map((c) => ({
-        country: c.iso_2,
-        region: r.id,
-        label: c.display_name,
-      }))
-    })
-    .flat()
-    .sort((a, b) => (a?.label ?? "").localeCompare(b?.label ?? ""))
+  const countryOptions: CountryOption[] = regions
+    .flatMap((region) =>
+      (region.countries ?? []).flatMap((country) =>
+        country.iso_2 && country.display_name
+          ? [
+              {
+                country: country.iso_2,
+                region: region.id,
+                label: country.display_name,
+              },
+            ]
+          : []
+      )
+    )
+    .sort((a, b) => a.label.localeCompare(b.label))
 
   return (
     <>

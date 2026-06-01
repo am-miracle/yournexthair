@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
-    "lib": ["es2021"],
-    "target": "es2021",
-    "allowJs": true,
+    "lib": ["ES2022"],
+    "target": "ES2022",
+    "allowJs": false,
     "esModuleInterop": true,
     "module": "Node16",
     "moduleResolution": "Node16",
@@ -14,10 +14,17 @@
     "sourceMap": false,
     "outDir": "./.medusa/server",
     "rootDir": "./",
-    "baseUrl": ".",
     "jsx": "react-jsx",
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "exactOptionalPropertyTypes": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
+    "types": ["node", "jest"],
     "checkJs": false
   },
   "ts-node": {

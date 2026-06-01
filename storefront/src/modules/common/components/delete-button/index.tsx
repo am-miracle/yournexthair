@@ -1,7 +1,7 @@
 "use client"
 import { Icon } from "@/components/Icon"
 import { withReactQueryProvider } from "@lib/util/react-query"
-import { useDeleteLineItem } from "hooks/cart"
+import { useDeleteLineItem } from "@/hooks/cart"
 
 const DeleteButton = ({ id }: { id: string }) => {
   const { mutate, isPending } = useDeleteLineItem()

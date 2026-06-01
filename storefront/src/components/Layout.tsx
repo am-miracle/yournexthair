@@ -1,25 +1,21 @@
 import * as React from "react"
 import { twJoin, twMerge } from "tailwind-merge"
 
-export const Layout = React.forwardRef<
-  HTMLDivElement,
-  React.ComponentPropsWithRef<"div">
->(({ className, ...rest }, ref) => (
-  <div
-    {...rest}
-    ref={ref}
-    className={twMerge(
-      "mx-auto grid grid-cols-12 gap-x-4 md:gap-x-12 px-4 sm:container",
-      className
-    )}
-  />
-))
+export const Layout = React.forwardRef<HTMLDivElement, React.ComponentPropsWithRef<"div">>(
+  ({ className, ...rest }, ref) => (
+    <div
+      {...rest}
+      ref={ref}
+      className={twMerge(
+        "mx-auto grid grid-cols-12 gap-x-4 md:gap-x-12 px-4 sm:container",
+        className,
+      )}
+    />
+  ),
+)
 
 Layout.displayName = "Layout"
 
-// const fullConfig = resolveConfig(tailwindConfig);
-// const breakpointsNamesArray = Object.keys(fullConfig.theme.screens);
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const breakpointsNamesArray = ["base", "xs", "sm", "md", "lg", "xl"] as const
 
 type BreakpointsNames = (typeof breakpointsNamesArray)[number]
@@ -56,13 +52,11 @@ export const getLayoutColumnClasses = ({
   return twJoin(...startClasses, ...endClasses)
 }
 
-export const LayoutColumn: React.FC<
-  React.ComponentPropsWithRef<"div"> & LayoutOwnProps
-> = ({ start = 1, end = 13, className, ...rest }) => {
-  return (
-    <div
-      {...rest}
-      className={twMerge(getLayoutColumnClasses({ start, end }), className)}
-    />
-  )
+export const LayoutColumn: React.FC<React.ComponentPropsWithRef<"div"> & LayoutOwnProps> = ({
+  start = 1,
+  end = 13,
+  className,
+  ...rest
+}) => {
+  return <div {...rest} className={twMerge(getLayoutColumnClasses({ start, end }), className)} />
 }

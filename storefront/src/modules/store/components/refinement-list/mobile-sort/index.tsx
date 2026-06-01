@@ -47,7 +47,7 @@ export const MobileSort: React.FC<{
                 <UiRadioGroup
                   className="flex flex-col mb-5"
                   name="sortBy"
-                  defaultValue={sortBy}
+                  defaultValue={sortBy ?? null}
                   aria-label="Sort by"
                 >
                   <ReactAria.Label className="block text-md font-semibold mb-3">

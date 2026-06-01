@@ -1,108 +1,99 @@
-import { SearchTypes } from '@medusajs/types';
-import { SearchUtils } from '@medusajs/utils';
-// @ts-ignore
-import { MeiliSearch, MeiliSearchApiError, Settings } from 'meilisearch';
-import { MeiliSearchPluginOptions } from './types';
-import { logger } from '@medusajs/framework';
+import type { SearchTypes } from "@medusajs/types"
+import { SearchUtils } from "@medusajs/utils"
+// @ts-expect-error meilisearch is ESM-only; type-only import is erased at compile time
+import { Meilisearch, MeilisearchApiError } from "meilisearch"
+import type { MeilisearchPluginOptions } from "./types"
+import { logger } from "@medusajs/framework"
 
-export class MeiliSearchService extends SearchUtils.AbstractSearchService {
-  static identifier = 'meilisearch';
+type MeilisearchIndex = ReturnType<InstanceType<typeof Meilisearch>["index"]>
+type AddDocumentsArg = Parameters<MeilisearchIndex["addDocuments"]>[0][number]
+type UpdateSettingsArg = Parameters<MeilisearchIndex["updateSettings"]>[0]
+type SearchOptions = NonNullable<Parameters<MeilisearchIndex["search"]>[1]>
+type DocTransformer = (doc: Record<string, unknown>) => AddDocumentsArg
 
-  isDefault = false;
+export class MeilisearchService extends SearchUtils.AbstractSearchService {
+  static identifier = "meilisearch"
 
-  protected readonly client: MeiliSearch;
+  isDefault = false
 
-  constructor(container: any, options: MeiliSearchPluginOptions) {
-    super(container, options);
+  private readonly typedOptions: MeilisearchPluginOptions
+  protected readonly client: Meilisearch
 
-    if (process.env.NODE_ENV !== 'development') {
+  constructor(container: unknown, options: MeilisearchPluginOptions) {
+    super(container, options)
+    this.typedOptions = options
+
+    if (process.env.NODE_ENV !== "development") {
       if (!options.config?.apiKey) {
-        throw Error(
-          'MeiliSearch API key is required for production environments.',
-        );
+        throw new Error("Meilisearch API key is required for production environments.")
       }
     }
 
     if (!options.config?.host) {
-      throw Error(
-        'MeiliSearch host is required. Please provide a host in the configuration.',
-      );
+      throw new Error("Meilisearch host is required. Please provide a host in the configuration.")
     }
 
-    this.client = new MeiliSearch(options.config);
+    this.client = new Meilisearch(options.config)
   }
 
-  async createIndex(
-    indexName: string,
-    options: Record<string, unknown> = { primaryKey: 'id' },
-  ) {
-    return this.client.createIndex(indexName, options);
+  createIndex(indexName: string, options: Record<string, unknown> = { primaryKey: "id" }) {
+    return this.client.createIndex(indexName, options)
   }
 
   getIndex(indexName: string) {
-    return this.client.index(indexName);
+    return this.client.index(indexName)
   }
 
-  async addDocuments(
-    indexName: string,
-    documents: Record<string, any>[],
-    type: string,
-  ) {
-    const indexSetting = this.options.settings?.[indexName];
-    const transformer = indexSetting?.transformer ?? ((doc: any) => doc);
-    const primaryKey = indexSetting?.primaryKey ?? 'id';
+  addDocuments(indexName: string, documents: Record<string, unknown>[], _type: string) {
+    const indexSetting = this.typedOptions.settings?.[indexName]
+    const transformer: DocTransformer =
+      (indexSetting?.transformer as DocTransformer | undefined) ?? ((doc) => doc)
+    const primaryKey = indexSetting?.primaryKey ?? "id"
 
-    return this.client
-      .index(indexName)
-      .addDocuments(documents.map(transformer), { primaryKey });
+    return this.client.index(indexName).addDocuments(documents.map(transformer), { primaryKey })
   }
 
-  async replaceDocuments(
-    indexName: string,
-    documents: Record<string, any>[],
-    type: string,
-  ) {
-    return this.addDocuments(indexName, documents, type);
+  replaceDocuments(indexName: string, documents: Record<string, unknown>[], type: string) {
+    return this.addDocuments(indexName, documents, type)
   }
 
-  async deleteDocument(indexName: string, documentId: string) {
-    return this.client.index(indexName).deleteDocument(documentId);
+  deleteDocument(indexName: string, documentId: string) {
+    return this.client.index(indexName).deleteDocument(documentId)
   }
 
-  async deleteAllDocuments(indexName: string) {
-    return this.client.index(indexName).deleteAllDocuments();
+  deleteAllDocuments(indexName: string) {
+    return this.client.index(indexName).deleteAllDocuments()
   }
 
-  async search(indexName: string, query: string, options: Record<string, any>) {
-    const { paginationOptions, filter, additionalOptions } = options;
+  search(indexName: string, query: string, options: Record<string, unknown>) {
+    const { paginationOptions, filter, additionalOptions } = options
 
-    return this.client
-      .index(indexName)
-      .search(query, { filter, ...paginationOptions, ...additionalOptions });
+    return this.client.index(indexName).search(query, {
+      filter,
+      ...(paginationOptions as Record<string, unknown>),
+      ...(additionalOptions as Record<string, unknown>),
+    } as unknown as SearchOptions)
   }
 
   async updateSettings(
     indexName: string,
-    settings: SearchTypes.IndexSettings & { indexSettings: Settings },
+    settings: SearchTypes.IndexSettings & { indexSettings?: UpdateSettingsArg },
   ) {
-    const indexSettings = settings.indexSettings ?? {};
+    const indexSettings = (settings.indexSettings ?? {}) as UpdateSettingsArg
 
     try {
-      await this.client.getIndex(indexName);
+      await this.client.getIndex(indexName)
     } catch (error) {
-      if (
-        error instanceof MeiliSearchApiError &&
-        error.cause?.code === 'index_not_found'
-      ) {
+      if (error instanceof MeilisearchApiError && error.cause?.code === "index_not_found") {
         await this.createIndex(indexName, {
-          primaryKey: settings.primaryKey ?? 'id',
-        });
+          primaryKey: settings.primaryKey ?? "id",
+        })
       } else {
-        logger.error(error);
-        throw error;
+        logger.error(error instanceof Error ? error : String(error))
+        throw error
       }
     }
 
-    return this.client.index(indexName).updateSettings(indexSettings);
+    return this.client.index(indexName).updateSettings(indexSettings)
   }
 }

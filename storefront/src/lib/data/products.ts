@@ -5,6 +5,7 @@ import { HttpTypes } from "@medusajs/types"
 import { getRegion } from "@lib/data/regions"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import { sortProducts } from "@lib/util/sort-products"
+import { withDefinedProp } from "@lib/util/optional-props"
 
 export const getProductsById = async function ({
   ids,
@@ -108,7 +109,7 @@ export const getProductsList = async function ({
           count,
         },
         nextPage,
-        queryParams,
+        ...withDefinedProp("queryParams", queryParams),
       }
     })
 }
@@ -156,6 +157,6 @@ export const getProductsListWithSort = async function ({
       count,
     },
     nextPage,
-    queryParams,
+    ...withDefinedProp("queryParams", queryParams),
   }
 }

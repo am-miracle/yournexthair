@@ -3,6 +3,7 @@ import { twMerge } from "tailwind-merge"
 import * as ReactAria from "react-aria-components"
 import { UiModal, UiModalOverlay, UiModalOwnProps } from "@/components/ui/Modal"
 import { UiDialog } from "@/components/Dialog"
+import { withDefinedProp } from "@lib/util/optional-props"
 
 export interface DrawerProps
   extends Omit<ReactAria.ModalOverlayProps, "children">,
@@ -22,7 +23,7 @@ export const Drawer: React.FC<DrawerProps> = ({
   return (
     <UiModalOverlay {...rest}>
       <UiModal
-        animateFrom={animateFrom}
+        {...withDefinedProp("animateFrom", animateFrom)}
         className={twMerge(
           "flex justify-self-center overflow-y-scroll max-h-screen h-screen max-w-75 rounded-none",
           colorScheme === "light"

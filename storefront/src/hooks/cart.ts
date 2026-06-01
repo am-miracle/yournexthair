@@ -454,11 +454,13 @@ export const addressesFormSchema = z
     ])
   )
 
+export type AddressesFormValues = z.infer<typeof addressesFormSchema>
+
 export const useSetShippingAddress = (
   options?: UseMutationOptions<
     { success: boolean; error: string | null },
     Error,
-    z.infer<typeof addressesFormSchema>,
+    AddressesFormValues,
     unknown
   >
 ) => {

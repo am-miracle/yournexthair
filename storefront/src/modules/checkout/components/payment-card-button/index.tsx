@@ -5,6 +5,7 @@ import * as React from "react"
 import { HttpTypes } from "@medusajs/types"
 
 import { isStripe } from "@lib/constants"
+import { withDefinedProp } from "@lib/util/optional-props"
 import { Button } from "@/components/Button"
 import { usePathname, useRouter } from "next/navigation"
 import { useInitiatePaymentSession, useSetPaymentMethod } from "hooks/cart"
@@ -39,8 +40,8 @@ const PaymentCardButton: React.FC<PaymentButtonProps> = ({
         cart={cart}
         isLoading={isLoading}
         setIsLoading={setIsLoading}
-        cardComplete={cardComplete}
         createQueryString={createQueryString}
+        {...withDefinedProp("cardComplete", cardComplete)}
       />
     )
   }
@@ -102,12 +103,12 @@ const StripeCardPaymentButton = ({
               cart.billing_address?.first_name +
               " " +
               cart.billing_address?.last_name,
-            address_line1: cart.billing_address?.address_1 ?? undefined,
-            address_line2: cart.billing_address?.address_2 ?? undefined,
-            address_city: cart.billing_address?.city ?? undefined,
-            address_country: cart.billing_address?.country_code ?? undefined,
-            address_zip: cart.billing_address?.postal_code ?? undefined,
-            address_state: cart.billing_address?.province ?? undefined,
+            ...withDefinedProp("address_line1", cart.billing_address?.address_1),
+            ...withDefinedProp("address_line2", cart.billing_address?.address_2),
+            ...withDefinedProp("address_city", cart.billing_address?.city),
+            ...withDefinedProp("address_country", cart.billing_address?.country_code),
+            ...withDefinedProp("address_zip", cart.billing_address?.postal_code),
+            ...withDefinedProp("address_state", cart.billing_address?.province),
           })
           if (token) {
             await setPaymentMethod.mutateAsync({

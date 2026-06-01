@@ -1,5 +1,5 @@
 import { Modules } from '@medusajs/framework/utils';
-import { MedusaRequest, MedusaResponse } from '@medusajs/framework';
+import type { MedusaRequest, MedusaResponse } from '@medusajs/framework';
 import { z } from '@medusajs/framework/zod';
 
 const productTypeFieldsMetadataSchema = z.object({
@@ -15,7 +15,7 @@ export async function GET(
   req: MedusaRequest,
   res: MedusaResponse,
 ): Promise<void> {
-  const { productTypeId } = req.params;
+  const productTypeId = req.params.productTypeId!;
   const productService = req.scope.resolve(Modules.PRODUCT);
   const productType = await productService.retrieveProductType(productTypeId);
 
@@ -32,8 +32,8 @@ export async function POST(
   req: MedusaRequest,
   res: MedusaResponse,
 ): Promise<void> {
-  const { productTypeId } = req.params;
-  const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+  const productTypeId = req.params.productTypeId!;
+  const body: unknown = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
   const customFields = productTypeFieldsMetadataSchema.parse(body);
 
   const productService = req.scope.resolve(Modules.PRODUCT);

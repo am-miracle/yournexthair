@@ -1,5 +1,5 @@
-import { HttpTypes } from '@medusajs/framework/types';
-import { UseMutationOptions, useMutation } from '@tanstack/react-query';
+import type { HttpTypes } from '@medusajs/framework/types';
+import { useMutation, type UseMutationOptions } from '@tanstack/react-query';
 
 const getFileBase64EncodedContent = (file: File) => {
   return new Promise<string>((resolve, reject) => {
@@ -78,7 +78,7 @@ export const useAdminUploadImage = (
         throw new Error(res.statusText);
       }
 
-      return res.json();
+      return res.json() as Promise<HttpTypes.AdminFileListResponse>;
     },
     ...options,
   });

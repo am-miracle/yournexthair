@@ -9,6 +9,7 @@ import { productsSearchTool } from "./tools/products-search"
 import { cartManageTool } from "./tools/cart"
 import { WebMCPClient } from "./types"
 import { applyPromotionTool, removePromotionTool } from "./tools/promotion"
+import { withDefinedProp } from "@lib/util/optional-props"
 
 interface Navigator extends globalThis.Navigator {
   modelContext: {
@@ -70,9 +71,12 @@ export const registerWebMCPTools = (router?: AppRouterInstance) => {
           name: tool.name,
           description: tool.description,
           inputSchema: tool.inputSchema,
-          annotations: tool.annotations,
+          ...withDefinedProp("annotations", tool.annotations),
           execute: async (input, client) => {
-            return await tool.handler(input, { router, client })
+            return await tool.handler(input, {
+              client,
+              ...withDefinedProp("router", router),
+            })
           },
         },
         { signal: controller.signal }

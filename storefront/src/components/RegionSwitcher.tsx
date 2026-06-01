@@ -1,6 +1,5 @@
 "use client"
 
-import * as React from "react"
 import { usePathname } from "next/navigation"
 import * as ReactAria from "react-aria-components"
 import {
@@ -10,72 +9,67 @@ import {
   UiSelectListBoxItem,
   UiSelectValue,
 } from "@/components/ui/Select"
+import { withDefinedProp } from "@lib/util/optional-props"
 import { useCountryCode } from "hooks/country-code"
 import { useUpdateRegion } from "hooks/cart"
 import { withReactQueryProvider } from "@lib/util/react-query"
 
 export const RegionSwitcher = withReactQueryProvider<{
   countryOptions: {
-    country: string | undefined
+    country: string
     region: string
-    label: string | undefined
+    label: string
   }[]
   className?: string
   selectButtonClassName?: string
   selectIconClassName?: string
-}>(
-  ({
-    countryOptions,
-    className,
-    selectButtonClassName,
-    selectIconClassName,
-  }) => {
-    const pathName = usePathname()
-    const countryCode = useCountryCode(countryOptions)
-    let currentPath = pathName
+}>(({ countryOptions, className, selectButtonClassName, selectIconClassName }) => {
+  const pathName = usePathname()
+  const countryCode = useCountryCode(countryOptions)
+  let currentPath = pathName
 
-    const updateRegion = useUpdateRegion()
+  const updateRegion = useUpdateRegion()
 
-    if (countryCode) {
-      currentPath = pathName.split(`/${countryCode}`)[1]
-    }
-
-    return (
-      <ReactAria.Select
-        selectedKey={`${countryCode}`}
-        onSelectionChange={(key) => {
-          updateRegion.mutate({ countryCode: `${key}`, currentPath })
-        }}
-        className={className}
-        aria-label="Select country"
-      >
-        <UiSelectButton variant="ghost" className={selectButtonClassName}>
-          <UiSelectValue>
-            {(item) =>
-              typeof item.selectedItem === "object" &&
-              item.selectedItem !== null &&
-              "country" in item.selectedItem &&
-              typeof item.selectedItem.country === "string"
-                ? item.selectedItem.country.toUpperCase()
-                : item.defaultChildren
-            }
-          </UiSelectValue>
-          <UiSelectIcon className={selectIconClassName} />
-        </UiSelectButton>
-        <ReactAria.Popover placement="bottom right" className="max-w-61 w-full">
-          <UiSelectListBox>
-            {countryOptions.map((country) => (
-              <UiSelectListBoxItem
-                key={country.country}
-                id={country.country}
-                value={country}
-              >
-                {country.label}
-              </UiSelectListBoxItem>
-            ))}
-          </UiSelectListBox>
-        </ReactAria.Popover>
-      </ReactAria.Select>
-    )
+  if (countryCode) {
+    currentPath = pathName.split(`/${countryCode}`)[1] ?? "/"
   }
-)
+
+  return (
+    <ReactAria.Select
+      value={countryCode ?? null}
+      onChange={(value) => {
+        if (typeof value === "string" && value.length > 0) {
+          updateRegion.mutate({ countryCode: value, currentPath })
+        }
+      }}
+      {...withDefinedProp("className", className)}
+      aria-label="Select country"
+    >
+      <UiSelectButton
+        variant="ghost"
+        {...withDefinedProp("className", selectButtonClassName)}
+      >
+        <UiSelectValue>
+          {(item) =>
+            typeof item.selectedItems[0] === "object" &&
+            item.selectedItems[0] !== null &&
+            "country" in item.selectedItems[0] &&
+            typeof item.selectedItems[0].country === "string"
+              ? item.selectedItems[0].country.toUpperCase()
+              : item.defaultChildren
+          }
+        </UiSelectValue>
+        <UiSelectIcon className={selectIconClassName} />
+      </UiSelectButton>
+      <ReactAria.Popover placement="bottom right" className="max-w-61 w-full">
+        <UiSelectListBox>
+          {countryOptions.map((country) => (
+            <UiSelectListBoxItem key={country.country} id={country.country} value={country}>
+              {country.label}
+            </UiSelectListBoxItem>
+          ))}
+        </UiSelectListBox>
+      </ReactAria.Popover>
+    </ReactAria.Select>
+  )
+})

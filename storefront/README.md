@@ -185,7 +185,7 @@ For the new version, the main folder structure remains unchanged. The contents h
     ├── modules
     ├── styles
     ├── types
-    └── middleware.ts
+    └── proxy.ts
 
 ```
 
@@ -249,7 +249,7 @@ This is where all the components, templates and Server Actions are, grouped by s
 
 Contains global TypeScript type defintions.
 
-### `middleware.ts`
+### `proxy.ts`
 
 Next.js Middleware, which is basically an Edge function that runs before (almost) every request. In our case it enforces a `countryCode` in the url. So when a user visits any url on your storefront without a `countryCode` param, it will redirect the user to the url for the most relevant region.
 

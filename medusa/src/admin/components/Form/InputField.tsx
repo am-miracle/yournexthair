@@ -1,5 +1,5 @@
 import { Input, Label, clx } from '@medusajs/ui';
-import { useController, ControllerRenderProps } from 'react-hook-form';
+import { useController, type ControllerRenderProps } from 'react-hook-form';
 
 export interface InputFieldProps {
   className?: string;

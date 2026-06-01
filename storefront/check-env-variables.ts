@@ -1,6 +1,11 @@
-const c = require("ansi-colors")
+import c from "ansi-colors"
 
-const requiredEnvs = [
+type RequiredEnv = {
+  key: string
+  description: string
+}
+
+const requiredEnvs: RequiredEnv[] = [
   {
     key: "NEXT_PUBLIC_MEDUSA_BACKEND_URL",
     description:
@@ -28,21 +33,17 @@ const requiredEnvs = [
   },
 ]
 
-function checkEnvVariables() {
-  const missingEnvs = requiredEnvs.filter((env) => {
-    return !process.env[env.key]
-  })
+export default function checkEnvVariables(): void {
+  const missingEnvs = requiredEnvs.filter((env) => !process.env[env.key])
 
   if (missingEnvs.length > 0) {
     console.error(
-      c.red.bold("\n🚫 Error: Missing required environment variables\n")
+      c.red.bold("\nError: Missing required environment variables\n")
     )
 
     missingEnvs.forEach((env) => {
       console.error(c.yellow(`  ${c.bold(env.key)}`))
-      if (env.description) {
-        console.error(c.dim(`    ${env.description}\n`))
-      }
+      console.error(c.dim(`    ${env.description}\n`))
     })
 
     console.error(
@@ -54,5 +55,3 @@ function checkEnvVariables() {
     process.exit(1)
   }
 }
-
-module.exports = checkEnvVariables

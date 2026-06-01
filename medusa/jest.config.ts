@@ -1,7 +1,10 @@
-const { loadEnv } = require('@medusajs/utils')
-loadEnv('test', process.cwd())
+import type { Config } from "jest"
 
-module.exports = {
+import { loadEnv } from "@medusajs/utils"
+
+loadEnv("test", process.cwd())
+
+const config: Config = {
   transform: {
     "^.+\\.[jt]s$": [
       "@swc/jest",
@@ -18,9 +21,11 @@ module.exports = {
 }
 
 if (process.env.TEST_TYPE === "integration:http") {
-  module.exports.testMatch = ["**/integration-tests/http/*.spec.[jt]s"]
+  config.testMatch = ["**/integration-tests/http/*.spec.[jt]s"]
 } else if (process.env.TEST_TYPE === "integration:modules") {
-  module.exports.testMatch = ["**/src/modules/*/__tests__/**/*.[jt]s"]
+  config.testMatch = ["**/src/modules/*/__tests__/**/*.[jt]s"]
 } else if (process.env.TEST_TYPE === "unit") {
-  module.exports.testMatch = ["**/src/**/__tests__/**/*.unit.spec.[jt]s"]
+  config.testMatch = ["**/src/**/__tests__/**/*.unit.spec.[jt]s"]
 }
+
+export default config

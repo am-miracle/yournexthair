@@ -23,7 +23,7 @@ export const EditMaterialDrawer: React.FC<{
         method: 'POST',
         body: JSON.stringify(values),
         credentials: 'include',
-      }).then((res) => res.json());
+      }).then((res) => res.json() as Promise<unknown>);
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({

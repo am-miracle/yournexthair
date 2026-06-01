@@ -1,18 +1,23 @@
-import { SearchTypes } from '@medusajs/types';
-// @ts-ignore
-import type { Config, Settings } from 'meilisearch';
+import type { SearchTypes } from '@medusajs/types'
+// @ts-expect-error meilisearch is ESM-only; type-only import is erased at compile time
+import type { Meilisearch } from 'meilisearch'
 
-export interface MeiliSearchPluginOptions {
-  /**
-   * MeiliSearch client configuration
-   */
-  config: Config;
+// Extract the settings type the client actually expects, without importing Settings by name
+type MeilisearchNativeSettings = Parameters<
+  ReturnType<InstanceType<typeof Meilisearch>['index']>['updateSettings']
+>[0]
 
-  /**
-   * MeiliSearch index settings
-   */
+export interface MeilisearchPluginOptions {
+  config: {
+    host: string
+    apiKey?: string
+    clientAgents?: string[]
+    timeout?: number
+  }
   settings?: Record<
     string,
-    SearchTypes.IndexSettings & { indexSettings: Settings }
-  >;
+    SearchTypes.IndexSettings & {
+      indexSettings?: MeilisearchNativeSettings
+    }
+  >
 }

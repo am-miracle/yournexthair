@@ -37,5 +37,13 @@ export const getProductTypeByHandle = async function (
       next: { tags: ["product-types"] },
       cache: "force-cache",
     })
-    .then(({ product_types }) => product_types[0])
+    .then(({ product_types }) => {
+      const productType = product_types[0]
+
+      if (!productType) {
+        throw new Error(`Product type not found for handle: ${handle}`)
+      }
+
+      return productType
+    })
 }

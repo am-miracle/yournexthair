@@ -1,4 +1,4 @@
-import { MeiliSearch } from "meilisearch"
+import { Meilisearch } from "meilisearch"
 
 const endpoint =
   process.env.NEXT_PUBLIC_SEARCH_ENDPOINT || "http://localhost:7700"
@@ -13,7 +13,7 @@ export interface MeiliSearchProductHit {
   variants: string[]
 }
 
-export const searchClient = new MeiliSearch({
+export const searchClient = new Meilisearch({
   host: endpoint,
   apiKey,
 })

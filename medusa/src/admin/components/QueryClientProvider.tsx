@@ -16,10 +16,10 @@ export const QueryClientProvider: React.FC<{ children: React.ReactNode }> = ({
   );
 };
 
-export const withQueryClient = <P extends unknown = {}>(
+export const withQueryClient = <P extends object>(
   Component: React.ComponentType<P>,
 ) => {
-  return (props: P & JSX.IntrinsicAttributes) => (
+  return (props: P) => (
     <QueryClientProvider>
       <Component {...props} />
     </QueryClientProvider>

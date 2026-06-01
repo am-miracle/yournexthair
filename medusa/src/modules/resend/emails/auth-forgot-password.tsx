@@ -1,16 +1,12 @@
-// External components
-import { Text, Heading, Button } from '@react-email/components';
+import { Text, Heading, Button } from "@react-email/components"
 
-// Types
-import { CustomerDTO } from '@medusajs/framework/types';
-
-// Components
-import EmailLayout, { EmailLayoutProps } from './components/EmailLayout';
+import type { CustomerDTO } from "@medusajs/framework/types"
+import EmailLayout, { type EmailLayoutProps } from "./components/EmailLayout"
 
 type Props = {
-  customer: Pick<CustomerDTO, 'id' | 'email' | 'first_name' | 'last_name'>;
-  token: string;
-};
+  customer: Pick<CustomerDTO, "id" | "email" | "first_name" | "last_name">
+  token: string
+}
 
 export default function AuthPasswordForgotResetEmail({
   customer,
@@ -19,16 +15,14 @@ export default function AuthPasswordForgotResetEmail({
 }: Props & EmailLayoutProps) {
   return (
     <EmailLayout {...emailLayoutProps}>
-      <Heading className="text-2xl mt-0 mb-10 font-medium">
-        Reset your password
-      </Heading>
-      <Text className="text-md !mb-10">
-        We received a request to reset your Sofa Society account password. Click
-        below to set a new password:
+      <Heading className="text-2xl mt-0 mb-10 font-medium">Reset your password</Heading>
+      <Text className="text-md mb-10!">
+        We received a request to reset your Sofa Society account password. Click below to set a new
+        password:
       </Text>
       <Button
         href={`${
-          process.env.STOREFRONT_URL || 'http://localhost:8000'
+          process.env.STOREFRONT_URL || "http://localhost:8000"
         }/auth/forgot-password/reset?email=${encodeURIComponent(
           customer.email,
         )}&token=${encodeURIComponent(token)}`}
@@ -37,19 +31,19 @@ export default function AuthPasswordForgotResetEmail({
         Reset password
       </Button>
       <Text className="text-md text-grayscale-500 m-0">
-        If you didn&apos;t request this change, please ignore this email, and
-        your current password will remain unchanged.
+        If you didn&apos;t request this change, please ignore this email, and your current password
+        will remain unchanged.
       </Text>
     </EmailLayout>
-  );
+  )
 }
 
 AuthPasswordForgotResetEmail.PreviewProps = {
   customer: {
-    id: '1',
-    email: 'example@medusa.local',
-    first_name: 'John',
-    last_name: 'Doe',
+    id: "1",
+    email: "example@medusa.local",
+    first_name: "John",
+    last_name: "Doe",
   },
-  token: '1234567789012345677890',
-} satisfies Props;
+  token: "1234567789012345677890",
+} satisfies Props

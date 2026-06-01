@@ -1,0 +1,16 @@
+.next
+out
+coverage
+jest-coverage
+node_modules
+public
+dist
+build
+.yarn
+yarn.lock
+package-lock.json
+pnpm-lock.yaml
+*.log
+*.snap
+*.min.js
+*.min.css

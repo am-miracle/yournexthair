@@ -49,7 +49,6 @@ test.describe("Login Page functionality", async () => {
   })
 
   test("logging out works correctly", async ({
-    page,
     accountOverviewPage,
     loginPage,
   }) => {

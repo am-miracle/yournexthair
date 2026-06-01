@@ -4,13 +4,15 @@ import * as React from "react"
 import { usePathname } from "next/navigation"
 import { twJoin } from "tailwind-merge"
 
-import { useCountryCode } from "hooks/country-code"
+import { useCountryCode } from "@/hooks/country-code"
 import { LocalizedLink } from "@/components/LocalizedLink"
 
 export const SidebarNav: React.FC = () => {
   const pathName = usePathname()
   const countryCode = useCountryCode()
-  const currentPath = pathName.split(`/${countryCode}`)[1]
+  const currentPath = countryCode
+    ? pathName.split(`/${countryCode}`)[1] ?? "/account"
+    : pathName
 
   return (
     <>

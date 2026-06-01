@@ -1,8 +1,5 @@
 import * as QueryConfig from './query-config';
-import {
-  MiddlewareRoute,
-  validateAndTransformQuery,
-} from '@medusajs/framework/http';
+import { validateAndTransformQuery, type MiddlewareRoute } from '@medusajs/framework/http';
 import {
   AdminGetProductTypeParams,
   AdminGetProductTypesParams,

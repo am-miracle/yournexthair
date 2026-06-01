@@ -1,4 +1,4 @@
-import {
+import type {
   AuthenticatedMedusaRequest,
   MedusaResponse,
 } from '@medusajs/framework';

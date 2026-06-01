@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation"
 
 import Spinner from "@modules/common/icons/spinner"
 import { isManual, isPaypal, isStripe } from "@lib/constants"
+import { withDefinedProp } from "@lib/util/optional-props"
 import { Button } from "@/components/Button"
 import ErrorMessage from "@modules/checkout/components/error-message"
 import { usePlaceOrder } from "hooks/cart"
@@ -164,7 +165,7 @@ const StripePaymentButton = ({
       >
         Place order
       </Button>
-      <ErrorMessage error={errorMessage} />
+      <ErrorMessage {...withDefinedProp("error", errorMessage)} />
     </>
   )
 }
@@ -240,10 +241,12 @@ const PayPalPaymentButton = ({
           onApprove={handlePayment}
           disabled={notReady || submitting || isPending}
         />
-        <ErrorMessage error={errorMessage} />
+        <ErrorMessage {...withDefinedProp("error", errorMessage)} />
       </>
     )
   }
+
+  return null
 }
 
 const ManualTestPaymentButton = ({ notReady }: { notReady: boolean }) => {
@@ -283,7 +286,7 @@ const ManualTestPaymentButton = ({ notReady }: { notReady: boolean }) => {
       >
         Place order
       </Button>
-      <ErrorMessage error={errorMessage} />
+      <ErrorMessage {...withDefinedProp("error", errorMessage)} />
     </>
   )
 }

@@ -6,6 +6,7 @@ import { z } from "zod"
 
 import { UiCloseButton } from "@/components/Dialog"
 import { Form, InputField } from "@/components/Forms"
+import { withDefinedProp } from "@lib/util/optional-props"
 import { SubmitButton } from "@modules/common/components/submit-button"
 import { updateCustomerFormSchema, useUpdateCustomer } from "hooks/customer"
 import { withReactQueryProvider } from "@lib/util/react-query"
@@ -14,7 +15,7 @@ export const PersonalInfoForm = withReactQueryProvider<{
   defaultValues?: {
     first_name: string
     last_name: string
-    phone?: string
+    phone?: string | null
   }
 }>(({ defaultValues }) => {
   const { mutate, isPending, data } = useUpdateCustomer()
@@ -33,18 +34,13 @@ export const PersonalInfoForm = withReactQueryProvider<{
     <Form
       onSubmit={onSubmit}
       schema={updateCustomerFormSchema}
-      defaultValues={defaultValues}
+      {...withDefinedProp("defaultValues", defaultValues)}
     >
-      {({ watch }) => {
+      {({ watch, formState }) => {
         const formData = watch()
         const isDisabled =
           !Object.values(formData).some((value) => value) ||
-          (defaultValues
-            ? !Object.entries(formData).some(
-                ([key, value]) =>
-                  defaultValues[key as keyof typeof defaultValues] !== value
-              )
-            : false)
+          !formState.isDirty
         return (
           <>
             <p className="text-md mb-8 sm:mb-10">Personal information</p>

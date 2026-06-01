@@ -4,56 +4,46 @@
 
 import * as React from "react"
 import { twJoin, twMerge } from "tailwind-merge"
-import { EmblaCarouselType } from "embla-carousel"
 import useEmblaCarousel from "embla-carousel-react"
 import { Icon } from "@/components/Icon"
 import { IconCircle } from "@/components/IconCircle"
 
-export const ProductPageGallery: React.FC<
-  React.ComponentPropsWithRef<"div">
-> = ({ children, className }) => {
+export const ProductPageGallery: React.FC<React.ComponentPropsWithRef<"div">> = ({
+  children,
+  className,
+}) => {
   const [emblaRef, emblaApi] = useEmblaCarousel({
     containScroll: "trimSnaps",
     skipSnaps: true,
   })
-  const [prevBtnDisabled, setPrevBtnDisabled] = React.useState(true)
-  const [nextBtnDisabled, setNextBtnDisabled] = React.useState(true)
+  const [, setTick] = React.useState(0)
 
-  const [selectedIndex, setSelectedIndex] = React.useState(0)
-  const [scrollSnaps, setScrollSnaps] = React.useState<number[]>([])
+  const prevBtnDisabled = emblaApi ? !emblaApi.canScrollPrev() : true
+  const nextBtnDisabled = emblaApi ? !emblaApi.canScrollNext() : true
+  const selectedIndex = emblaApi?.selectedScrollSnap() ?? 0
+  const scrollSnaps = emblaApi?.scrollSnapList() ?? []
 
-  const scrollPrev = React.useCallback(
-    () => emblaApi && emblaApi.scrollPrev(),
-    [emblaApi]
-  )
-  const scrollNext = React.useCallback(
-    () => emblaApi && emblaApi.scrollNext(),
-    [emblaApi]
-  )
-  const onSelect = React.useCallback((emblaApi: EmblaCarouselType) => {
-    setPrevBtnDisabled(!emblaApi.canScrollPrev())
-    setNextBtnDisabled(!emblaApi.canScrollNext())
-    setSelectedIndex(emblaApi.selectedScrollSnap())
-  }, [])
-  const onInit = React.useCallback((emblaApi: EmblaCarouselType) => {
-    setScrollSnaps(emblaApi.scrollSnapList())
-  }, [])
+  const scrollPrev = React.useCallback(() => emblaApi && emblaApi.scrollPrev(), [emblaApi])
+  const scrollNext = React.useCallback(() => emblaApi && emblaApi.scrollNext(), [emblaApi])
 
   const onDotButtonClick = React.useCallback(
     (index: number) => {
       if (!emblaApi) return
       emblaApi.scrollTo(index)
     },
-    [emblaApi]
+    [emblaApi],
   )
 
   React.useEffect(() => {
     if (!emblaApi) return
 
-    onInit(emblaApi)
-    onSelect(emblaApi)
-    emblaApi.on("reInit", onInit).on("reInit", onSelect).on("select", onSelect)
-  }, [emblaApi, onInit, onSelect])
+    const refresh = () => setTick((t) => t + 1)
+    emblaApi.on("reInit", refresh).on("select", refresh)
+
+    return () => {
+      emblaApi.off("reInit", refresh).off("select", refresh)
+    }
+  }, [emblaApi])
 
   return (
     <div className={twMerge("overflow-hidden relative", className)}>
@@ -68,7 +58,7 @@ export const ProductPageGallery: React.FC<
           <IconCircle
             className={twJoin(
               "bg-black text-white transition-colors",
-              prevBtnDisabled && "bg-transparent text-black"
+              prevBtnDisabled && "bg-transparent text-black",
             )}
           >
             <Icon name="arrow-left" className="w-6 h-6" />
@@ -77,11 +67,7 @@ export const ProductPageGallery: React.FC<
         <div ref={emblaRef} className="w-full">
           <div className="flex touch-pan-y gap-4">
             {React.Children.map(children, (child) => {
-              return (
-                <div className="w-full md:max-w-[80%] flex-shrink-0">
-                  {child}
-                </div>
-              )
+              return <div className="w-full md:max-w-[80%] shrink-0">{child}</div>
             })}
           </div>
         </div>
@@ -95,7 +81,7 @@ export const ProductPageGallery: React.FC<
           <IconCircle
             className={twJoin(
               "bg-black text-white transition-colors",
-              nextBtnDisabled && "bg-transparent text-black"
+              nextBtnDisabled && "bg-transparent text-black",
             )}
           >
             <Icon name="arrow-right" className="w-6 h-6" />
@@ -104,16 +90,11 @@ export const ProductPageGallery: React.FC<
       </div>
       <div className="flex justify-center max-lg:w-full max-lg:absolute max-lg:bottom-4">
         {scrollSnaps.map((_, index) => (
-          <button
-            // eslint-disable-next-line react/no-array-index-key
-            key={index}
-            onClick={() => onDotButtonClick(index)}
-            className="px-1.5"
-          >
+          <button key={index} onClick={() => onDotButtonClick(index)} className="px-1.5">
             <span
               className={twMerge(
                 "border-b border-transparent transition-colors px-0.5",
-                index === selectedIndex && "border-black"
+                index === selectedIndex && "border-black",
               )}
             >
               {index + 1}

@@ -1,5 +1,5 @@
 import { model } from '@medusajs/framework/utils';
-import { InferTypeOf } from '@medusajs/framework/types';
+import type { InferTypeOf } from '@medusajs/framework/types';
 import Material from './material';
 
 const Color = model.define('color', {

@@ -1,7 +1,7 @@
 "use client"
 
 import { isEqual } from "lodash"
-import { useEffect, useMemo, useState } from "react"
+import { useMemo, useState } from "react"
 import { HttpTypes } from "@medusajs/types"
 import * as ReactAria from "react-aria-components"
 import { useSearchParams } from "next/navigation"
@@ -15,11 +15,11 @@ import {
   UiSelectListBoxItem,
   UiSelectValue,
 } from "@/components/ui/Select"
-import { useCountryCode } from "hooks/country-code"
+import { useCountryCode } from "@/hooks/country-code"
 import ProductPrice from "@modules/products/components/product-price"
 import { UiRadioGroup } from "@/components/ui/Radio"
 import { withReactQueryProvider } from "@lib/util/react-query"
-import { useAddLineItem } from "hooks/cart"
+import { useAddLineItem } from "@/hooks/cart"
 
 type ProductActionsProps = {
   product: HttpTypes.StoreProduct
@@ -36,9 +36,7 @@ type ProductActionsProps = {
   disabled?: boolean
 }
 
-const optionsAsKeymap = (
-  variantOptions: HttpTypes.StoreProductVariant["options"]
-) => {
+const optionsAsKeymap = (variantOptions: HttpTypes.StoreProductVariant["options"]) => {
   return variantOptions?.reduce((acc: Record<string, string>, varopt) => {
     if (varopt.option_id) {
       acc[varopt.option_id] = varopt.value
@@ -49,12 +47,17 @@ const optionsAsKeymap = (
 
 const priorityOptions = ["Material", "Color", "Size"]
 
-const normalizeOptionKey = (key: string) =>
-  key.trim().toLowerCase().replace(/\s+/g, "_")
+const normalizeOptionKey = (key: string) => key.trim().toLowerCase().replace(/\s+/g, "_")
 
 const getInitialOptions = (product: ProductActionsProps["product"]) => {
   if (product.variants?.length === 1) {
-    const variantOptions = optionsAsKeymap(product.variants[0].options)
+    const firstVariant = product.variants[0]
+
+    if (!firstVariant) {
+      return {}
+    }
+
+    const variantOptions = optionsAsKeymap(firstVariant.options)
     return variantOptions ?? {}
   }
 
@@ -64,10 +67,15 @@ const getInitialOptions = (product: ProductActionsProps["product"]) => {
       .filter((option) => option.values!.length === 1)
       .reduce(
         (acc, option) => {
-          acc[option.id] = option.values![0].value
+          const onlyValue = option.values?.[0]?.value
+
+          if (onlyValue) {
+            acc[option.id] = onlyValue
+          }
+
           return acc
         },
-        {} as Record<string, string>
+        {} as Record<string, string>,
       )
 
     return singleOptionValues
@@ -79,73 +87,74 @@ const getInitialOptions = (product: ProductActionsProps["product"]) => {
 function ProductActions({ product, materials, disabled }: ProductActionsProps) {
   const searchParams = useSearchParams()
   const [options, setOptions] = useState<Record<string, string | undefined>>(
-    getInitialOptions(product) ?? {}
+    getInitialOptions(product) ?? {},
   )
   const [quantity, setQuantity] = useState(1)
   const countryCode = useCountryCode()
 
   const { mutateAsync, isPending } = useAddLineItem()
 
-  // If there is only 1 variant, preselect the options
-  useEffect(() => {
+  // Re-initialize options when product changes (handles component reuse across products)
+  const [prevProduct, setPrevProduct] = useState(product)
+  if (prevProduct !== product) {
+    setPrevProduct(product)
     const initialOptions = getInitialOptions(product)
     if (initialOptions) {
       setOptions(initialOptions)
     }
-  }, [product])
+  }
 
-  useEffect(() => {
+  // Apply MCP URL option params when searchParams or product options change
+  const [prevSearchParams, setPrevSearchParams] = useState(searchParams)
+  const [prevProductOptions, setPrevProductOptions] = useState(product.options)
+  if (prevSearchParams !== searchParams || prevProductOptions !== product.options) {
+    setPrevSearchParams(searchParams)
+    setPrevProductOptions(product.options)
+
     const optionEntries = Array.from(searchParams.entries()).filter(([key]) =>
-      key.startsWith("mcp_opt_")
+      key.startsWith("mcp_opt_"),
     )
 
-    if (!optionEntries.length || !product.options?.length) {
-      return
-    }
-
-    const requestedValues = optionEntries.reduce(
-      (acc, [key, value]) => {
-        const normalizedKey = normalizeOptionKey(key.replace(/^mcp_opt_/, ""))
-        acc[normalizedKey] = value
-        return acc
-      },
-      {} as Record<string, string>
-    )
-
-    const mappedOptions = (product.options ?? []).reduce(
-      (acc, option) => {
-        const optionIdKey = normalizeOptionKey(option.id)
-        const optionTitleKey = normalizeOptionKey(option.title ?? "")
-        const selectedValue =
-          requestedValues[optionIdKey] ?? requestedValues[optionTitleKey]
-
-        if (!selectedValue) {
+    if (optionEntries.length && product.options?.length) {
+      const requestedValues = optionEntries.reduce(
+        (acc, [key, value]) => {
+          const normalizedKey = normalizeOptionKey(key.replace(/^mcp_opt_/, ""))
+          acc[normalizedKey] = value
           return acc
-        }
+        },
+        {} as Record<string, string>,
+      )
 
-        const allowedValues = new Set(
-          (option.values ?? []).map((value) => value.value)
-        )
+      const mappedOptions = (product.options ?? []).reduce(
+        (acc, option) => {
+          const optionIdKey = normalizeOptionKey(option.id)
+          const optionTitleKey = normalizeOptionKey(option.title ?? "")
+          const selectedValue = requestedValues[optionIdKey] ?? requestedValues[optionTitleKey]
 
-        if (allowedValues.size && !allowedValues.has(selectedValue)) {
+          if (!selectedValue) {
+            return acc
+          }
+
+          const allowedValues = new Set((option.values ?? []).map((value) => value.value))
+
+          if (allowedValues.size && !allowedValues.has(selectedValue)) {
+            return acc
+          }
+
+          acc[option.id] = selectedValue
           return acc
-        }
+        },
+        {} as Record<string, string>,
+      )
 
-        acc[option.id] = selectedValue
-        return acc
-      },
-      {} as Record<string, string>
-    )
-
-    if (!Object.keys(mappedOptions).length) {
-      return
+      if (Object.keys(mappedOptions).length) {
+        setOptions((prev) => ({
+          ...prev,
+          ...mappedOptions,
+        }))
+      }
     }
-
-    setOptions((prev) => ({
-      ...prev,
-      ...mappedOptions,
-    }))
-  }, [searchParams, product.options])
+  }
 
   const selectedVariant = useMemo(() => {
     if (!product.variants || product.variants.length === 0) {
@@ -167,13 +176,11 @@ function ProductActions({ product, materials, disabled }: ProductActionsProps) {
   }
 
   // check if the selected variant is in stock
-  const itemsInStock = selectedVariant
-    ? getVariantItemsInStock(selectedVariant)
-    : 0
+  const itemsInStock = selectedVariant ? getVariantItemsInStock(selectedVariant) : 0
 
   // add the selected variant to the cart
-  const handleAddToCart = async () => {
-    if (!selectedVariant?.id) return null
+  const handleAddToCart = async (): Promise<void> => {
+    if (!selectedVariant?.id) return
 
     await mutateAsync({
       variantId: selectedVariant.id,
@@ -202,9 +209,7 @@ function ProductActions({ product, materials, disabled }: ProductActionsProps) {
   const colorOption = productOptions.find((o) => o.title === "Color")
   const otherOptions =
     materialOption && colorOption
-      ? productOptions.filter(
-          (o) => o.id !== materialOption.id && o.id !== colorOption.id
-        )
+      ? productOptions.filter((o) => o.id !== materialOption.id && o.id !== colorOption.id)
       : productOptions
 
   const selectedMaterial =
@@ -215,12 +220,11 @@ function ProductActions({ product, materials, disabled }: ProductActionsProps) {
   const showOtherOptions =
     !materialOption ||
     !colorOption ||
-    (selectedMaterial &&
-      (selectedMaterial.colors.length < 2 || options[colorOption.id]))
+    (selectedMaterial && (selectedMaterial.colors.length < 2 || options[colorOption.id]))
 
   return (
     <>
-      <ProductPrice product={product} variant={selectedVariant} />
+      <ProductPrice product={product} {...(selectedVariant ? { variant: selectedVariant } : {})} />
       <div className="max-md:text-xs mb-8 md:mb-16 max-w-120">
         <p>{product.description}</p>
       </div>
@@ -232,14 +236,12 @@ function ProductActions({ product, materials, disabled }: ProductActionsProps) {
                 <p className="mb-4">
                   Materials
                   {options[materialOption.id] && (
-                    <span className="text-grayscale-500 ml-6">
-                      {options[materialOption.id]}
-                    </span>
+                    <span className="text-grayscale-500 ml-6">{options[materialOption.id]}</span>
                   )}
                 </p>
                 <ReactAria.Select
-                  selectedKey={options[materialOption.id] ?? null}
-                  onSelectionChange={(value) => {
+                  value={options[materialOption.id] ?? null}
+                  onChange={(value) => {
                     setOptions({ [materialOption.id]: `${value}` })
                   }}
                   placeholder="Choose material"
@@ -247,17 +249,14 @@ function ProductActions({ product, materials, disabled }: ProductActionsProps) {
                   isDisabled={!!disabled || isPending}
                   aria-label="Material"
                 >
-                  <UiSelectButton className="!h-12 px-4 gap-2 max-md:text-base">
+                  <UiSelectButton className="h-12! px-4 gap-2 max-md:text-base">
                     <UiSelectValue />
                     <UiSelectIcon className="h-6 w-6" />
                   </UiSelectButton>
                   <ReactAria.Popover className="w-[--trigger-width]">
                     <UiSelectListBox>
                       {materials.map((material) => (
-                        <UiSelectListBoxItem
-                          key={material.id}
-                          id={material.name}
-                        >
+                        <UiSelectListBoxItem key={material.id} id={material.name}>
                           {material.name}
                         </UiSelectListBoxItem>
                       ))}
@@ -269,9 +268,7 @@ function ProductActions({ product, materials, disabled }: ProductActionsProps) {
                 <div className="mb-6">
                   <p className="mb-4">
                     Colors
-                    <span className="text-grayscale-500 ml-6">
-                      {options[colorOption.id]}
-                    </span>
+                    <span className="text-grayscale-500 ml-6">{options[colorOption.id]}</span>
                   </p>
                   <UiRadioGroup
                     value={options[colorOption.id] ?? null}
@@ -283,13 +280,17 @@ function ProductActions({ product, materials, disabled }: ProductActionsProps) {
                     isDisabled={!!disabled || isPending}
                   >
                     {selectedMaterial.colors.map((color) => (
-                      <ReactAria.Radio
+                      <ReactAria.RadioField
                         key={color.id}
                         value={color.name}
                         aria-label={color.name}
-                        className="h-8 w-8 cursor-pointer relative before:transition-colors before:absolute before:content-[''] before:-bottom-2 before:left-0 before:w-full before:h-px data-[selected]:before:bg-black shadow-sm hover:shadow"
-                        style={{ background: color.hex_code }}
-                      />
+                        className="contents"
+                      >
+                        <ReactAria.RadioButton
+                          className="h-8 w-8 cursor-pointer relative before:transition-colors before:absolute before:content-[''] before:-bottom-2 before:left-0 before:w-full before:h-px data-selected:before:bg-black shadow-sm hover:shadow"
+                          style={{ background: color.hex_code }}
+                        />
+                      </ReactAria.RadioField>
                     ))}
                   </UiRadioGroup>
                 </div>
@@ -303,14 +304,12 @@ function ProductActions({ product, materials, disabled }: ProductActionsProps) {
                   <p className="mb-4">
                     {option.title}
                     {options[option.id] && (
-                      <span className="text-grayscale-500 ml-6">
-                        {options[option.id]}
-                      </span>
+                      <span className="text-grayscale-500 ml-6">{options[option.id]}</span>
                     )}
                   </p>
                   <ReactAria.Select
-                    selectedKey={options[option.id] ?? null}
-                    onSelectionChange={(value) => {
+                    value={options[option.id] ?? null}
+                    onChange={(value) => {
                       setOptionValue(option.id, `${value}`)
                     }}
                     placeholder={`Choose ${option.title.toLowerCase()}`}
@@ -318,7 +317,7 @@ function ProductActions({ product, materials, disabled }: ProductActionsProps) {
                     isDisabled={!!disabled || isPending}
                     aria-label={option.title}
                   >
-                    <UiSelectButton className="!h-12 px-4 gap-2 max-md:text-base">
+                    <UiSelectButton className="h-12! px-4 gap-2 max-md:text-base">
                       <UiSelectValue />
                       <UiSelectIcon className="h-6 w-6" />
                     </UiSelectButton>
@@ -327,10 +326,7 @@ function ProductActions({ product, materials, disabled }: ProductActionsProps) {
                         {(option.values ?? [])
                           .filter((value) => Boolean(value.value))
                           .map((value) => (
-                            <UiSelectListBoxItem
-                              key={value.id}
-                              id={value.value}
-                            >
+                            <UiSelectListBoxItem key={value.id} id={value.value}>
                               {value.value}
                             </UiSelectListBoxItem>
                           ))}
@@ -344,9 +340,7 @@ function ProductActions({ product, materials, disabled }: ProductActionsProps) {
       )}
       <div className="flex max-sm:flex-col gap-4">
         <InputNumberField
-          isDisabled={
-            !itemsInStock || !selectedVariant || !!disabled || isPending
-          }
+          isDisabled={!itemsInStock || !selectedVariant || !!disabled || isPending}
           value={quantity}
           onChange={setQuantity}
           minValue={1}
@@ -360,11 +354,7 @@ function ProductActions({ product, materials, disabled }: ProductActionsProps) {
           isLoading={isPending}
           className="sm:flex-1"
         >
-          {!selectedVariant
-            ? "Select variant"
-            : !itemsInStock
-              ? "Out of stock"
-              : "Add to cart"}
+          {!selectedVariant ? "Select variant" : !itemsInStock ? "Out of stock" : "Add to cart"}
         </Button>
       </div>
     </>

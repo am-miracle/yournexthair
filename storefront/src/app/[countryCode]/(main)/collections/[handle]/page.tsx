@@ -6,6 +6,7 @@ import {
   getCollectionsList,
 } from "@lib/data/collections"
 import { listRegions } from "@lib/data/regions"
+import { withDefinedProp } from "@lib/util/optional-props"
 import { StoreCollection, StoreRegion } from "@medusajs/types"
 import CollectionTemplate from "@modules/collections/templates"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
@@ -97,13 +98,14 @@ export default async function CollectionPage({ params, searchParams }: Props) {
   return (
     <CollectionTemplate
       collection={collection}
-      page={page}
-      sortBy={sortBy}
       countryCode={countryCode}
-      category={
+      {...withDefinedProp("page", page)}
+      {...withDefinedProp("sortBy", sortBy)}
+      {...withDefinedProp(
+        "category",
         !category ? undefined : Array.isArray(category) ? category : [category]
-      }
-      type={!type ? undefined : Array.isArray(type) ? type : [type]}
+      )}
+      {...withDefinedProp("type", !type ? undefined : Array.isArray(type) ? type : [type])}
     />
   )
 }

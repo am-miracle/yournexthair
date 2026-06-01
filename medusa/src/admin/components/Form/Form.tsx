@@ -1,55 +1,58 @@
-import * as React from 'react';
+import * as React from "react"
 import {
   FormProvider,
   useForm,
-  UseFormProps,
-  DefaultValues,
-  UseFormReturn,
-} from 'react-hook-form';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
+  type DefaultValues,
+  type FieldValues,
+  type SubmitHandler,
+  type UseFormProps,
+  type UseFormReturn,
+} from "react-hook-form"
+import type { z } from "zod"
+import { zodResolver } from "@hookform/resolvers/zod"
 
-export type FormProps<T extends z.ZodType<any, any>> = UseFormProps<
-  z.infer<T>
+export type FormProps<TSchema extends z.ZodType<FieldValues, FieldValues>> = Omit<
+  UseFormProps<z.input<TSchema>>,
+  "resolver" | "defaultValues"
 > & {
-  schema: T;
+  schema: TSchema
   onSubmit: (
-    values: z.infer<T>,
-    form: UseFormReturn<z.infer<T>>,
-  ) => void | Promise<void>;
-  defaultValues?: DefaultValues<z.infer<T>>;
-  children?: React.ReactNode;
-  formProps?: Omit<React.ComponentProps<'form'>, 'onSubmit'>;
-};
+    values: z.output<TSchema>,
+    form: UseFormReturn<z.input<TSchema>>,
+  ) => void | Promise<void>
+  defaultValues?: DefaultValues<z.input<TSchema>>
+  children?: React.ReactNode
+  formProps?: Omit<React.ComponentProps<"form">, "onSubmit">
+}
 
-export const Form = <T extends z.ZodType<any, any>>({
+export function Form<TSchema extends z.ZodType<FieldValues, FieldValues>>({
   schema,
   onSubmit,
   children,
   formProps,
   ...props
-}: FormProps<T>) => {
-  const form = useForm({
+}: FormProps<TSchema>) {
+  const form = useForm<z.input<TSchema>>({
     resolver: zodResolver(schema),
     ...props,
-  });
+  })
 
-  const submitHandler = React.useCallback(
-    (values: z.infer<T>) => {
-      return onSubmit(values, form);
+  const submitHandler = React.useCallback<SubmitHandler<z.input<TSchema>>>(
+    (values) => {
+      return onSubmit(values as z.output<TSchema>, form)
     },
     [onSubmit, form],
-  );
+  )
 
-  const onFormSubmit: React.FormEventHandler<HTMLFormElement> =
-    React.useCallback(
-      (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        form.handleSubmit(submitHandler)(event);
-      },
-      [form, submitHandler],
-    );
+  const onFormSubmit = React.useCallback(
+    (event: React.SyntheticEvent<HTMLFormElement>) => {
+      event.preventDefault()
+      event.stopPropagation()
+
+      void form.handleSubmit(submitHandler)(event)
+    },
+    [form, submitHandler],
+  )
 
   return (
     <FormProvider {...form}>
@@ -57,5 +60,5 @@ export const Form = <T extends z.ZodType<any, any>>({
         <fieldset disabled={form.formState.isSubmitting}>{children}</fieldset>
       </form>
     </FormProvider>
-  );
-};
+  )
+}

@@ -3,7 +3,7 @@
 import { Icon } from "@/components/Icon"
 import { LocalizedButtonLink } from "@/components/LocalizedLink"
 import { withReactQueryProvider } from "@lib/util/react-query"
-import { useCustomer } from "hooks/customer"
+import { useCustomer } from "@/hooks/customer"
 
 const LoginLink = ({ className }: { className: string }) => {
   const { data: customer } = useCustomer()

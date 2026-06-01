@@ -1,6 +1,6 @@
-import * as React from 'react';
-import { z } from 'zod';
-import { useParams } from 'react-router-dom';
+import * as React from "react"
+import { z } from "zod"
+import { useParams, useSearchParams } from "react-router-dom"
 import {
   Container,
   Heading,
@@ -14,52 +14,46 @@ import {
   Switch,
   Label,
   Kbd,
-} from '@medusajs/ui';
-import {
-  PencilSquare,
-  EllipsisHorizontal,
-  Trash,
-  ArrowPath,
-} from '@medusajs/icons';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useSearchParams } from 'react-router-dom';
+} from "@medusajs/ui"
+import { PencilSquare, EllipsisHorizontal, Trash, ArrowPath } from "@medusajs/icons"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
-import type { MaterialModelType } from '../../../../modules/fashion/models/material';
-import { ColorModelType } from '../../../../modules/fashion/models/color';
-import { useCreateColorMutation } from '../../../hooks/fashion';
-import { Form } from '../../../components/Form/Form';
-import { InputField } from '../../../components/Form/InputField';
-import { EditMaterialDrawer } from '../../../components/EditMaterialDrawer';
-import { withQueryClient } from '../../../components/QueryClientProvider';
+import type { MaterialModelType } from "../../../../modules/fashion/models/material"
+import type { ColorModelType } from "../../../../modules/fashion/models/color"
+import { useCreateColorMutation } from "../../../hooks/fashion"
+import { Form } from "../../../components/Form/Form"
+import { InputField } from "../../../components/Form/InputField"
+import { EditMaterialDrawer } from "../../../components/EditMaterialDrawer"
+import { withQueryClient } from "../../../components/QueryClientProvider"
 
 const colorFormSchema = z.object({
   name: z.string().min(1),
   hex_code: z.string().min(7).max(7),
-});
+})
 
 const EditColorDrawer: React.FC<{
-  materialId: string;
-  id: string;
-  initialValues: z.infer<typeof colorFormSchema>;
-  children: React.ReactNode;
+  materialId: string
+  id: string
+  initialValues: z.infer<typeof colorFormSchema>
+  children: React.ReactNode
 }> = ({ materialId, id, initialValues, children }) => {
-  const queryClient = useQueryClient();
-  const [isDrawerOpen, setIsDrawerOpen] = React.useState(false);
+  const queryClient = useQueryClient()
+  const [isDrawerOpen, setIsDrawerOpen] = React.useState(false)
   const updateColorMutation = useMutation({
-    mutationKey: ['fashion', materialId, 'colors', id, 'update'],
+    mutationKey: ["fashion", materialId, "colors", id, "update"],
     mutationFn: async (values: z.infer<typeof colorFormSchema>) => {
       return fetch(`/admin/fashion/${materialId}/colors/${id}`, {
-        method: 'POST',
+        method: "POST",
         body: JSON.stringify(values),
-        credentials: 'include',
-      }).then((res) => res.json());
+        credentials: "include",
+      }).then((res) => res.json() as Promise<unknown>)
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        predicate: (query) => query.queryKey[0] === 'fashion',
-      });
+        predicate: (query) => query.queryKey[0] === "fashion",
+      })
     },
-  });
+  })
 
   return (
     <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
@@ -72,8 +66,8 @@ const EditColorDrawer: React.FC<{
           <Form
             schema={colorFormSchema}
             onSubmit={async (values) => {
-              await updateColorMutation.mutateAsync(values);
-              setIsDrawerOpen(false);
+              await updateColorMutation.mutateAsync(values)
+              setIsDrawerOpen(false)
             }}
             formProps={{
               id: `edit-color-${id}-form`,
@@ -87,7 +81,7 @@ const EditColorDrawer: React.FC<{
                 label="Hex Code"
                 type="color"
                 inputProps={{
-                  className: 'max-w-8',
+                  className: "max-w-8",
                 }}
               />
             </div>
@@ -107,33 +101,33 @@ const EditColorDrawer: React.FC<{
         </Drawer.Footer>
       </Drawer.Content>
     </Drawer>
-  );
-};
+  )
+}
 
 const DeleteColorPrompt: React.FC<{
-  materialId: string;
-  id: string;
-  name: string;
-  children: React.ReactNode;
+  materialId: string
+  id: string
+  name: string
+  children: React.ReactNode
 }> = ({ materialId, name, id, children }) => {
-  const queryClient = useQueryClient();
-  const [isPromptOpen, setIsPromptOpen] = React.useState(false);
+  const queryClient = useQueryClient()
+  const [isPromptOpen, setIsPromptOpen] = React.useState(false)
   const deleteColorMutation = useMutation({
-    mutationKey: ['fashion', materialId, 'colors', id, 'delete'],
+    mutationKey: ["fashion", materialId, "colors", id, "delete"],
     mutationFn: async () => {
       return fetch(`/admin/fashion/${materialId}/colors/${id}`, {
-        method: 'DELETE',
-        credentials: 'include',
-      }).then((res) => res.json());
+        method: "DELETE",
+        credentials: "include",
+      }).then((res) => res.json() as Promise<unknown>)
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        predicate: (query) => query.queryKey[0] === 'fashion',
-      });
+        predicate: (query) => query.queryKey[0] === "fashion",
+      })
 
-      setIsPromptOpen(false);
+      setIsPromptOpen(false)
     },
-  });
+  })
 
   return (
     <Prompt open={isPromptOpen} onOpenChange={setIsPromptOpen}>
@@ -141,15 +135,13 @@ const DeleteColorPrompt: React.FC<{
       <Prompt.Content>
         <Prompt.Header>
           <Prompt.Title>Delete {name} color?</Prompt.Title>
-          <Prompt.Description>
-            Are you sure you want to delete the color {name}?
-          </Prompt.Description>
+          <Prompt.Description>Are you sure you want to delete the color {name}?</Prompt.Description>
         </Prompt.Header>
         <Prompt.Footer>
           <Prompt.Cancel>Cancel</Prompt.Cancel>
           <Prompt.Action
             onClick={() => {
-              deleteColorMutation.mutate();
+              deleteColorMutation.mutate()
             }}
           >
             Delete
@@ -157,40 +149,36 @@ const DeleteColorPrompt: React.FC<{
         </Prompt.Footer>
       </Prompt.Content>
     </Prompt>
-  );
-};
+  )
+}
 
 const RestoreColorPrompt: React.FC<{
-  materialId: string;
-  id: string;
-  name: string;
-  children: React.ReactNode;
+  materialId: string
+  id: string
+  name: string
+  children: React.ReactNode
 }> = ({ materialId, name, id, children }) => {
-  const queryClient = useQueryClient();
-  const [isPromptOpen, setIsPromptOpen] = React.useState(false);
+  const queryClient = useQueryClient()
+  const [isPromptOpen, setIsPromptOpen] = React.useState(false)
   const restoreColorMutation = useMutation({
-    mutationKey: ['fashion', materialId, 'colors', id, 'restore'],
+    mutationKey: ["fashion", materialId, "colors", id, "restore"],
     mutationFn: async () => {
       return fetch(`/admin/fashion/${materialId}/colors/${id}/restore`, {
-        method: 'POST',
-        credentials: 'include',
-      }).then((res) => res.json());
+        method: "POST",
+        credentials: "include",
+      }).then((res) => res.json() as Promise<unknown>)
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        predicate: (query) => query.queryKey[0] === 'fashion',
-      });
+        predicate: (query) => query.queryKey[0] === "fashion",
+      })
 
-      setIsPromptOpen(false);
+      setIsPromptOpen(false)
     },
-  });
+  })
 
   return (
-    <Prompt
-      open={isPromptOpen}
-      onOpenChange={setIsPromptOpen}
-      variant="confirmation"
-    >
+    <Prompt open={isPromptOpen} onOpenChange={setIsPromptOpen} variant="confirmation">
       <Prompt.Trigger asChild>{children}</Prompt.Trigger>
       <Prompt.Content>
         <Prompt.Header>
@@ -203,7 +191,7 @@ const RestoreColorPrompt: React.FC<{
           <Prompt.Cancel>Cancel</Prompt.Cancel>
           <Prompt.Action
             onClick={() => {
-              restoreColorMutation.mutate();
+              restoreColorMutation.mutate()
             }}
           >
             Restore
@@ -211,66 +199,64 @@ const RestoreColorPrompt: React.FC<{
         </Prompt.Footer>
       </Prompt.Content>
     </Prompt>
-  );
-};
+  )
+}
 
 const MaterialColors: React.FC<{ materialId: string }> = ({ materialId }) => {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const page = Number(searchParams.get('page')) || 1;
+  const [searchParams, setSearchParams] = useSearchParams()
+  const page = Number(searchParams.get("page")) || 1
   const setPage = React.useCallback(
     (page: number) => {
       setSearchParams((prev) => {
-        const next = new URLSearchParams(prev);
-        next.set('page', page.toString());
-        return next;
-      });
+        const next = new URLSearchParams(prev)
+        next.set("page", page.toString())
+        return next
+      })
     },
-    [setSearchParams]
-  );
-  const deleted = searchParams.has('deleted');
+    [setSearchParams],
+  )
+  const deleted = searchParams.has("deleted")
   const toggleDeleted = React.useCallback(() => {
     setSearchParams((prev) => {
-      const next = new URLSearchParams(prev);
+      const next = new URLSearchParams(prev)
 
-      if (prev.has('page')) {
-        next.delete('page');
+      if (prev.has("page")) {
+        next.delete("page")
       }
 
-      if (!prev.has('deleted')) {
-        next.set('deleted', '');
+      if (!prev.has("deleted")) {
+        next.set("deleted", "")
       } else {
-        next.delete('deleted');
+        next.delete("deleted")
       }
 
-      return next;
-    });
-  }, [setSearchParams]);
+      return next
+    })
+  }, [setSearchParams])
 
-  const [isCreateModalOpen, setIsCreateModalOpen] = React.useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = React.useState(false)
 
   const { data, isLoading, isError, isSuccess } = useQuery({
-    queryKey: ['fashion', materialId, 'colors', deleted, page],
+    queryKey: ["fashion", materialId, "colors", deleted, page],
     queryFn: async () => {
       return fetch(
-        `/admin/fashion/${materialId}/colors?page=${page}${
-          deleted ? '&deleted=true' : ''
-        }`,
+        `/admin/fashion/${materialId}/colors?page=${page}${deleted ? "&deleted=true" : ""}`,
         {
-          credentials: 'include',
-        }
+          credentials: "include",
+        },
       ).then(
         (res) =>
           res.json() as Promise<{
-            colors: ColorModelType[];
-            count: number;
-            page: number;
-            last_page: number;
-          }>
-      );
+            colors: ColorModelType[]
+            count: number
+            page: number
+            last_page: number
+          }>,
+      )
     },
-  });
+  })
 
-  const createColorMutation = useCreateColorMutation(materialId);
+  const createColorMutation = useCreateColorMutation(materialId)
 
   return (
     <div className="-px-6">
@@ -282,7 +268,7 @@ const MaterialColors: React.FC<{ materialId: string }> = ({ materialId }) => {
               id="deleted-flag"
               checked={deleted}
               onClick={() => {
-                toggleDeleted();
+                toggleDeleted()
               }}
             />
             <Label htmlFor="deleted-flag">Show Deleted</Label>
@@ -301,11 +287,11 @@ const MaterialColors: React.FC<{ materialId: string }> = ({ materialId }) => {
                 <Form
                   schema={colorFormSchema}
                   onSubmit={async (values) => {
-                    await createColorMutation.mutateAsync(values);
-                    setIsCreateModalOpen(false);
+                    await createColorMutation.mutateAsync(values)
+                    setIsCreateModalOpen(false)
                   }}
                   formProps={{
-                    id: 'create-color-form',
+                    id: "create-color-form",
                   }}
                 >
                   <div className="flex flex-col gap-4">
@@ -315,7 +301,7 @@ const MaterialColors: React.FC<{ materialId: string }> = ({ materialId }) => {
                       label="Hex Code"
                       type="color"
                       inputProps={{
-                        className: 'max-w-8',
+                        className: "max-w-8",
                       }}
                     />
                   </div>
@@ -348,26 +334,23 @@ const MaterialColors: React.FC<{ materialId: string }> = ({ materialId }) => {
         <Table.Body>
           {isLoading && (
             <Table.Row>
-              {/* @ts-ignore */}
-              <Table.Cell colSpan={3}>
+              <td colSpan={3}>
                 <Text>Loading...</Text>
-              </Table.Cell>
+              </td>
             </Table.Row>
           )}
           {isError && (
             <Table.Row>
-              {/* @ts-ignore */}
-              <Table.Cell colSpan={3}>
+              <td colSpan={3}>
                 <Text>Error loading colors</Text>
-              </Table.Cell>
+              </td>
             </Table.Row>
           )}
           {isSuccess && data.colors.length === 0 && (
             <Table.Row>
-              {/* @ts-ignore */}
-              <Table.Cell colSpan={3}>
+              <td colSpan={3}>
                 <Text>No colors found</Text>
-              </Table.Cell>
+              </td>
             </Table.Row>
           )}
           {isSuccess &&
@@ -460,23 +443,23 @@ const MaterialColors: React.FC<{ materialId: string }> = ({ materialId }) => {
         nextPage={() => setPage(Math.min(page + 1, data?.last_page ?? 1))}
       />
     </div>
-  );
-};
+  )
+}
 
 const MaterialPage = () => {
-  const { id } = useParams();
+  const { id } = useParams()
   const { data, isLoading, isError, isSuccess } = useQuery({
-    queryKey: ['fashion', id],
+    queryKey: ["fashion", id],
     queryFn: async () => {
       const res = await fetch(`/admin/fashion/${id}`, {
-        credentials: 'include',
-      });
-      return res.json() as Promise<MaterialModelType>;
+        credentials: "include",
+      })
+      return res.json() as Promise<MaterialModelType>
     },
-  });
+  })
 
   if (!id) {
-    return null;
+    return null
   }
 
   return (
@@ -500,7 +483,7 @@ const MaterialPage = () => {
       <hr className="mb-6" />
       <MaterialColors materialId={id} />
     </Container>
-  );
-};
+  )
+}
 
-export default withQueryClient(MaterialPage);
+export default withQueryClient(MaterialPage)

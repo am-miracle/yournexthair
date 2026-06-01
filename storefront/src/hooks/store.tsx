@@ -21,8 +21,8 @@ export const useStoreProducts = ({
       return getProductsListWithSort({
         page: pageParam,
         queryParams,
-        sortBy,
         countryCode,
+        ...(sortBy ? { sortBy } : {}),
       })
     },
     getNextPageParam: (lastPage: {

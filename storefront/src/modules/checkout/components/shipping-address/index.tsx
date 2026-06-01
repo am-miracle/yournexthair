@@ -1,5 +1,5 @@
 import { HttpTypes } from "@medusajs/types"
-import React, { useEffect, useMemo } from "react"
+import { useEffect, useMemo } from "react"
 import * as ReactAria from "react-aria-components"
 
 import compareAddresses from "@lib/util/compare-addresses"
@@ -10,30 +10,50 @@ import { UiModalOverlay, UiModal } from "@/components/ui/Modal"
 import { UiRadio, UiRadioBox, UiRadioLabel } from "@/components/ui/Radio"
 import { Icon } from "@/components/Icon"
 import { Button } from "@/components/Button"
-import { useCountryCode } from "hooks/country-code"
+import { useCountryCode } from "@/hooks/country-code"
 import {
   UiCheckbox,
   UiCheckboxBox,
   UiCheckboxIcon,
   UiCheckboxLabel,
 } from "@/components/ui/Checkbox"
+import { withDefinedProp } from "@lib/util/optional-props"
 import { useFormContext, useWatch } from "react-hook-form"
 
-const isShippingAddressEmpty = (formData: {
-  shipping_address?: Pick<
-    HttpTypes.StoreCartAddress,
-    | "first_name"
-    | "last_name"
-    | "address_1"
-    | "address_2"
-    | "company"
-    | "postal_code"
-    | "city"
-    | "country_code"
-    | "province"
-    | "phone"
-  >
-}) => {
+type CheckoutAddressFields = Pick<
+  HttpTypes.StoreCartAddress,
+  | "first_name"
+  | "last_name"
+  | "address_1"
+  | "address_2"
+  | "company"
+  | "postal_code"
+  | "city"
+  | "country_code"
+  | "province"
+  | "phone"
+>
+
+type CheckoutAddressFormValues = {
+  shipping_address?: CheckoutAddressFields
+  billing_address?: CheckoutAddressFields
+  same_as_billing?: "on" | "off"
+}
+
+const EMPTY_CHECKOUT_ADDRESS: CheckoutAddressFields = {
+  first_name: "",
+  last_name: "",
+  address_1: "",
+  address_2: "",
+  company: "",
+  postal_code: "",
+  city: "",
+  country_code: "",
+  province: "",
+  phone: "",
+}
+
+const isShippingAddressEmpty = (formData: CheckoutAddressFormValues) => {
   return (
     !formData?.shipping_address?.first_name &&
     !formData?.shipping_address?.last_name &&
@@ -62,9 +82,10 @@ const ShippingAddress = ({
 }) => {
   const countryCode = useCountryCode()
 
-  const { setValue, control } = useFormContext()
+  const { setValue, control } = useFormContext<CheckoutAddressFormValues>()
 
-  const formData = useWatch({ control })
+  const formData = useWatch<CheckoutAddressFormValues>({ control })
+  const currentShippingAddress = formData.shipping_address ?? EMPTY_CHECKOUT_ADDRESS
 
   const countriesInRegion = useMemo(
     () => cart?.region?.countries?.map((c) => c.iso_2),
@@ -80,21 +101,7 @@ const ShippingAddress = ({
     [customer?.addresses, countriesInRegion]
   )
 
-  const setFormAddress = (
-    address?: Pick<
-      HttpTypes.StoreCartAddress,
-      | "first_name"
-      | "last_name"
-      | "address_1"
-      | "address_2"
-      | "company"
-      | "postal_code"
-      | "city"
-      | "country_code"
-      | "province"
-      | "phone"
-    >
-  ) => {
+  const populateShippingAddress = (address?: CheckoutAddressFields) => {
     if (address) {
       setValue("shipping_address", {
         first_name: address?.first_name || "",
@@ -114,7 +121,7 @@ const ShippingAddress = ({
     // Ensure cart is not null and has a shipping_address before setting form data
     if (cart) {
       if (cart.shipping_address) {
-        setFormAddress(cart.shipping_address)
+        populateShippingAddress(cart.shipping_address)
       } else if (
         // If customer has saved addresses in the region and form data is empty
         // set the first address in the region as the form data
@@ -125,32 +132,24 @@ const ShippingAddress = ({
       ) {
         const defaultShippingAddress =
           addressesInRegion.find((a) => a.is_default_shipping) ||
-          addressesInRegion[0]
+          addressesInRegion[0]!
 
-        setFormAddress({
-          first_name: defaultShippingAddress.first_name ?? undefined,
-          last_name: defaultShippingAddress.last_name ?? undefined,
-          address_1: defaultShippingAddress.address_1 ?? undefined,
-          address_2: defaultShippingAddress.address_2 ?? undefined,
-          company: defaultShippingAddress.company ?? undefined,
-          postal_code: defaultShippingAddress.postal_code ?? undefined,
-          city: defaultShippingAddress.city ?? undefined,
-          country_code: defaultShippingAddress.country_code ?? undefined,
-          province: defaultShippingAddress.province ?? undefined,
-          phone: defaultShippingAddress.phone ?? undefined,
+        populateShippingAddress({
+          first_name: defaultShippingAddress.first_name ?? "",
+          last_name: defaultShippingAddress.last_name ?? "",
+          address_1: defaultShippingAddress.address_1 ?? "",
+          address_2: defaultShippingAddress.address_2 ?? "",
+          company: defaultShippingAddress.company ?? "",
+          postal_code: defaultShippingAddress.postal_code ?? "",
+          city: defaultShippingAddress.city ?? "",
+          country_code: defaultShippingAddress.country_code ?? "",
+          province: defaultShippingAddress.province ?? "",
+          phone: defaultShippingAddress.phone ?? "",
         })
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cart, customer, addressesInRegion])
-
-  const handleChange = (
-    e:
-      | React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-      | { target: { name: string; value: string } }
-  ) => {
-    setValue(e.target.name, e.target.value)
-  }
 
   return (
     <>
@@ -166,21 +165,21 @@ const ShippingAddress = ({
                   <p className="text-xs text-grayscale-500 mb-1.5">Country</p>
                   <p>
                     {cart?.region?.countries?.find(
-                      (c) => c.iso_2 === formData.shipping_address.country_code
-                    )?.display_name || formData.shipping_address.country_code}
+                      (c) => c.iso_2 === currentShippingAddress.country_code
+                    )?.display_name || currentShippingAddress.country_code}
                   </p>
                 </div>
                 <div className="grow basis-0">
                   <p className="text-xs text-grayscale-500 mb-1.5">Address</p>
-                  <p>{formData.shipping_address.address_1}</p>
+                  <p>{currentShippingAddress.address_1}</p>
                 </div>
               </div>
-              {formData.shipping_address.address_2 && (
+              {currentShippingAddress.address_2 && (
                 <div>
                   <p className="text-xs text-grayscale-500 mb-1.5">
                     Apartment, suite, etc. (Optional)
                   </p>
-                  <p>{formData.shipping_address.address_2}</p>
+                  <p>{currentShippingAddress.address_2}</p>
                 </div>
               )}
               <div className="flex flex-wrap justify-between gap-6">
@@ -188,11 +187,11 @@ const ShippingAddress = ({
                   <p className="text-xs text-grayscale-500 mb-1.5">
                     Postal Code
                   </p>
-                  <p>{formData.shipping_address.postal_code}</p>
+                  <p>{currentShippingAddress.postal_code}</p>
                 </div>
                 <div className="grow basis-0">
                   <p className="text-xs text-grayscale-500 mb-1.5">City</p>
-                  <p>{formData.shipping_address.city}</p>
+                  <p>{currentShippingAddress.city}</p>
                 </div>
               </div>
             </div>
@@ -213,18 +212,17 @@ const ShippingAddress = ({
                         (a) => a.id === value
                       )
                       if (selectedAddress) {
-                        setFormAddress({
-                          address_1: selectedAddress.address_1 ?? undefined,
-                          address_2: selectedAddress.address_2 ?? undefined,
-                          city: selectedAddress.city ?? undefined,
-                          company: selectedAddress.company ?? undefined,
-                          country_code:
-                            selectedAddress.country_code ?? undefined,
-                          first_name: selectedAddress.first_name ?? undefined,
-                          last_name: selectedAddress.last_name ?? undefined,
-                          phone: selectedAddress.phone ?? undefined,
-                          postal_code: selectedAddress.postal_code ?? undefined,
-                          province: selectedAddress.province ?? undefined,
+                        populateShippingAddress({
+                          address_1: selectedAddress.address_1 ?? "",
+                          address_2: selectedAddress.address_2 ?? "",
+                          city: selectedAddress.city ?? "",
+                          company: selectedAddress.company ?? "",
+                          country_code: selectedAddress.country_code ?? "",
+                          first_name: selectedAddress.first_name ?? "",
+                          last_name: selectedAddress.last_name ?? "",
+                          phone: selectedAddress.phone ?? "",
+                          postal_code: selectedAddress.postal_code ?? "",
+                          province: selectedAddress.province ?? "",
                         })
                       }
                     }}
@@ -244,20 +242,19 @@ const ShippingAddress = ({
                             phone: a.phone ?? "",
                           },
                           {
-                            first_name: formData.shipping_address.first_name,
-                            last_name: formData.shipping_address.last_name,
-                            address_1: formData.shipping_address.address_1,
-                            address_2: formData.shipping_address.address_2,
-                            company: formData.shipping_address.company,
-                            postal_code: formData.shipping_address.postal_code,
-                            city: formData.shipping_address.city,
-                            country_code:
-                              formData.shipping_address.country_code,
-                            province: formData.shipping_address.province,
-                            phone: formData.shipping_address.phone,
+                            first_name: currentShippingAddress.first_name ?? "",
+                            last_name: currentShippingAddress.last_name ?? "",
+                            address_1: currentShippingAddress.address_1 ?? "",
+                            address_2: currentShippingAddress.address_2 ?? "",
+                            company: currentShippingAddress.company ?? "",
+                            postal_code: currentShippingAddress.postal_code ?? "",
+                            city: currentShippingAddress.city ?? "",
+                            country_code: currentShippingAddress.country_code ?? "",
+                            province: currentShippingAddress.province ?? "",
+                            phone: currentShippingAddress.phone ?? "",
                           }
                         )
-                      )?.id
+                      )?.id ?? null
                     }
                   >
                     {addressesInRegion?.map((address) => (
@@ -299,7 +296,10 @@ const ShippingAddress = ({
                           <UiDialog>
                             <UpsertAddressForm
                               region={cart?.region}
-                              defaultValues={{ country_code: countryCode }}
+                              {...withDefinedProp(
+                                "defaultValues",
+                                countryCode ? { country_code: countryCode } : undefined,
+                              )}
                             />
                           </UiDialog>
                         </UiModal>
@@ -354,16 +354,7 @@ const ShippingAddress = ({
             name="shipping_address.country_code"
             selectProps={{
               autoComplete: "country",
-              region: cart?.region,
-              selectedKey: formData["shipping_address.country_code"] || null,
-              onSelectionChange: (value) => {
-                handleChange({
-                  target: {
-                    name: "shipping_address.country_code",
-                    value: `${value}`,
-                  },
-                })
-              },
+              ...withDefinedProp("region", cart?.region),
             }}
             data-testid="shipping-country-select"
           />

@@ -10,14 +10,28 @@ export type AdminGetProductTypeParamsType = z.infer<
 >;
 export const AdminGetProductTypeParams = createSelectParams();
 
-export type AdminGetProductTypesParamsType = z.infer<
-  typeof AdminGetProductTypesParams
->;
-export const AdminGetProductTypesParams = createFindParams({
-  limit: 10,
-  offset: 0,
-}).merge(
-  z.object({
+interface AdminGetProductTypesParamsShape {
+  limit?: number | undefined;
+  offset?: number | undefined;
+  fields?: string | undefined;
+  order?: string | undefined;
+  q?: string | undefined;
+  id?: string | string[] | undefined;
+  value?: string | string[] | undefined;
+  created_at?: Record<string, unknown> | undefined;
+  updated_at?: Record<string, unknown> | undefined;
+  deleted_at?: Record<string, unknown> | undefined;
+  $and?: AdminGetProductTypesParamsShape[] | undefined;
+  $or?: AdminGetProductTypesParamsShape[] | undefined;
+}
+
+export type AdminGetProductTypesParamsType = AdminGetProductTypesParamsShape;
+
+export const AdminGetProductTypesParams: z.ZodType<AdminGetProductTypesParamsShape> =
+  createFindParams({
+    limit: 10,
+    offset: 0,
+  }).extend({
     q: z.string().optional(),
     id: z.union([z.string(), z.array(z.string())]).optional(),
     value: z.union([z.string(), z.array(z.string())]).optional(),
@@ -28,5 +42,4 @@ export const AdminGetProductTypesParams = createFindParams({
     deleted_at: createOperatorMap().optional(),
     $and: z.lazy(() => AdminGetProductTypesParams.array()).optional(),
     $or: z.lazy(() => AdminGetProductTypesParams.array()).optional(),
-  }),
-);
+  });

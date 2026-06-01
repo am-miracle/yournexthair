@@ -36,7 +36,7 @@ export const CartDrawer = withReactQueryProvider(() => {
           <Icon
             name="case"
             className=" w-6 h-6"
-            status={quantity && quantity > 0 ? quantity : undefined}
+            {...(quantity && quantity > 0 ? { status: quantity } : {})}
           />
         )}
       </Button>

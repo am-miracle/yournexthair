@@ -12,7 +12,14 @@ type Country = {
   display_name: string;
 };
 
+type OrderForEmail = OrderPlacedEmailProps['order'];
+type AddressForEmail = NonNullable<OrderForEmail['shipping_address']>;
+
 type MathBNInput = Parameters<typeof MathBN.convert>[0];
+
+type QueryGraphResult<T> = {
+  data: T[];
+};
 
 const toNumber = (value: MathBNInput | null | undefined): number =>
   MathBN.convert(value ?? 0).toNumber();
@@ -65,9 +72,7 @@ export default async function sendOrderConfirmationHandler({
   const query = container.resolve(ContainerRegistrationKeys.QUERY);
   const notificationModuleService = container.resolve(Modules.NOTIFICATION);
 
-  const {
-    data: [order],
-  } = await query.graph({
+  const orderQueryResult = (await query.graph({
     entity: 'order',
     fields: [
       'id',
@@ -101,7 +106,40 @@ export default async function sendOrderConfirmationHandler({
       'summary.*',
     ],
     filters: { id: data.id },
-  });
+  })) as QueryGraphResult<{
+    id: string;
+    currency_code: string;
+    total: MathBNInput | null;
+    subtotal: MathBNInput | null;
+    tax_total: MathBNInput | null;
+    shipping_total: MathBNInput | null;
+    email: string | null;
+    shipping_address:
+      | ({
+          country_code?: string | null;
+        } & Record<string, unknown>)
+      | null;
+    billing_address:
+      | ({
+          country_code?: string | null;
+        } & Record<string, unknown>)
+      | null;
+    items: Array<{
+      id: string;
+      quantity: MathBNInput | null;
+      total: MathBNInput | null;
+      thumbnail?: string | null;
+      product_title?: string | null;
+      variant_title?: string | null;
+      variant_option_values?: Record<string, unknown>;
+      product: {
+        thumbnail?: string | null;
+        images?: Array<{ url?: string | null }> | null;
+      };
+      variant?: { options?: unknown[] };
+    }>;
+  }>;
+  const order = orderQueryResult.data[0];
 
   if (!order || !order.email) {
     return;
@@ -115,13 +153,14 @@ export default async function sendOrderConfirmationHandler({
   const countryMap: Map<string, Country> = new Map();
 
   if (countryCodes.length > 0) {
-    const { data: countries } = await query.graph({
+    const countryQueryResult = (await query.graph({
       entity: 'country',
       fields: ['iso_2', 'name', 'display_name'],
       filters: {
         iso_2: countryCodes,
       },
-    });
+    })) as QueryGraphResult<Country>;
+    const { data: countries } = countryQueryResult;
 
     countries.forEach((country) => {
       countryMap.set(country.iso_2, {
@@ -138,25 +177,30 @@ export default async function sendOrderConfirmationHandler({
     display_name: countryCode.toUpperCase(),
   });
 
-  const shippingAddressForEmail = order.shipping_address
-    ? {
-        ...order.shipping_address,
-        country: order.shipping_address.country_code
-          ? (countryMap.get(order.shipping_address.country_code) ??
-            getFallbackCountry(order.shipping_address.country_code))
-          : undefined,
-      }
-    : order.shipping_address;
+  const withCountry = (
+    address: (Record<string, unknown> & { country_code?: string | null }) | null,
+  ): AddressForEmail | null => {
+    if (!address) {
+      return null;
+    }
 
-  const billingAddressForEmail = order.billing_address
-    ? {
-        ...order.billing_address,
-        country: order.billing_address.country_code
-          ? (countryMap.get(order.billing_address.country_code) ??
-            getFallbackCountry(order.billing_address.country_code))
-          : undefined,
-      }
-    : order.billing_address;
+    const country = address.country_code
+      ? (countryMap.get(address.country_code) ?? getFallbackCountry(address.country_code))
+      : undefined;
+
+    if (!country) {
+      return address as AddressForEmail;
+    }
+
+    return {
+      ...address,
+      country,
+    };
+  };
+
+  const shippingAddressForEmail = withCountry(order.shipping_address);
+
+  const billingAddressForEmail = withCountry(order.billing_address);
 
   const transformedItems = order.items.map((item) => ({
     id: item.id,
