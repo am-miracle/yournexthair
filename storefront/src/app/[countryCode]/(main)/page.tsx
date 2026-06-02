@@ -7,17 +7,12 @@ import { LocalizedLink } from "@/components/LocalizedLink"
 import { CollectionsSection } from "@/components/CollectionsSection"
 
 export const metadata: Metadata = {
-  title: "Medusa Next.js Starter Template",
-  description:
-    "A performant frontend ecommerce starter template with Next.js 14 and Medusa.",
+  title: "YourNextHair",
+  description: "Raw and virgin donor hair extensions and wigs shipped nationwide and worldwide.",
 }
 
 const ProductTypesSection: React.FC = async () => {
-  const productTypes = await getProductTypesList(0, 20, [
-    "id",
-    "value",
-    "metadata",
-  ])
+  const productTypes = await getProductTypesList(0, 20, ["id", "value", "metadata"])
 
   if (!productTypes) {
     return null
@@ -26,7 +21,7 @@ const ProductTypesSection: React.FC = async () => {
   return (
     <Layout className="mb-26 md:mb-36 max-md:gap-x-2">
       <LayoutColumn>
-        <h3 className="text-md md:text-2xl mb-8 md:mb-15">Our products</h3>
+        <h3 className="text-md md:text-2xl mb-8 md:mb-15">Shop by category</h3>
       </LayoutColumn>
       {productTypes.productTypes.map((productType, index) => (
         <LayoutColumn
@@ -55,11 +50,7 @@ const ProductTypesSection: React.FC = async () => {
   )
 }
 
-export default async function Home({
-  params,
-}: {
-  params: Promise<{ countryCode: string }>
-}) {
+export default async function Home({ params }: { params: Promise<{ countryCode: string }> }) {
   const { countryCode } = await params
   const region = await getRegion(countryCode)
 
@@ -82,15 +73,15 @@ export default async function Home({
         <Layout className="mb-26 md:mb-36">
           <LayoutColumn start={1} end={{ base: 13, md: 8 }}>
             <h3 className="text-md max-md:mb-6 md:text-2xl">
-              Elevate Your Living Space with Unmatched Comfort & Style
+              Raw and Virgin Hair, Direct from the Donor
             </h3>
           </LayoutColumn>
           <LayoutColumn start={{ base: 1, md: 9 }} end={13}>
             <div className="flex items-center h-full">
               <div className="md:text-md">
-                <p>Discover Your Perfect Sofa Today</p>
+                <p>Bundles, closures, frontals, and wigs. Strictly donor hair.</p>
                 <LocalizedLink href="/store" variant="underline">
-                  Explore Now
+                  Shop now
                 </LocalizedLink>
               </div>
             </div>
@@ -100,39 +91,31 @@ export default async function Home({
         <CollectionsSection className="mb-22 md:mb-36" />
         <Layout>
           <LayoutColumn className="col-span-full">
-            <h3 className="text-md md:text-2xl mb-8 md:mb-16">
-              About Sofa Society
-            </h3>
+            <h3 className="text-md md:text-2xl mb-8 md:mb-16">About Your Next Hair</h3>
             <Image
               src="/images/content/gray-sofa-against-concrete-wall.png"
               width={2496}
               height={1400}
               alt="Gray sofa against concrete wall"
-              className="mb-8 md:mb-16 max-md:aspect-[3/2] max-md:object-cover"
+              className="mb-8 md:mb-16 max-md:aspect-3/2 max-md:object-cover"
             />
           </LayoutColumn>
           <LayoutColumn start={1} end={{ base: 13, md: 7 }}>
             <h2 className="text-md md:text-2xl">
-              At Sofa Society, we believe that a sofa is the heart of every
-              home.
+              Raw and virgin hair sourced for consistency, longevity, and natural movement.
             </h2>
           </LayoutColumn>
-          <LayoutColumn
-            start={{ base: 1, md: 8 }}
-            end={13}
-            className="mt-6 md:mt-19"
-          >
+          <LayoutColumn start={{ base: 1, md: 8 }} end={13} className="mt-6 md:mt-19">
             <div className="md:text-md">
               <p className="mb-5 md:mb-9">
-                We are dedicated to delivering high-quality, thoughtfully
-                designed sofas that merge comfort and style effortlessly.
+                Bundles, closures, frontals, and wigs that blend naturally and hold up with wear.
+                No guesswork, no mixed hair.
               </p>
               <p className="mb-5 md:mb-3">
-                Our mission is to transform your living space into a sanctuary
-                of relaxation and beauty, with products built to last.
+                Ships nationwide and worldwide. Zelle accepted.
               </p>
               <LocalizedLink href="/about" variant="underline">
-                Read more about Sofa Society
+                Learn more about Your Next Hair
               </LocalizedLink>
             </div>
           </LayoutColumn>

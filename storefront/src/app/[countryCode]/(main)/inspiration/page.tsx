@@ -7,8 +7,8 @@ import { LocalizedLink } from "@/components/LocalizedLink"
 import { CollectionsSection } from "@/components/CollectionsSection"
 
 export const metadata: Metadata = {
-  title: "Inspiration",
-  description: "Get inspired by our latest collections",
+  title: "Hair Guide",
+  description: "Your guide to raw and virgin donor hair, textures, origins, and how to choose.",
 }
 
 export async function generateStaticParams() {
@@ -40,7 +40,7 @@ export default function InspirationPage() {
           src="/images/content/living-room-dark-green-three-seater-sofa.png"
           width={2880}
           height={1500}
-          alt="Living room with dark green three-seater sofa"
+          alt="Your Next Hair Guide"
           className="md:h-screen md:object-cover mb-8 md:mb-26"
         />
       </div>
@@ -48,34 +48,33 @@ export default function InspirationPage() {
         <Layout>
           <LayoutColumn start={1} end={{ base: 13, md: 8 }}>
             <h3 className="text-md mb-6 md:mb-16 md:text-2xl">
-              The Astrid Curve sofa is a masterpiece of minimalism and luxury.
+              Raw vs Virgin Hair. What is the difference?
             </h3>
             <div className="md:text-md max-md:mb-16 max-w-135">
               <p>
-                Our design philosophy revolves around creating pieces that are
-                both beautiful and practical. Inspired by Scandinavian
-                simplicity, modern luxury, and timeless classics.
+                Raw hair is collected directly from a single donor with the
+                cuticles intact and fully aligned. Virgin hair has never been
+                chemically processed but may come from multiple donors. Both are
+                high quality. Raw is simply the most unaltered form of donor
+                hair you can get.
               </p>
             </div>
           </LayoutColumn>
           <LayoutColumn start={{ base: 1, md: 9 }} end={13}>
-            <LocalizedLink href="/products/astrid-curve">
+            <LocalizedLink href="/store?category=bundles">
               <Image
                 src="/images/content/dark-gray-three-seater-sofa.png"
                 width={768}
                 height={572}
-                alt="Dark gray three-seater sofa"
+                alt="Raw donor bundles"
                 className="mb-4 md:mb-6"
               />
               <div className="flex justify-between">
                 <div>
-                  <p className="mb-1">Astrid Curve</p>
+                  <p className="mb-1">Raw Bundles</p>
                   <p className="text-grayscale-500 text-xs">
-                    Scandinavian Simplicity
+                    Single donor, cuticles aligned
                   </p>
-                </div>
-                <div>
-                  <p className="font-semibold">1500€</p>
                 </div>
               </div>
             </LocalizedLink>
@@ -85,64 +84,60 @@ export default function InspirationPage() {
               src="/images/content/living-room-brown-armchair-gray-corner-sofa.png"
               width={2496}
               height={1404}
-              alt="Living room with brown armchair and gray corner sofa"
+              alt="Hair texture guide"
               className="mt-26 md:mt-36 mb-8 md:mb-26"
             />
           </LayoutColumn>
           <LayoutColumn start={1} end={{ base: 13, md: 8 }}>
             <h3 className="text-md mb-6 md:mb-16 md:text-2xl">
-              Haven Sofas have minimalistic designs, neutral colors, and
-              high-quality textures.
+              Choosing the right texture for your lifestyle.
             </h3>
             <div className="md:text-md max-md:mb-16 max-w-135">
               <p>
-                Perfect for those who seek comfort with a clean and understated
-                aesthetic. This collection brings the essence of Scandinavian
-                elegance to your living room.
+                Body wave and loose wave are the most versatile. They hold
+                curls, lay flat, and bounce back after washing. Straight hair is
+                low maintenance and blends easily with most textures. Deep wave
+                and kinky curly give you maximum volume and defined patterns
+                that thrive with moisture. Choose based on how much upkeep you
+                want day to day.
               </p>
             </div>
           </LayoutColumn>
           <LayoutColumn start={{ base: 1, md: 9 }} end={13}>
             <LocalizedLink
-              href="/products/nordic-haven"
+              href="/store?category=closures-frontals"
               className="mb-8 md:mb-16 inline-block"
             >
               <Image
                 src="/images/content/gray-three-seater-sofa.png"
                 width={768}
                 height={572}
-                alt="Gray three-seater sofa"
+                alt="Closures and frontals"
                 className="mb-4 md:mb-6"
               />
               <div className="flex justify-between">
                 <div>
-                  <p className="mb-1">Nordic Haven</p>
+                  <p className="mb-1">Closures &amp; Frontals</p>
                   <p className="text-grayscale-500 text-xs">
-                    Scandinavian Simplicity
+                    4x4, 5x5, 13x4, 13x6
                   </p>
-                </div>
-                <div>
-                  <p className="font-semibold">1500€</p>
                 </div>
               </div>
             </LocalizedLink>
-            <LocalizedLink href="/products/nordic-breeze">
+            <LocalizedLink href="/store?category=wigs">
               <Image
                 src="/images/content/gray-arm-chair.png"
                 width={768}
                 height={572}
-                alt="Gray arm chair"
+                alt="Wigs and units"
                 className="mb-4 md:mb-6"
               />
               <div className="flex justify-between">
                 <div>
-                  <p className="mb-1">Nordic Breeze</p>
+                  <p className="mb-1">Wigs &amp; Units</p>
                   <p className="text-grayscale-500 text-xs">
-                    Scandinavian Simplicity
+                    Lace front, full lace, glueless
                   </p>
-                </div>
-                <div>
-                  <p className="font-semibold">1200€</p>
                 </div>
               </div>
             </LocalizedLink>
@@ -152,41 +147,41 @@ export default function InspirationPage() {
           src="/images/content/living-room-gray-two-seater-puffy-sofa.png"
           width={2880}
           height={1618}
-          alt="Living room with gray two-seater puffy sofa"
+          alt="Your Next Hair origins guide"
           className="md:h-screen md:object-cover mt-26 md:mt-36 mb-8 md:mb-26"
         />
         <Layout>
           <LayoutColumn start={1} end={{ base: 13, md: 8 }}>
             <h3 className="text-md mb-6 md:mb-16 md:text-2xl">
-              Oslo Drift is infused with playful textures and vibrant patterns
-              with eclectic vibes.
+              Brazilian, Peruvian, Indian, Malaysian, Cambodian. Origins matter.
             </h3>
             <div className="md:text-md max-md:mb-16 max-w-135">
               <p>
-                Whether you&apos;re looking for bold statement pieces or subtle
-                elegance, this collection elevates your home with a touch of
-                glamour, sophistication, and unmatched coziness.
+                Brazilian is soft and full with natural body movement. Peruvian
+                is lightweight with a natural luster that catches light well.
+                Indian is dense and versatile with a wave pattern that holds up
+                through styling. Malaysian is silky and smooth. Cambodian is
+                thick and strong, great for holding styles and lasting through
+                heavy wear. Choose based on your natural texture and how much
+                maintenance you want to put in.
               </p>
             </div>
           </LayoutColumn>
           <LayoutColumn start={{ base: 1, md: 9 }} end={13}>
-            <LocalizedLink href="/products/oslo-drift">
+            <LocalizedLink href="/store">
               <Image
                 src="/images/content/white-two-seater-sofa.png"
                 width={768}
                 height={572}
-                alt="White two-seater sofa"
+                alt="Shop all hair"
                 className="mb-4 md:mb-6"
               />
               <div className="flex justify-between">
                 <div>
-                  <p className="mb-1">Oslo Drift</p>
+                  <p className="mb-1">Shop All Hair</p>
                   <p className="text-grayscale-500 text-xs">
-                    Scandinavian Simplicity
+                    Bundles, closures, frontals &amp; wigs
                   </p>
-                </div>
-                <div>
-                  <p className="font-semibold">1500€</p>
                 </div>
               </div>
             </LocalizedLink>

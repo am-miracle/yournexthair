@@ -9,15 +9,13 @@ import { HeaderWrapper } from "@/components/HeaderWrapper"
 
 import dynamic from "next/dynamic"
 
-const LoginLink = dynamic(
-  () => import("@modules/header/components/LoginLink"),
-  { loading: () => <></> }
-)
+const LoginLink = dynamic(() => import("@modules/header/components/LoginLink"), {
+  loading: () => <></>,
+})
 
-const CartDrawer = dynamic(
-  () => import("@/components/CartDrawer").then((mod) => mod.CartDrawer),
-  { loading: () => <></> }
-)
+const CartDrawer = dynamic(() => import("@/components/CartDrawer").then((mod) => mod.CartDrawer), {
+  loading: () => <></>,
+})
 
 type CountryOption = {
   country: string
@@ -39,8 +37,8 @@ export const Header: React.FC = async () => {
                 label: country.display_name,
               },
             ]
-          : []
-      )
+          : [],
+      ),
     )
     .sort((a, b) => a.label.localeCompare(b.label))
 
@@ -51,11 +49,11 @@ export const Header: React.FC = async () => {
           <LayoutColumn>
             <div className="flex justify-between items-center h-18 md:h-21">
               <h1 className="font-medium text-md">
-                <LocalizedLink href="/">SofaSocietyCo.</LocalizedLink>
+                <LocalizedLink href="/">YourNextHair</LocalizedLink>
               </h1>
               <div className="flex items-center gap-8 max-md:hidden">
                 <LocalizedLink href="/about">About</LocalizedLink>
-                <LocalizedLink href="/inspiration">Inspiration</LocalizedLink>
+                <LocalizedLink href="/inspiration">Hair Guide</LocalizedLink>
                 <LocalizedLink href="/store">Shop</LocalizedLink>
               </div>
               <div className="flex items-center gap-3 lg:gap-6 max-md:hidden">

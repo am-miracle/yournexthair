@@ -26,11 +26,6 @@ const requiredEnvs: RequiredEnv[] = [
     description:
       'Your preferred default region. When middleware cannot determine the user region from the "x-vercel-country" header, the default region will be used. ISO-2 lowercase format.',
   },
-  {
-    key: "NEXT_PUBLIC_STRIPE_KEY",
-    description:
-      "Your Stripe public key. See - https://docs.medusajs.com/add-plugins/stripe.",
-  },
 ]
 
 export default function checkEnvVariables(): void {

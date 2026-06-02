@@ -6,7 +6,7 @@ import { Layout, LayoutColumn } from "@/components/Layout"
 
 export const metadata: Metadata = {
   title: "About",
-  description: "Learn more about Sofa Society",
+  description: "Learn more about Your Next Hair, raw and virgin donor hair extensions and wigs.",
 }
 
 export async function generateStaticParams() {
@@ -38,7 +38,7 @@ export default function AboutPage() {
           src="/images/content/living-room-gray-three-seater-sofa.png"
           width={2880}
           height={1500}
-          alt="Living room with gray three-seater sofa"
+          alt="Your Next Hair"
           className="md:h-screen md:object-cover"
         />
       </div>
@@ -46,22 +46,21 @@ export default function AboutPage() {
         <Layout>
           <LayoutColumn start={1} end={{ base: 13, lg: 7 }}>
             <h3 className="text-md max-lg:mb-6 md:text-2xl">
-              At Sofa Society, we believe that a sofa is the heart of every
-              home.
+              At Your Next Hair, we believe great hair starts at the source.
             </h3>
           </LayoutColumn>
           <LayoutColumn start={{ base: 1, lg: 8 }} end={13}>
             <div className="md:text-md lg:mt-18">
               <p className="mb-5 lg:mb-9">
-                Welcome to Sofa Society, where we believe that comfort and style
-                should be effortlessly intertwined. Our mission is to help you
-                create beautiful, functional spaces that bring warmth and
-                relaxation into your home.
+                Your Next Hair is built around one thing: raw, unprocessed donor
+                hair that you can actually trust. We deal strictly in virgin and
+                raw bundles, closures, frontals, and wigs sourced directly from
+                real donors.
               </p>
               <p>
-                Every piece in our collection is designed with care, blending
-                timeless craftsmanship with modern aesthetics to offer you the
-                perfect balance between form and function.
+                No shortcuts. No blended hair. Just clean, full, lasting quality
+                shipped nationwide and worldwide from Port Harcourt, Rivers
+                State, Nigeria.
               </p>
             </div>
           </LayoutColumn>
@@ -70,32 +69,27 @@ export default function AboutPage() {
               src="/images/content/living-room-black-armchair-dark-gray-sofa.png"
               width={2496}
               height={1404}
-              alt="Living room with black armchair and dark gray sofa"
+              alt="Your Next Hair collection"
               className="mt-26 lg:mt-36 mb-8 lg:mb-26"
             />
           </LayoutColumn>
           <LayoutColumn start={1} end={{ base: 13, lg: 8 }}>
             <h3 className="text-md lg:mb-10 mb-6 md:text-2xl">
-              We are here to make your living space a true reflection of your
-              personal style.
+              Strictly donor hair. Nothing less, nothing mixed.
             </h3>
           </LayoutColumn>
           <LayoutColumn start={1} end={{ base: 13, lg: 6 }}>
             <div className="mb-16 lg:mb-26">
               <p className="mb-5 md:mb-9">
-                At the heart of our brand is a deep commitment to quality. We
-                understand that a sofa isn&apos;t just another piece of
-                furniture; it&apos;s where you unwind, gather with loved ones,
-                and make memories. That&apos;s why we source only the finest
-                materials and fabrics, ensuring that every sofa we offer is
-                built to last.
+                Every bundle, closure, frontal, and wig we carry is sourced from
+                a single donor and never chemically processed. The cuticles are
+                intact, the strands are aligned, and the hair moves exactly the
+                way it should.
               </p>
               <p>
-                From luxurious leathers and soft linens to high-performance
-                textiles, each fabric is carefully selected for its durability
-                and beauty. Our attention to detail extends to every stitch and
-                seam, guaranteeing that your sofa will not only look stunning
-                but will also withstand the test of time.
+                We carry Brazilian, Peruvian, Indian, Malaysian, and Cambodian
+                raw hair because texture, origin, and density matter. We stock
+                what actually works.
               </p>
             </div>
           </LayoutColumn>
@@ -104,31 +98,23 @@ export default function AboutPage() {
               src="/images/content/gray-one-seater-sofa-wooden-coffee-table.png"
               width={1200}
               height={1600}
-              alt="Gray one-seater sofa and wooden coffee table"
+              alt="Your Next Hair quality"
               className="mb-16 lg:mb-46"
             />
           </LayoutColumn>
           <LayoutColumn start={{ base: 1, lg: 8 }} end={13}>
             <div className="mb-6 lg:mb-20 xl:mb-36">
               <p>
-                Our design philosophy revolves around creating pieces that are
-                both beautiful and practical. Inspired by Scandinavian
-                simplicity, modern luxury, and timeless classics, our
-                collections are curated to suit a wide variety of tastes and
-                lifestyles. We understand that every home is different, so we
-                offer a diverse range of styles, colors, and textures to help
-                you find the perfect fit. Whether you prefer sleek modern lines
-                or soft, inviting silhouettes, we have something to suit every
-                space and personality.
+                We ship nationwide across Nigeria and worldwide to the UK, US,
+                Canada, Europe, the Caribbean, and beyond. Great hair is a
+                global need and we are built to meet it wherever you are.
               </p>
             </div>
             <div className="md:text-md max-lg:mb-26">
               <p>
-                We believe that great design should be environmentally
-                conscious, which is why we strive to minimise our environmental
-                footprint through responsible sourcing and production practices.
-                Our commitment to sustainability ensures that our products are
-                not only beautiful but also kind to the planet.
+                We also accept Zelle for payment because buying quality hair
+                should be straightforward with no unnecessary barriers between
+                you and what you need.
               </p>
             </div>
           </LayoutColumn>
@@ -137,27 +123,33 @@ export default function AboutPage() {
           src="/images/content/living-room-gray-three-seater-puffy-sofa.png"
           width={2880}
           height={1618}
-          alt="Living room with gray three-seater puffy sofa"
+          alt="Your Next Hair"
           className="mb-8 lg:mb-26"
         />
         <Layout>
           <LayoutColumn start={1} end={{ base: 13, lg: 7 }}>
             <h3 className="text-md max-lg:mb-6 md:text-2xl">
-              Our customers are at the center of everything we do!
+              Our clients are at the center of everything we do.
             </h3>
           </LayoutColumn>
           <LayoutColumn start={{ base: 1, lg: 8 }} end={13}>
             <div className="md:text-md lg:mt-18">
               <p className="mb-5 lg:mb-9">
-                Our team is here to help guide you through the process, offering
-                personalised support to ensure that you find exactly what
-                you&apos;re looking for.
+                Whether you are a first-time buyer or a returning client, we
+                take the time to make sure you get exactly what you are looking
+                for. Questions? Reach us directly on{" "}
+                <a
+                  href="https://api.whatsapp.com/send?phone=2348156197614"
+                  target="_blank"
+                  className="underline"
+                >
+                  WhatsApp
+                </a>
+                .
               </p>
               <p>
-                We&apos;re not just selling sofas - we&apos;re helping you
-                create spaces where you can relax, recharge, and make lasting
-                memories. Thank you for choosing Sofa Society to be a part of
-                your home!
+                Thank you for choosing Your Next Hair. We are not just selling
+                extensions. We are helping you show up exactly how you want to.
               </p>
             </div>
           </LayoutColumn>

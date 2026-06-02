@@ -1,5 +1,4 @@
 import { HttpTypes } from "@medusajs/types"
-import { notFound } from "next/navigation"
 import { NextRequest, NextResponse } from "next/server"
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL
@@ -27,7 +26,7 @@ async function getRegionMap() {
     }).then((res) => res.json())
 
     if (!regions?.length) {
-      notFound()
+      return regionMapCache.regionMap
     }
 
     regions.forEach((region: HttpTypes.StoreRegion) => {

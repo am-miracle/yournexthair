@@ -14,123 +14,151 @@ import {
   linkSalesChannelsToStockLocationWorkflow,
   updateStoresWorkflow,
   uploadFilesWorkflow,
-} from '@medusajs/medusa/core-flows';
+} from "@medusajs/medusa/core-flows"
 import type {
   ExecArgs,
   IFulfillmentModuleService,
   ISalesChannelModuleService,
   IStoreModuleService,
-} from '@medusajs/framework/types';
-import {
-  ContainerRegistrationKeys,
-  Modules,
-  ProductStatus,
-} from '@medusajs/framework/utils';
-import type FashionModuleService from '../modules/fashion/service';
-import type { MaterialModelType } from '../modules/fashion/models/material';
+} from "@medusajs/framework/types"
+import { ContainerRegistrationKeys, Modules, ProductStatus } from "@medusajs/framework/utils"
+import type FashionModuleService from "../modules/fashion/service"
+import type { MaterialModelType } from "../modules/fashion/models/material"
 
 function requireDefined<T>(value: T | undefined, message: string): T {
   if (value === undefined) {
-    throw new Error(message);
+    throw new Error(message)
   }
 
-  return value;
+  return value
 }
 
 function requireFirst<T>(values: T[], message: string): T {
-  return requireDefined(values[0], message);
+  return requireDefined(values[0], message)
 }
 
-function requireFound<T>(
-  values: T[],
-  predicate: (value: T) => boolean,
-  message: string,
-): T {
-  const value = values.find(predicate);
+function requireFound<T>(values: T[], predicate: (value: T) => boolean, message: string): T {
+  const value = values.find(predicate)
 
   if (!value) {
-    throw new Error(message);
+    throw new Error(message)
   }
 
-  return value;
+  return value
 }
 
 async function getImageUrlContent(url: string) {
-  const response = await fetch(url);
+  const response = await fetch(url)
 
   if (!response.ok) {
-    throw new Error(`Failed to fetch image "${url}": ${response.statusText}`);
+    throw new Error(`Failed to fetch image "${url}": ${response.statusText}`)
   }
 
-  const arrayBuffer = await response.arrayBuffer();
+  const arrayBuffer = await response.arrayBuffer()
 
-  return Buffer.from(arrayBuffer).toString('binary');
+  return Buffer.from(arrayBuffer).toString("binary")
 }
 
 export default async function seedDemoData({ container }: ExecArgs) {
-  const logger = container.resolve(ContainerRegistrationKeys.LOGGER);
-  const remoteLink = container.resolve(ContainerRegistrationKeys.LINK);
-  const fulfillmentModuleService: IFulfillmentModuleService = container.resolve(
-    Modules.FULFILLMENT,
-  );
-  const salesChannelModuleService: ISalesChannelModuleService =
-    container.resolve(Modules.SALES_CHANNEL);
-  const storeModuleService: IStoreModuleService = container.resolve(
-    Modules.STORE,
-  );
-  const fashionModuleService: FashionModuleService = container.resolve(
-    'fashionModuleService',
-  );
+  const logger = container.resolve(ContainerRegistrationKeys.LOGGER)
+  const remoteLink = container.resolve(ContainerRegistrationKeys.LINK)
+  const fulfillmentModuleService: IFulfillmentModuleService = container.resolve(Modules.FULFILLMENT)
+  const salesChannelModuleService: ISalesChannelModuleService = container.resolve(
+    Modules.SALES_CHANNEL,
+  )
+  const storeModuleService: IStoreModuleService = container.resolve(Modules.STORE)
+  const fashionModuleService: FashionModuleService = container.resolve("fashionModuleService")
 
-  const countries = ['hr', 'gb', 'de', 'dk', 'se', 'fr', 'es', 'it'];
+  const countries = [
+    "ng",
+    "gb",
+    "us",
+    "ca",
+    "au",
+    "de",
+    "fr",
+    "es",
+    "it",
+    "nl",
+    "be",
+    "se",
+    "no",
+    "dk",
+    "fi",
+    "ie",
+    "pt",
+    "ch",
+    "at",
+    "pl",
+    "cz",
+    "hu",
+    "hr",
+    "gh",
+    "ke",
+    "za",
+    "tz",
+    "ug",
+    "et",
+    "eg",
+    "ma",
+    "jm",
+    "tt",
+    "bb",
+    "gy",
+    "bs",
+    "in",
+    "sg",
+    "my",
+    "ae",
+    "sa",
+    "qa",
+    "nz",
+  ]
 
-  logger.info('Seeding store data...');
+  logger.info("Seeding store data...")
   const store = requireFirst(
     await storeModuleService.listStores(),
-    'Expected at least one store to exist before seeding demo data.',
-  );
+    "Expected at least one store to exist before seeding demo data.",
+  )
   let defaultSalesChannel = await salesChannelModuleService.listSalesChannels({
-    name: 'Default Sales Channel',
-  });
+    name: "Default Sales Channel",
+  })
 
   if (!defaultSalesChannel.length) {
-    // create the default sales channel
-    const { result: salesChannelResult } = await createSalesChannelsWorkflow(
-      container,
-    ).run({
+    const { result: salesChannelResult } = await createSalesChannelsWorkflow(container).run({
       input: {
         salesChannelsData: [
           {
-            name: 'Default Sales Channel',
+            name: "Default Sales Channel",
           },
         ],
       },
-    });
-    defaultSalesChannel = salesChannelResult;
+    })
+    defaultSalesChannel = salesChannelResult
   }
   const defaultSalesChannelId = requireFirst(
     defaultSalesChannel,
-    'Expected a default sales channel to exist before seeding demo data.',
-  ).id;
+    "Expected a default sales channel to exist before seeding demo data.",
+  ).id
 
-  logger.info('Seeding region data...');
+  logger.info("Seeding region data...")
   const { result: regionResult } = await createRegionsWorkflow(container).run({
     input: {
       regions: [
         {
-          name: 'Europe',
-          currency_code: 'eur',
+          name: "Nigeria",
+          currency_code: "ngn",
           countries,
-          payment_providers: ['pp_stripe_stripe'],
+          payment_providers: ["pp_stripe_stripe"],
         },
       ],
     },
-  });
+  })
   const region = requireFirst(
     regionResult,
-    'Expected a region to be created while seeding demo data.',
-  );
-  logger.info('Finished seeding regions.');
+    "Expected a region to be created while seeding demo data.",
+  )
+  logger.info("Finished seeding regions.")
 
   await updateStoresWorkflow(container).run({
     input: {
@@ -138,122 +166,92 @@ export default async function seedDemoData({ container }: ExecArgs) {
       update: {
         supported_currencies: [
           {
-            currency_code: 'eur',
+            currency_code: "ngn",
             is_default: true,
           },
           {
-            currency_code: 'usd',
+            currency_code: "usd",
+          },
+          {
+            currency_code: "eur",
           },
         ],
         default_sales_channel_id: defaultSalesChannelId,
         default_region_id: region.id,
       },
     },
-  });
+  })
 
-  logger.info('Seeding tax regions...');
+  logger.info("Seeding tax regions...")
   await createTaxRegionsWorkflow(container).run({
     input: countries.map((country_code) => ({
       country_code,
     })),
-  });
-  logger.info('Finished seeding tax regions.');
+  })
+  logger.info("Finished seeding tax regions.")
 
-  logger.info('Seeding stock location data...');
-  const { result: stockLocationResult } = await createStockLocationsWorkflow(
-    container,
-  ).run({
+  logger.info("Seeding stock location data...")
+  const { result: stockLocationResult } = await createStockLocationsWorkflow(container).run({
     input: {
       locations: [
         {
-          name: 'European Warehouse',
+          name: "Portharcourt Warehouse",
           address: {
-            city: 'Copenhagen',
-            country_code: 'DK',
-            address_1: '',
+            city: "Port harcourt",
+            country_code: "NG",
+            address_1: "",
           },
         },
       ],
     },
-  });
+  })
   const stockLocation = requireFirst(
     stockLocationResult,
-    'Expected a stock location to be created while seeding demo data.',
-  );
+    "Expected a stock location to be created while seeding demo data.",
+  )
 
   await remoteLink.create({
     [Modules.STOCK_LOCATION]: {
       stock_location_id: stockLocation.id,
     },
     [Modules.FULFILLMENT]: {
-      fulfillment_provider_id: 'manual_manual',
+      fulfillment_provider_id: "manual_manual",
     },
-  });
+  })
 
-  logger.info('Seeding fulfillment data...');
-  const { result: shippingProfileResult } =
-    await createShippingProfilesWorkflow(container).run({
-      input: {
-        data: [
-          {
-            name: 'Default',
-            type: 'default',
-          },
-        ],
-      },
-    });
+  logger.info("Seeding fulfillment data...")
+  const { result: shippingProfileResult } = await createShippingProfilesWorkflow(container).run({
+    input: {
+      data: [
+        {
+          name: "Default",
+          type: "default",
+        },
+      ],
+    },
+  })
   const shippingProfile = requireFirst(
     shippingProfileResult,
-    'Expected a shipping profile to be created while seeding demo data.',
-  );
+    "Expected a shipping profile to be created while seeding demo data.",
+  )
 
   const fulfillmentSet = await fulfillmentModuleService.createFulfillmentSets({
-    name: 'European Warehouse delivery',
-    type: 'shipping',
+    name: "Port Harcourt Warehouse delivery",
+    type: "shipping",
     service_zones: [
       {
-        name: 'Europe',
-        geo_zones: [
-          {
-            country_code: 'hr',
-            type: 'country',
-          },
-          {
-            country_code: 'gb',
-            type: 'country',
-          },
-          {
-            country_code: 'de',
-            type: 'country',
-          },
-          {
-            country_code: 'dk',
-            type: 'country',
-          },
-          {
-            country_code: 'se',
-            type: 'country',
-          },
-          {
-            country_code: 'fr',
-            type: 'country',
-          },
-          {
-            country_code: 'es',
-            type: 'country',
-          },
-          {
-            country_code: 'it',
-            type: 'country',
-          },
-        ],
+        name: "Worldwide",
+        geo_zones: countries.map((country_code) => ({
+          country_code,
+          type: "country" as const,
+        })),
       },
     ],
-  });
+  })
   const fulfillmentServiceZone = requireFirst(
     fulfillmentSet.service_zones,
-    'Expected a shipping fulfillment service zone to be created.',
-  );
+    "Expected a shipping fulfillment service zone to be created.",
+  )
 
   await remoteLink.create({
     [Modules.STOCK_LOCATION]: {
@@ -262,28 +260,28 @@ export default async function seedDemoData({ container }: ExecArgs) {
     [Modules.FULFILLMENT]: {
       fulfillment_set_id: fulfillmentSet.id,
     },
-  });
+  })
 
   await createShippingOptionsWorkflow(container).run({
     input: [
       {
-        name: 'Standard Shipping',
-        price_type: 'flat',
-        provider_id: 'manual_manual',
+        name: "Standard Shipping",
+        price_type: "flat",
+        provider_id: "manual_manual",
         service_zone_id: fulfillmentServiceZone.id,
         shipping_profile_id: shippingProfile.id,
         type: {
-          label: 'Standard',
-          description: 'Ship in 2-3 days.',
-          code: 'standard',
+          label: "Standard",
+          description: "Ship in 2-3 days.",
+          code: "standard",
         },
         prices: [
           {
-            currency_code: 'usd',
+            currency_code: "usd",
             amount: 10,
           },
           {
-            currency_code: 'eur',
+            currency_code: "eur",
             amount: 10,
           },
           {
@@ -293,35 +291,35 @@ export default async function seedDemoData({ container }: ExecArgs) {
         ],
         rules: [
           {
-            attribute: 'enabled_in_store',
+            attribute: "enabled_in_store",
             value: '"true"',
-            operator: 'eq',
+            operator: "eq",
           },
           {
-            attribute: 'is_return',
-            value: 'false',
-            operator: 'eq',
+            attribute: "is_return",
+            value: "false",
+            operator: "eq",
           },
         ],
       },
       {
-        name: 'Express Shipping',
-        price_type: 'flat',
-        provider_id: 'manual_manual',
+        name: "Express Shipping",
+        price_type: "flat",
+        provider_id: "manual_manual",
         service_zone_id: fulfillmentServiceZone.id,
         shipping_profile_id: shippingProfile.id,
         type: {
-          label: 'Express',
-          description: 'Ship in 24 hours.',
-          code: 'express',
+          label: "Express",
+          description: "Ship in 24 hours.",
+          code: "express",
         },
         prices: [
           {
-            currency_code: 'usd',
+            currency_code: "usd",
             amount: 10,
           },
           {
-            currency_code: 'eur',
+            currency_code: "eur",
             amount: 10,
           },
           {
@@ -331,44 +329,39 @@ export default async function seedDemoData({ container }: ExecArgs) {
         ],
         rules: [
           {
-            attribute: 'enabled_in_store',
+            attribute: "enabled_in_store",
             value: '"true"',
-            operator: 'eq',
+            operator: "eq",
           },
           {
-            attribute: 'is_return',
-            value: 'false',
-            operator: 'eq',
+            attribute: "is_return",
+            value: "false",
+            operator: "eq",
           },
         ],
       },
     ],
-  });
+  })
 
-  const pickupFulfillmentSet =
-    await fulfillmentModuleService.createFulfillmentSets({
-      name: 'Store pickup',
-      type: 'pickup',
-      service_zones: [
-        {
-          name: 'Store pickup',
-          geo_zones: [
-            {
-              country_code: 'hr',
-              type: 'country',
-            },
-            {
-              country_code: 'dk',
-              type: 'country',
-            },
-          ],
-        },
-      ],
-    });
+  const pickupFulfillmentSet = await fulfillmentModuleService.createFulfillmentSets({
+    name: "Store pickup",
+    type: "pickup",
+    service_zones: [
+      {
+        name: "Store pickup",
+        geo_zones: [
+          {
+            country_code: "ng",
+            type: "country",
+          },
+        ],
+      },
+    ],
+  })
   const pickupServiceZone = requireFirst(
     pickupFulfillmentSet.service_zones,
-    'Expected a pickup fulfillment service zone to be created.',
-  );
+    "Expected a pickup fulfillment service zone to be created.",
+  )
 
   await remoteLink.create({
     [Modules.STOCK_LOCATION]: {
@@ -377,28 +370,28 @@ export default async function seedDemoData({ container }: ExecArgs) {
     [Modules.FULFILLMENT]: {
       fulfillment_set_id: pickupFulfillmentSet.id,
     },
-  });
+  })
 
   await createShippingOptionsWorkflow(container).run({
     input: [
       {
-        name: 'Denmark Store Pickup',
-        price_type: 'flat',
-        provider_id: 'manual_manual',
+        name: "Nigeria Store Pickup",
+        price_type: "flat",
+        provider_id: "manual_manual",
         service_zone_id: pickupServiceZone.id,
         shipping_profile_id: shippingProfile.id,
         type: {
-          label: 'Denmark Store Pickup',
-          description: 'Free in-store pickup.',
-          code: 'standard',
+          label: "Nigeria Store Pickup",
+          description: "Free in-store pickup.",
+          code: "standard",
         },
         prices: [
           {
-            currency_code: 'usd',
+            currency_code: "usd",
             amount: 0,
           },
           {
-            currency_code: 'eur',
+            currency_code: "eur",
             amount: 0,
           },
           {
@@ -408,671 +401,655 @@ export default async function seedDemoData({ container }: ExecArgs) {
         ],
         rules: [
           {
-            attribute: 'enabled_in_store',
+            attribute: "enabled_in_store",
             value: '"true"',
-            operator: 'eq',
+            operator: "eq",
           },
           {
-            attribute: 'is_return',
-            value: 'false',
-            operator: 'eq',
+            attribute: "is_return",
+            value: "false",
+            operator: "eq",
           },
         ],
       },
     ],
-  });
+  })
 
-  logger.info('Finished seeding fulfillment data.');
+  logger.info("Finished seeding fulfillment data.")
 
   await linkSalesChannelsToStockLocationWorkflow(container).run({
     input: {
       id: stockLocation.id,
       add: [defaultSalesChannelId],
     },
-  });
-  logger.info('Finished seeding stock location data.');
+  })
+  logger.info("Finished seeding stock location data.")
 
-  logger.info('Seeding publishable API key data...');
-  const { result: publishableApiKeyResult } = await createApiKeysWorkflow(
-    container,
-  ).run({
+  logger.info("Seeding publishable API key data...")
+  const { result: publishableApiKeyResult } = await createApiKeysWorkflow(container).run({
     input: {
       api_keys: [
         {
-          title: 'Webshop',
-          type: 'publishable',
-          created_by: '',
+          title: "Webshop",
+          type: "publishable",
+          created_by: "",
         },
       ],
     },
-  });
+  })
   const publishableApiKey = requireFirst(
     publishableApiKeyResult,
-    'Expected a publishable API key to be created while seeding demo data.',
-  );
+    "Expected a publishable API key to be created while seeding demo data.",
+  )
 
   await linkSalesChannelsToApiKeyWorkflow(container).run({
     input: {
       id: publishableApiKey.id,
       add: [defaultSalesChannelId],
     },
-  });
-  logger.info('Finished seeding publishable API key data.');
+  })
+  logger.info("Finished seeding publishable API key data.")
 
-  logger.info('Seeding product data...');
+  logger.info("Seeding product data...")
 
-  const { result: categoryResult } = await createProductCategoriesWorkflow(
-    container,
-  ).run({
+  const { result: categoryResult } = await createProductCategoriesWorkflow(container).run({
     input: {
       product_categories: [
         {
-          name: 'One seater',
+          name: "Bundles",
           is_active: true,
         },
         {
-          name: 'Two seater',
+          name: "Closures & Frontals",
           is_active: true,
         },
         {
-          name: 'Three seater',
+          name: "Wigs",
           is_active: true,
         },
       ],
     },
-  });
-  const oneSeaterCategoryId = requireFound(
+  })
+  const bundlesCategoryId = requireFound(
     categoryResult,
-    (category) => category.name === 'One seater',
-    'Expected "One seater" product category to exist.',
-  ).id;
-  const twoSeaterCategoryId = requireFound(
+    (category) => category.name === "Bundles",
+    'Expected "Bundles" product category to exist.',
+  ).id
+  const closuresFrontalsCategoryId = requireFound(
     categoryResult,
-    (category) => category.name === 'Two seater',
-    'Expected "Two seater" product category to exist.',
-  ).id;
-  const threeSeaterCategoryId = requireFound(
+    (category) => category.name === "Closures & Frontals",
+    'Expected "Closures & Frontals" product category to exist.',
+  ).id
+  const wigsCategoryId = requireFound(
     categoryResult,
-    (category) => category.name === 'Three seater',
-    'Expected "Three seater" product category to exist.',
-  ).id;
+    (category) => category.name === "Wigs",
+    'Expected "Wigs" product category to exist.',
+  ).id
 
-  const [sofasImage, armChairsImage] = await uploadFilesWorkflow(container)
+  const [extensionsImage, wigsImage] = await uploadFilesWorkflow(container)
     .run({
       input: {
         files: [
           {
-            access: 'public',
-            filename: 'sofas.png',
-            mimeType: 'image/png',
+            access: "public",
+            filename: "extensions.png",
+            mimeType: "image/png",
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/product-types/sofas/image.png',
+              "https://assets.agilo.com/fashion-starter/product-types/sofas/image.png",
             ),
           },
           {
-            access: 'public',
-            filename: 'arm-chairs.png',
-            mimeType: 'image/png',
+            access: "public",
+            filename: "wigs.png",
+            mimeType: "image/png",
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/product-types/arm-chairs/image.png',
+              "https://assets.agilo.com/fashion-starter/product-types/arm-chairs/image.png",
             ),
           },
         ],
       },
     })
-    .then((res) => res.result);
+    .then((res) => res.result)
 
-  const { result: productTypes } = await createProductTypesWorkflow(
-    container,
-  ).run({
+  const { result: productTypes } = await createProductTypesWorkflow(container).run({
     input: {
       product_types: [
         {
-          value: 'Sofas',
+          value: "Extensions",
           metadata: {
-            image: sofasImage,
+            image: extensionsImage,
           },
         },
         {
-          value: 'Arm Chairs',
+          value: "Wigs & Units",
           metadata: {
-            image: armChairsImage,
+            image: wigsImage,
           },
         },
       ],
     },
-  });
-  const sofasProductTypeId = requireFound(
+  })
+  const extensionsProductTypeId = requireFound(
     productTypes,
-    (productType) => productType.value === 'Sofas',
-    'Expected "Sofas" product type to exist.',
-  ).id;
-  const armChairsProductTypeId = requireFound(
+    (productType) => productType.value === "Extensions",
+    'Expected "Extensions" product type to exist.',
+  ).id
+  const wigsProductTypeId = requireFound(
     productTypes,
-    (productType) => productType.value === 'Arm Chairs',
-    'Expected "Arm Chairs" product type to exist.',
-  ).id;
+    (productType) => productType.value === "Wigs & Units",
+    'Expected "Wigs & Units" product type to exist.',
+  ).id
 
   const [
-    scandinavianSimplicityImage,
-    scandinavianSimplicityCollectionPageImage,
-    scandinavianSimplicityProductPageImage,
-    scandinavianSimplicityProductPageWideImage,
-    scandinavianSimplicityProductPageCtaImage,
-    modernLuxeImage,
-    modernLuxeCollectionPageImage,
-    modernLuxeProductPageImage,
-    modernLuxeProductPageWideImage,
-    modernLuxeProductPageCtaImage,
-    bohoChicImage,
-    bohoChicCollectionPageImage,
-    bohoChicProductPageImage,
-    bohoChicProductPageWideImage,
-    bohoChicProductPageCtaImage,
-    timelessClassicsImage,
-    timelessClassicsCollectionPageImage,
-    timelessClassicsProductPageImage,
-    timelessClassicsProductPageWideImage,
-    timelessClassicsProductPageCtaImage,
+    brazilianVirginImage,
+    brazilianVirginCollectionPageImage,
+    brazilianVirginProductPageImage,
+    brazilianVirginProductPageWideImage,
+    brazilianVirginProductPageCtaImage,
+    peruvianSilkyImage,
+    peruvianSilkyCollectionPageImage,
+    peruvianSilkyProductPageImage,
+    peruvianSilkyProductPageWideImage,
+    peruvianSilkyProductPageCtaImage,
+    indianRawImage,
+    indianRawCollectionPageImage,
+    indianRawProductPageImage,
+    indianRawProductPageWideImage,
+    indianRawProductPageCtaImage,
+    cambodianDonorImage,
+    cambodianDonorCollectionPageImage,
+    cambodianDonorProductPageImage,
+    cambodianDonorProductPageWideImage,
+    cambodianDonorProductPageCtaImage,
   ] = await uploadFilesWorkflow(container)
     .run({
       input: {
         files: [
           {
-            access: 'public',
-            filename: 'scandinavian-simplicity.png',
-            mimeType: 'image/png',
+            access: "public",
+            filename: "brazilian-virgin.png",
+            mimeType: "image/png",
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/collections/scandinavian-simplicity/image.png',
+              "https://assets.agilo.com/fashion-starter/collections/scandinavian-simplicity/image.png",
             ),
           },
           {
-            access: 'public',
-            filename: 'scandinavian-simplicity-collection-page-image.png',
-            mimeType: 'image/png',
+            access: "public",
+            filename: "scandinavian-simplicity-collection-page-image.png",
+            mimeType: "image/png",
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/collections/scandinavian-simplicity/collection_page_image.png',
+              "https://assets.agilo.com/fashion-starter/collections/scandinavian-simplicity/collection_page_image.png",
             ),
           },
           {
-            access: 'public',
-            filename: 'scandinavian-simplicity-product-page-image.png',
-            mimeType: 'image/png',
+            access: "public",
+            filename: "scandinavian-simplicity-product-page-image.png",
+            mimeType: "image/png",
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/collections/scandinavian-simplicity/product_page_image.png',
+              "https://assets.agilo.com/fashion-starter/collections/scandinavian-simplicity/product_page_image.png",
             ),
           },
           {
-            access: 'public',
-            filename: 'scandinavian-simplicity-product-page-wide-image.png',
-            mimeType: 'image/png',
+            access: "public",
+            filename: "scandinavian-simplicity-product-page-wide-image.png",
+            mimeType: "image/png",
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/collections/scandinavian-simplicity/product_page_wide_image.png',
+              "https://assets.agilo.com/fashion-starter/collections/scandinavian-simplicity/product_page_wide_image.png",
             ),
           },
           {
-            access: 'public',
-            filename: 'scandinavian-simplicity-product-page-cta-image.png',
-            mimeType: 'image/png',
+            access: "public",
+            filename: "scandinavian-simplicity-product-page-cta-image.png",
+            mimeType: "image/png",
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/collections/scandinavian-simplicity/product_page_cta_image.png',
+              "https://assets.agilo.com/fashion-starter/collections/scandinavian-simplicity/product_page_cta_image.png",
             ),
           },
           {
-            access: 'public',
-            filename: 'modern-luxe.png',
-            mimeType: 'image/png',
+            access: "public",
+            filename: "modern-luxe.png",
+            mimeType: "image/png",
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/collections/modern-luxe/image.png',
+              "https://assets.agilo.com/fashion-starter/collections/modern-luxe/image.png",
             ),
           },
           {
-            access: 'public',
-            filename: 'modern-luxe-collection-page-image.png',
-            mimeType: 'image/png',
+            access: "public",
+            filename: "modern-luxe-collection-page-image.png",
+            mimeType: "image/png",
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/collections/modern-luxe/collection_page_image.png',
+              "https://assets.agilo.com/fashion-starter/collections/modern-luxe/collection_page_image.png",
             ),
           },
           {
-            access: 'public',
-            filename: 'modern-luxe-product-page-image.png',
-            mimeType: 'image/png',
+            access: "public",
+            filename: "modern-luxe-product-page-image.png",
+            mimeType: "image/png",
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/collections/modern-luxe/product_page_image.png',
+              "https://assets.agilo.com/fashion-starter/collections/modern-luxe/product_page_image.png",
             ),
           },
           {
-            access: 'public',
-            filename: 'modern-luxe-product-page-wide-image.png',
-            mimeType: 'image/png',
+            access: "public",
+            filename: "modern-luxe-product-page-wide-image.png",
+            mimeType: "image/png",
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/collections/modern-luxe/product_page_wide_image.png',
+              "https://assets.agilo.com/fashion-starter/collections/modern-luxe/product_page_wide_image.png",
             ),
           },
           {
-            access: 'public',
-            filename: 'modern-luxe-product-page-cta-image.png',
-            mimeType: 'image/png',
+            access: "public",
+            filename: "modern-luxe-product-page-cta-image.png",
+            mimeType: "image/png",
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/collections/modern-luxe/product_page_cta_image.png',
+              "https://assets.agilo.com/fashion-starter/collections/modern-luxe/product_page_cta_image.png",
             ),
           },
           {
-            access: 'public',
-            filename: 'boho-chic.png',
-            mimeType: 'image/png',
+            access: "public",
+            filename: "boho-chic.png",
+            mimeType: "image/png",
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/collections/boho-chic/image.png',
+              "https://assets.agilo.com/fashion-starter/collections/boho-chic/image.png",
             ),
           },
           {
-            access: 'public',
-            filename: 'boho-chic-collection-page-image.png',
-            mimeType: 'image/png',
+            access: "public",
+            filename: "boho-chic-collection-page-image.png",
+            mimeType: "image/png",
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/collections/boho-chic/collection_page_image.png',
+              "https://assets.agilo.com/fashion-starter/collections/boho-chic/collection_page_image.png",
             ),
           },
           {
-            access: 'public',
-            filename: 'boho-chic-product-page-image.png',
-            mimeType: 'image/png',
+            access: "public",
+            filename: "boho-chic-product-page-image.png",
+            mimeType: "image/png",
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/collections/boho-chic/product_page_image.png',
+              "https://assets.agilo.com/fashion-starter/collections/boho-chic/product_page_image.png",
             ),
           },
           {
-            access: 'public',
-            filename: 'boho-chic-product-page-wide-image.png',
-            mimeType: 'image/png',
+            access: "public",
+            filename: "boho-chic-product-page-wide-image.png",
+            mimeType: "image/png",
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/collections/boho-chic/product_page_wide_image.png',
+              "https://assets.agilo.com/fashion-starter/collections/boho-chic/product_page_wide_image.png",
             ),
           },
           {
-            access: 'public',
-            filename: 'boho-chic-product-page-cta-image.png',
-            mimeType: 'image/png',
+            access: "public",
+            filename: "boho-chic-product-page-cta-image.png",
+            mimeType: "image/png",
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/collections/boho-chic/product_page_cta_image.png',
+              "https://assets.agilo.com/fashion-starter/collections/boho-chic/product_page_cta_image.png",
             ),
           },
           {
-            access: 'public',
-            filename: 'timeless-classics.png',
-            mimeType: 'image/png',
+            access: "public",
+            filename: "timeless-classics.png",
+            mimeType: "image/png",
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/collections/timeless-classics/image.png',
+              "https://assets.agilo.com/fashion-starter/collections/timeless-classics/image.png",
             ),
           },
           {
-            access: 'public',
-            filename: 'timeless-classics-collection-page-image.png',
-            mimeType: 'image/png',
+            access: "public",
+            filename: "timeless-classics-collection-page-image.png",
+            mimeType: "image/png",
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/collections/timeless-classics/collection_page_image.png',
+              "https://assets.agilo.com/fashion-starter/collections/timeless-classics/collection_page_image.png",
             ),
           },
           {
-            access: 'public',
-            filename: 'timeless-classics-product-page-image.png',
-            mimeType: 'image/png',
+            access: "public",
+            filename: "timeless-classics-product-page-image.png",
+            mimeType: "image/png",
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/collections/timeless-classics/product_page_image.png',
+              "https://assets.agilo.com/fashion-starter/collections/timeless-classics/product_page_image.png",
             ),
           },
           {
-            access: 'public',
-            filename: 'timeless-classics-product-page-wide-image.png',
-            mimeType: 'image/png',
+            access: "public",
+            filename: "timeless-classics-product-page-wide-image.png",
+            mimeType: "image/png",
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/collections/timeless-classics/product_page_wide_image.png',
+              "https://assets.agilo.com/fashion-starter/collections/timeless-classics/product_page_wide_image.png",
             ),
           },
           {
-            access: 'public',
-            filename: 'timeless-classics-product-page-cta-image.png',
-            mimeType: 'image/png',
+            access: "public",
+            filename: "timeless-classics-product-page-cta-image.png",
+            mimeType: "image/png",
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/collections/timeless-classics/product_page_cta_image.png',
+              "https://assets.agilo.com/fashion-starter/collections/timeless-classics/product_page_cta_image.png",
             ),
           },
         ],
       },
     })
-    .then((res) => res.result);
+    .then((res) => res.result)
 
-  const { result: collections } = await createCollectionsWorkflow(
-    container,
-  ).run({
+  const { result: collections } = await createCollectionsWorkflow(container).run({
     input: {
       collections: [
         {
-          title: 'Scandinavian Simplicity',
-          handle: 'scandinavian-simplicity',
+          title: "Brazilian Virgin",
+          handle: "brazilian-virgin",
           metadata: {
             description:
-              'Minimalistic designs, neutral colors, and high-quality textures',
-            image: scandinavianSimplicityImage,
-            collection_page_image: scandinavianSimplicityCollectionPageImage,
-            collection_page_heading:
-              'Scandinavian Simplicity: Effortless elegance, timeless comfort',
-            collection_page_content: `Minimalistic designs, neutral colors, and high-quality textures. Perfect for those who seek comfort with a clean and understated aesthetic.
+              "Silky-smooth Brazilian raw donor hair, unprocessed and full of natural life",
+            image: brazilianVirginImage,
+            collection_page_image: brazilianVirginCollectionPageImage,
+            collection_page_heading: "Brazilian Virgin: Pure raw donor hair with natural movement",
+            collection_page_content: `Sourced directly from Brazilian donors and never chemically processed. Soft, silky, and built to last through washing, styling, and daily wear.
 
-This collection brings the essence of Scandinavian elegance to your living room.`,
-            product_page_heading: 'Collection Inspired Interior',
-            product_page_image: scandinavianSimplicityProductPageImage,
-            product_page_wide_image: scandinavianSimplicityProductPageWideImage,
-            product_page_cta_image: scandinavianSimplicityProductPageCtaImage,
+This collection brings the finest Brazilian raw hair straight to your door.`,
+            product_page_heading: "Collection Inspired Styles",
+            product_page_image: brazilianVirginProductPageImage,
+            product_page_wide_image: brazilianVirginProductPageWideImage,
+            product_page_cta_image: brazilianVirginProductPageCtaImage,
             product_page_cta_heading:
-              "The 'Name of sofa' embodies Scandinavian minimalism with clean lines and a soft, neutral palette.",
-            product_page_cta_link:
-              'See more out of ‘Scandinavian Simplicity’ collection',
+              "The '[product name]' delivers effortless natural movement with pure Brazilian raw texture.",
+            product_page_cta_link: "See more from the 'Brazilian Virgin' collection",
           },
         },
         {
-          title: 'Modern Luxe',
-          handle: 'modern-luxe',
+          title: "Peruvian Silky",
+          handle: "peruvian-silky",
           metadata: {
             description:
-              'Sophisticated and sleek, these sofas blend modern design with luxurious comfort',
-            image: modernLuxeImage,
-            collection_page_image: modernLuxeCollectionPageImage,
-            collection_page_heading:
-              'Modern Luxe: Where modern design meets luxurious living',
-            collection_page_content: `Sophisticated and sleek, these sofas blend modern design with luxurious comfort. Bold lines and premium materials create the ultimate statement pieces for any contemporary home.
+              "Lightweight and naturally lustrous Peruvian virgin hair with a long-lasting shine",
+            image: peruvianSilkyImage,
+            collection_page_image: peruvianSilkyCollectionPageImage,
+            collection_page_heading: "Peruvian Silky: Naturally straight, naturally stunning",
+            collection_page_content: `Lightweight with incredible natural luster, Peruvian virgin hair blends seamlessly with most hair textures. Low-maintenance and long-lasting with minimal shedding.
 
-Elevate your space with timeless beauty.`,
-            product_page_heading: 'Collection Inspired Interior',
-            product_page_image: modernLuxeProductPageImage,
-            product_page_wide_image: modernLuxeProductPageWideImage,
-            product_page_cta_image: modernLuxeProductPageCtaImage,
+Elevate your look with hair that moves and shines like your own.`,
+            product_page_heading: "Collection Inspired Styles",
+            product_page_image: peruvianSilkyProductPageImage,
+            product_page_wide_image: peruvianSilkyProductPageWideImage,
+            product_page_cta_image: peruvianSilkyProductPageCtaImage,
             product_page_cta_heading:
-              "The 'Name of sofa' is a masterpiece of minimalism and luxury.",
-            product_page_cta_link: 'See more out of ‘Modern Luxe’ collection',
+              "The '[product name]' is a statement piece — pure Peruvian silk with a flawless finish.",
+            product_page_cta_link: "See more from the 'Peruvian Silky' collection",
           },
         },
         {
-          title: 'Boho Chic',
-          handle: 'boho-chic',
+          title: "Indian Raw",
+          handle: "indian-raw",
           metadata: {
-            description:
-              'Infused with playful textures and vibrant patterns with eclectic vibes',
-            image: bohoChicImage,
-            collection_page_image: bohoChicCollectionPageImage,
-            collection_page_heading:
-              'Boho Chic: Relaxed, eclectic style with a touch of free-spirited charm',
-            collection_page_content: `Infused with playful textures and vibrant patterns, this collection embodies relaxed, eclectic vibes. Soft fabrics and creative designs add warmth and personality to any room.
+            description: "Dense and versatile raw Indian donor hair with natural wave patterns",
+            image: indianRawImage,
+            collection_page_image: indianRawCollectionPageImage,
+            collection_page_heading: "Indian Raw: Dense, natural, and incredibly versatile",
+            collection_page_content: `Raw Indian donor hair collected directly at the source with cuticles intact and aligned. Known for its density, natural wave, and ability to hold styles beautifully.
 
-It’s comfort with a bold, carefree spirit.`,
-            product_page_heading: 'Collection Inspired Interior',
-            product_page_image: bohoChicProductPageImage,
-            product_page_wide_image: bohoChicProductPageWideImage,
-            product_page_cta_image: bohoChicProductPageCtaImage,
+The go-to choice for clients who want volume, versatility, and longevity.`,
+            product_page_heading: "Collection Inspired Styles",
+            product_page_image: indianRawProductPageImage,
+            product_page_wide_image: indianRawProductPageWideImage,
+            product_page_cta_image: indianRawProductPageCtaImage,
             product_page_cta_heading:
-              "The 'Name of sofa' captures the essence of boho style with its relaxed, oversized form and eclectic fabric choices.",
-            product_page_cta_link: 'See more out of ‘Boho Chic’ collection',
+              "The '[product name]' captures the essence of raw Indian hair — dense, natural, and built for everyday wear.",
+            product_page_cta_link: "See more from the 'Indian Raw' collection",
           },
         },
         {
-          title: 'Timeless Classics',
-          handle: 'timeless-classics',
+          title: "Cambodian Donor",
+          handle: "cambodian-donor",
           metadata: {
             description:
-              'Elegant shapes and rich textures, traditional craftsmanship with modern comfort',
-            image: timelessClassicsImage,
-            collection_page_image: timelessClassicsCollectionPageImage,
-            collection_page_heading:
-              'Timeless Classics: Enduring style, crafted for comfort and lasting beauty',
-            collection_page_content: `Designed for those who appreciate enduring style, this collection features elegant shapes and rich textures. These sofas combine traditional craftsmanship with modern comfort.
+              "Thick and durable Cambodian donor hair known for its natural body and strength",
+            image: cambodianDonorImage,
+            collection_page_image: cambodianDonorCollectionPageImage,
+            collection_page_heading: "Cambodian Donor: Thick, strong, and built to last",
+            collection_page_content: `Cambodian donor hair is prized for its coarse, thick strands that hold curls and styles with ease. Collected from single donors for maximum consistency.
 
-Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
-            product_page_heading: 'Collection Inspired Interior',
-            product_page_image: timelessClassicsProductPageImage,
-            product_page_wide_image: timelessClassicsProductPageWideImage,
-            product_page_cta_image: timelessClassicsProductPageCtaImage,
+Perfect for clients who want bold, full-bodied hair that lasts.`,
+            product_page_heading: "Collection Inspired Styles",
+            product_page_image: cambodianDonorProductPageImage,
+            product_page_wide_image: cambodianDonorProductPageWideImage,
+            product_page_cta_image: cambodianDonorProductPageCtaImage,
             product_page_cta_heading:
-              "The 'Name of sofa' brings a touch of traditional charm with its elegant curves and classic silhouette",
-            product_page_cta_link:
-              'See more out of ‘Timeless Classics’ collection',
+              "The '[product name]' brings full-bodied Cambodian donor texture with strength and natural movement.",
+            product_page_cta_link: "See more from the 'Cambodian Donor' collection",
           },
         },
       ],
     },
-  });
-  const scandinavianSimplicityCollectionId = requireFound(
+  })
+  const brazilianVirginCollectionId = requireFound(
     collections,
-    (collection) => collection.handle === 'scandinavian-simplicity',
-    'Expected "scandinavian-simplicity" collection to exist.',
-  ).id;
-  const modernLuxeCollectionId = requireFound(
+    (collection) => collection.handle === "brazilian-virgin",
+    'Expected "brazilian-virgin" collection to exist.',
+  ).id
+  const peruvianSilkyCollectionId = requireFound(
     collections,
-    (collection) => collection.handle === 'modern-luxe',
-    'Expected "modern-luxe" collection to exist.',
-  ).id;
-  const bohoChicCollectionId = requireFound(
+    (collection) => collection.handle === "peruvian-silky",
+    'Expected "peruvian-silky" collection to exist.',
+  ).id
+  const indianRawCollectionId = requireFound(
     collections,
-    (collection) => collection.handle === 'boho-chic',
-    'Expected "boho-chic" collection to exist.',
-  ).id;
-  const timelessClassicsCollectionId = requireFound(
+    (collection) => collection.handle === "indian-raw",
+    'Expected "indian-raw" collection to exist.',
+  ).id
+  const cambodianDonorCollectionId = requireFound(
     collections,
-    (collection) => collection.handle === 'timeless-classics',
-    'Expected "timeless-classics" collection to exist.',
-  ).id;
+    (collection) => collection.handle === "cambodian-donor",
+    'Expected "cambodian-donor" collection to exist.',
+  ).id
 
-  const materials: MaterialModelType[] =
-    await fashionModuleService.createMaterials([
-      {
-        name: 'Velvet',
-      },
-      {
-        name: 'Linen',
-      },
-      {
-        name: 'Boucle',
-      },
-      {
-        name: 'Leather',
-      },
-      {
-        name: 'Microfiber',
-      },
-    ]);
-  const velvetMaterialId = requireFound(
+  const materials: MaterialModelType[] = await fashionModuleService.createMaterials([
+    {
+      name: "Brazilian",
+    },
+    {
+      name: "Peruvian",
+    },
+    {
+      name: "Indian",
+    },
+    {
+      name: "Malaysian",
+    },
+    {
+      name: "Cambodian",
+    },
+  ])
+  const brazilianMaterialId = requireFound(
     materials,
-    (material) => material.name === 'Velvet',
-    'Expected "Velvet" material to exist.',
-  ).id;
-  const linenMaterialId = requireFound(
+    (material) => material.name === "Brazilian",
+    'Expected "Brazilian" material to exist.',
+  ).id
+  const peruvianMaterialId = requireFound(
     materials,
-    (material) => material.name === 'Linen',
-    'Expected "Linen" material to exist.',
-  ).id;
-  const boucleMaterialId = requireFound(
+    (material) => material.name === "Peruvian",
+    'Expected "Peruvian" material to exist.',
+  ).id
+  const indianMaterialId = requireFound(
     materials,
-    (material) => material.name === 'Boucle',
-    'Expected "Boucle" material to exist.',
-  ).id;
-  const leatherMaterialId = requireFound(
+    (material) => material.name === "Indian",
+    'Expected "Indian" material to exist.',
+  ).id
+  const malaysianMaterialId = requireFound(
     materials,
-    (material) => material.name === 'Leather',
-    'Expected "Leather" material to exist.',
-  ).id;
-  const microfiberMaterialId = requireFound(
+    (material) => material.name === "Malaysian",
+    'Expected "Malaysian" material to exist.',
+  ).id
+  const cambodianMaterialId = requireFound(
     materials,
-    (material) => material.name === 'Microfiber',
-    'Expected "Microfiber" material to exist.',
-  ).id;
+    (material) => material.name === "Cambodian",
+    'Expected "Cambodian" material to exist.',
+  ).id
 
   await fashionModuleService.createColors([
-    // Velvet
+    // Brazilian
     {
-      name: 'Black',
-      hex_code: '#4C4D4E',
-      material_id: velvetMaterialId,
+      name: "Natural Black",
+      hex_code: "#1A1A1A",
+      material_id: brazilianMaterialId,
     },
     {
-      name: 'Purple',
-      hex_code: '#904C94',
-      material_id: velvetMaterialId,
+      name: "Dark Brown",
+      hex_code: "#3B2314",
+      material_id: brazilianMaterialId,
     },
-    // Linen
+    // Peruvian
     {
-      name: 'Green',
-      hex_code: '#438849',
-      material_id: linenMaterialId,
-    },
-    {
-      name: 'Light Gray',
-      hex_code: '#B1B1B1',
-      material_id: linenMaterialId,
+      name: "Natural Black",
+      hex_code: "#1A1A1A",
+      material_id: peruvianMaterialId,
     },
     {
-      name: 'Yellow',
-      hex_code: '#F1BD37',
-      material_id: linenMaterialId,
+      name: "Dark Brown",
+      hex_code: "#3B2314",
+      material_id: peruvianMaterialId,
     },
     {
-      name: 'Red',
-      hex_code: '#CD1F23',
-      material_id: linenMaterialId,
+      name: "Medium Brown",
+      hex_code: "#6B4423",
+      material_id: peruvianMaterialId,
     },
     {
-      name: 'Blue',
-      hex_code: '#475F8A',
-      material_id: linenMaterialId,
-    },
-    // Microfiber
-    {
-      name: 'Orange',
-      hex_code: '#EF7218',
-      material_id: microfiberMaterialId,
+      name: "Burgundy",
+      hex_code: "#6B0F1A",
+      material_id: peruvianMaterialId,
     },
     {
-      name: 'Dark Gray',
-      hex_code: '#4A4A4A',
-      material_id: microfiberMaterialId,
+      name: "Blonde 613",
+      hex_code: "#E8C97D",
+      material_id: peruvianMaterialId,
+    },
+    // Indian
+    {
+      name: "Natural Black",
+      hex_code: "#1A1A1A",
+      material_id: indianMaterialId,
     },
     {
-      name: 'Black',
-      hex_code: '#282828',
-      material_id: microfiberMaterialId,
-    },
-    // Boucle
-    {
-      name: 'Beige',
-      hex_code: '#C8BCB3',
-      material_id: boucleMaterialId,
+      name: "Off Black",
+      hex_code: "#2A2020",
+      material_id: indianMaterialId,
     },
     {
-      name: 'White',
-      hex_code: '#EAEAEA',
-      material_id: boucleMaterialId,
+      name: "Dark Brown",
+      hex_code: "#3B2314",
+      material_id: indianMaterialId,
+    },
+    // Malaysian
+    {
+      name: "Natural Black",
+      hex_code: "#1A1A1A",
+      material_id: malaysianMaterialId,
     },
     {
-      name: 'Light Gray',
-      hex_code: '#C3C0BE',
-      material_id: boucleMaterialId,
+      name: "Dark Brown",
+      hex_code: "#3B2314",
+      material_id: malaysianMaterialId,
     },
-    // Leather
+    // Cambodian
     {
-      name: 'Violet',
-      hex_code: '#B1ABBF',
-      material_id: leatherMaterialId,
+      name: "Natural Black",
+      hex_code: "#1A1A1A",
+      material_id: cambodianMaterialId,
     },
     {
-      name: 'Beige',
-      hex_code: '#A79D9B',
-      material_id: leatherMaterialId,
+      name: "Dark Brown",
+      hex_code: "#3B2314",
+      material_id: cambodianMaterialId,
     },
-  ]);
+    {
+      name: "Off Black",
+      hex_code: "#2A2020",
+      material_id: cambodianMaterialId,
+    },
+  ])
 
-  const astridCurveImages = await uploadFilesWorkflow(container)
+  const indianBodyWaveImages = await uploadFilesWorkflow(container)
     .run({
       input: {
         files: [
           {
-            access: 'public',
-            filename: 'astrid-curve.png',
-            mimeType: 'image/png',
+            access: "public",
+            filename: "indian-body-wave-bundle.png",
+            mimeType: "image/png",
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/products/astrid-curve/image.png',
+              "https://assets.agilo.com/fashion-starter/products/astrid-curve/image.png",
             ),
           },
           {
-            access: 'public',
-            filename: 'astrid-curve-2.png',
-            mimeType: 'image/png',
+            access: "public",
+            filename: "indian-body-wave-bundle-2.png",
+            mimeType: "image/png",
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/products/astrid-curve/image1.png',
+              "https://assets.agilo.com/fashion-starter/products/astrid-curve/image1.png",
             ),
           },
         ],
       },
     })
-    .then((res) => res.result);
+    .then((res) => res.result)
 
   await createProductsWorkflow(container).run({
     input: {
       products: [
         {
-          title: 'Astrid Curve',
-          handle: 'astrid-curve',
+          title: "Indian Body Wave Bundle",
+          handle: "indian-body-wave-bundle",
           description:
-            'The Astrid Curve combines flowing curves and cozy, textured fabric for a truly bohemian vibe. Its relaxed design adds character and comfort, perfect for eclectic living spaces with a free-spirited charm.',
-          category_ids: [threeSeaterCategoryId],
-          collection_id: bohoChicCollectionId,
-          type_id: sofasProductTypeId,
+            "Raw Indian body wave bundles with a natural, flowing wave pattern. Full from root to tip with minimal shedding. Perfect for achieving voluminous, textured styles that hold beautifully.",
+          category_ids: [bundlesCategoryId],
+          collection_id: indianRawCollectionId,
+          type_id: extensionsProductTypeId,
           status: ProductStatus.PUBLISHED,
-          images: astridCurveImages,
+          images: indianBodyWaveImages,
           options: [
             {
-              title: 'Material',
-              values: ['Microfiber', 'Velvet'],
+              title: "Origin",
+              values: ["Cambodian", "Indian"],
             },
             {
-              title: 'Color',
-              values: ['Dark Gray', 'Purple'],
+              title: "Color",
+              values: ["Natural Black", "Dark Brown"],
             },
           ],
           variants: [
             {
-              title: 'Microfiber / Dark Gray',
-              sku: 'ASTRID-CURVE-MICROFIBER-DARK-GRAY',
+              title: "Cambodian / Natural Black",
+              sku: "INDIAN-BODY-WAVE-CAMBODIAN-NATURAL-BLACK",
               options: {
-                Material: 'Microfiber',
-                Color: 'Dark Gray',
+                Origin: "Cambodian",
+                Color: "Natural Black",
               },
               manage_inventory: false,
               prices: [
                 {
                   amount: 1500,
-                  currency_code: 'eur',
+                  currency_code: "eur",
                 },
                 {
                   amount: 1700,
-                  currency_code: 'usd',
+                  currency_code: "usd",
                 },
               ],
             },
             {
-              title: 'Velvet / Purple',
-              sku: 'ASTRID-CURVE-VELVET-PURPLE',
+              title: "Indian / Dark Brown",
+              sku: "INDIAN-BODY-WAVE-INDIAN-DARK-BROWN",
               options: {
-                Material: 'Velvet',
-                Color: 'Purple',
+                Origin: "Indian",
+                Color: "Dark Brown",
               },
               manage_inventory: false,
               prices: [
                 {
                   amount: 2000,
-                  currency_code: 'eur',
+                  currency_code: "eur",
                 },
                 {
                   amount: 2200,
-                  currency_code: 'usd',
+                  currency_code: "usd",
                 },
               ],
             },
@@ -1085,111 +1062,111 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
         },
       ],
     },
-  });
+  })
 
-  const belimeEstateImages = await uploadFilesWorkflow(container)
+  const cambodianClosureImages = await uploadFilesWorkflow(container)
     .run({
       input: {
         files: [
           {
-            access: 'public',
-            filename: 'belime-estate.png',
-            mimeType: 'image/png',
+            access: "public",
+            filename: "cambodian-straight-closure.png",
+            mimeType: "image/png",
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/products/belime-estate/image.png',
+              "https://assets.agilo.com/fashion-starter/products/belime-estate/image.png",
             ),
           },
           {
-            access: 'public',
-            filename: 'belime-estate-2.png',
-            mimeType: 'image/png',
+            access: "public",
+            filename: "cambodian-straight-closure-2.png",
+            mimeType: "image/png",
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/products/belime-estate/image1.png',
+              "https://assets.agilo.com/fashion-starter/products/belime-estate/image1.png",
             ),
           },
         ],
       },
     })
-    .then((res) => res.result);
+    .then((res) => res.result)
 
   await createProductsWorkflow(container).run({
     input: {
       products: [
         {
-          title: 'Belime Estate',
-          handle: 'belime-estate',
+          title: "Cambodian 4x4 Straight Closure",
+          handle: "cambodian-4x4-straight-closure",
           description:
-            'The Belime Estate exudes classic sophistication with its tufted back and rich fabric. Its luxurious look and enduring comfort make it a perfect fit for traditional, elegant interiors.',
-          category_ids: [twoSeaterCategoryId],
-          collection_id: timelessClassicsCollectionId,
-          type_id: sofasProductTypeId,
+            "A 4x4 lace closure made from raw Cambodian straight donor hair. Naturally thick and aligned from root to tip. Provides a natural-looking hairline with minimal maintenance and long-lasting durability.",
+          category_ids: [closuresFrontalsCategoryId],
+          collection_id: cambodianDonorCollectionId,
+          type_id: extensionsProductTypeId,
           status: ProductStatus.PUBLISHED,
-          images: belimeEstateImages,
+          images: cambodianClosureImages,
           options: [
             {
-              title: 'Material',
-              values: ['Linen', 'Boucle'],
+              title: "Origin",
+              values: ["Peruvian", "Cambodian"],
             },
             {
-              title: 'Color',
-              values: ['Red', 'Blue', 'Beige'],
+              title: "Color",
+              values: ["Natural Black", "Dark Brown", "Burgundy"],
             },
           ],
           variants: [
             {
-              title: 'Linen / Red',
-              sku: 'BELIME-ESTATE-LINEN-RED',
+              title: "Peruvian / Natural Black",
+              sku: "CAMBODIAN-4X4-CLOSURE-PERUVIAN-NATURAL-BLACK",
               options: {
-                Material: 'Linen',
-                Color: 'Red',
+                Origin: "Peruvian",
+                Color: "Natural Black",
               },
               manage_inventory: false,
               prices: [
                 {
                   amount: 1500,
-                  currency_code: 'eur',
+                  currency_code: "eur",
                 },
                 {
                   amount: 1700,
-                  currency_code: 'usd',
+                  currency_code: "usd",
                 },
               ],
             },
             {
-              title: 'Linen / Blue',
-              sku: 'BELIME-ESTATE-LINEN-BLUE',
+              title: "Peruvian / Dark Brown",
+              sku: "CAMBODIAN-4X4-CLOSURE-PERUVIAN-DARK-BROWN",
               options: {
-                Material: 'Linen',
-                Color: 'Blue',
+                Origin: "Peruvian",
+                Color: "Dark Brown",
               },
               manage_inventory: false,
               prices: [
                 {
                   amount: 1500,
-                  currency_code: 'eur',
+                  currency_code: "eur",
                 },
                 {
                   amount: 1700,
-                  currency_code: 'usd',
+                  currency_code: "usd",
                 },
               ],
             },
             {
-              title: 'Boucle / Beige',
-              sku: 'BELIME-ESTATE-BOUCLE-BEIGE',
+              title: "Cambodian / Dark Brown",
+              sku: "CAMBODIAN-4X4-CLOSURE-CAMBODIAN-DARK-BROWN",
               options: {
-                Material: 'Boucle',
-                Color: 'Beige',
+                Origin: "Cambodian",
+                Color: "Dark Brown",
               },
               manage_inventory: false,
               prices: [
                 {
                   amount: 2000,
-                  currency_code: 'eur',
+                  currency_code: "eur",
                 },
                 {
                   amount: 2200,
-                  currency_code: 'usd',
+                  currency_code: "usd",
                 },
               ],
             },
@@ -1202,92 +1179,92 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
         },
       ],
     },
-  });
+  })
 
-  const cypressRetreatImages = await uploadFilesWorkflow(container)
+  const cambodianDeepWaveImages = await uploadFilesWorkflow(container)
     .run({
       input: {
         files: [
           {
-            access: 'public',
-            filename: 'cypress-retreat.png',
-            mimeType: 'image/png',
+            access: "public",
+            filename: "cambodian-deep-wave-bundle.png",
+            mimeType: "image/png",
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/products/cypress-retreat/image.png',
+              "https://assets.agilo.com/fashion-starter/products/cypress-retreat/image.png",
             ),
           },
           {
-            access: 'public',
-            filename: 'cypress-retreat-2.png',
-            mimeType: 'image/png',
+            access: "public",
+            filename: "cambodian-deep-wave-bundle-2.png",
+            mimeType: "image/png",
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/products/cypress-retreat/image1.png',
+              "https://assets.agilo.com/fashion-starter/products/cypress-retreat/image1.png",
             ),
           },
         ],
       },
     })
-    .then((res) => res.result);
+    .then((res) => res.result)
 
   await createProductsWorkflow(container).run({
     input: {
       products: [
         {
-          title: 'Cypress Retreat',
-          handle: 'cypress-retreat',
+          title: "Cambodian Deep Wave Bundle",
+          handle: "cambodian-deep-wave-bundle",
           description:
-            'The Cypress Retreat is a nod to traditional design with its elegant lines and durable, high-quality upholstery. A timeless choice, it offers long-lasting comfort and a refined aesthetic for any home.',
-          category_ids: [threeSeaterCategoryId],
-          collection_id: timelessClassicsCollectionId,
-          type_id: sofasProductTypeId,
+            "Raw Cambodian deep wave bundles with a defined, tight wave pattern. Known for their thickness and strength, these bundles hold curl effortlessly and maintain their pattern even after washing.",
+          category_ids: [bundlesCategoryId],
+          collection_id: cambodianDonorCollectionId,
+          type_id: extensionsProductTypeId,
           status: ProductStatus.PUBLISHED,
-          images: cypressRetreatImages,
+          images: cambodianDeepWaveImages,
           options: [
             {
-              title: 'Material',
-              values: ['Leather'],
+              title: "Origin",
+              values: ["Malaysian"],
             },
             {
-              title: 'Color',
-              values: ['Beige', 'Violet'],
+              title: "Color",
+              values: ["Natural Black", "Dark Brown"],
             },
           ],
           variants: [
             {
-              title: 'Leather / Beige',
-              sku: 'CYPRESS-RETREAT-LEATHER-BEIGE',
+              title: "Malaysian / Natural Black",
+              sku: "CAMBODIAN-DEEP-WAVE-MALAYSIAN-NATURAL-BLACK",
               options: {
-                Material: 'Leather',
-                Color: 'Beige',
+                Origin: "Malaysian",
+                Color: "Natural Black",
               },
               manage_inventory: false,
               prices: [
                 {
                   amount: 1500,
-                  currency_code: 'eur',
+                  currency_code: "eur",
                 },
                 {
                   amount: 1700,
-                  currency_code: 'usd',
+                  currency_code: "usd",
                 },
               ],
             },
             {
-              title: 'Leather / Violet',
-              sku: 'CYPRESS-RETREAT-LEATHER-VIOLET',
+              title: "Malaysian / Dark Brown",
+              sku: "CAMBODIAN-DEEP-WAVE-MALAYSIAN-DARK-BROWN",
               options: {
-                Material: 'Leather',
-                Color: 'Violet',
+                Origin: "Malaysian",
+                Color: "Dark Brown",
               },
               manage_inventory: false,
               prices: [
                 {
                   amount: 2000,
-                  currency_code: 'eur',
+                  currency_code: "eur",
                 },
                 {
                   amount: 2200,
-                  currency_code: 'usd',
+                  currency_code: "usd",
                 },
               ],
             },
@@ -1300,92 +1277,92 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
         },
       ],
     },
-  });
+  })
 
-  const everlyEstateImages = await uploadFilesWorkflow(container)
+  const peruvianFrontalImages = await uploadFilesWorkflow(container)
     .run({
       input: {
         files: [
           {
-            access: 'public',
-            filename: 'everly-estate.png',
-            mimeType: 'image/png',
+            access: "public",
+            filename: "peruvian-loose-wave-frontal.png",
+            mimeType: "image/png",
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/products/everly-estate/image.png',
+              "https://assets.agilo.com/fashion-starter/products/everly-estate/image.png",
             ),
           },
           {
-            access: 'public',
-            filename: 'everly-estate-2.png',
-            mimeType: 'image/png',
+            access: "public",
+            filename: "peruvian-loose-wave-frontal-2.png",
+            mimeType: "image/png",
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/products/everly-estate/image1.png',
+              "https://assets.agilo.com/fashion-starter/products/everly-estate/image1.png",
             ),
           },
         ],
       },
     })
-    .then((res) => res.result);
+    .then((res) => res.result)
 
   await createProductsWorkflow(container).run({
     input: {
       products: [
         {
-          title: 'Everly Estate',
-          handle: 'everly-estate',
+          title: "Peruvian 13x4 Loose Wave Frontal",
+          handle: "peruvian-13x4-loose-wave-frontal",
           description:
-            'The Everly Estate offers a blend of modern elegance and plush luxury, with its sleek lines and soft velvet upholstery. Perfect for upscale interiors, it exudes sophistication and comfort in equal measure.',
-          category_ids: [twoSeaterCategoryId],
-          collection_id: modernLuxeCollectionId,
-          type_id: sofasProductTypeId,
+            "A 13x4 lace frontal made from raw Peruvian loose wave hair. Lightweight with a natural wave that flows effortlessly. Ideal for a seamless hairline and versatile parting. Low shedding, long lasting.",
+          category_ids: [closuresFrontalsCategoryId],
+          collection_id: peruvianSilkyCollectionId,
+          type_id: extensionsProductTypeId,
           status: ProductStatus.PUBLISHED,
-          images: everlyEstateImages,
+          images: peruvianFrontalImages,
           options: [
             {
-              title: 'Material',
-              values: ['Microfiber', 'Velvet'],
+              title: "Origin",
+              values: ["Cambodian", "Indian"],
             },
             {
-              title: 'Color',
-              values: ['Orange', 'Black'],
+              title: "Color",
+              values: ["Natural Black", "Dark Brown"],
             },
           ],
           variants: [
             {
-              title: 'Microfiber / Orange',
-              sku: 'EVERLY-ESTATE-MICROFIBER-ORANGE',
+              title: "Cambodian / Natural Black",
+              sku: "PERUVIAN-13X4-FRONTAL-CAMBODIAN-NATURAL-BLACK",
               options: {
-                Material: 'Microfiber',
-                Color: 'Orange',
+                Origin: "Cambodian",
+                Color: "Natural Black",
               },
               manage_inventory: false,
               prices: [
                 {
                   amount: 1500,
-                  currency_code: 'eur',
+                  currency_code: "eur",
                 },
                 {
                   amount: 1700,
-                  currency_code: 'usd',
+                  currency_code: "usd",
                 },
               ],
             },
             {
-              title: 'Velvet / Black',
-              sku: 'EVERLY-ESTATE-VELVET-BLACK',
+              title: "Indian / Dark Brown",
+              sku: "PERUVIAN-13X4-FRONTAL-INDIAN-DARK-BROWN",
               options: {
-                Material: 'Velvet',
-                Color: 'Black',
+                Origin: "Indian",
+                Color: "Dark Brown",
               },
               manage_inventory: false,
               prices: [
                 {
                   amount: 2000,
-                  currency_code: 'eur',
+                  currency_code: "eur",
                 },
                 {
                   amount: 2200,
-                  currency_code: 'usd',
+                  currency_code: "usd",
                 },
               ],
             },
@@ -1398,92 +1375,92 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
         },
       ],
     },
-  });
+  })
 
-  const havenhillEstateImages = await uploadFilesWorkflow(container)
+  const cambodianWigImages = await uploadFilesWorkflow(container)
     .run({
       input: {
         files: [
           {
-            access: 'public',
-            filename: 'havenhill-estate.png',
-            mimeType: 'image/png',
+            access: "public",
+            filename: "cambodian-body-wave-wig.png",
+            mimeType: "image/png",
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/products/havenhill-estate/image.png',
+              "https://assets.agilo.com/fashion-starter/products/havenhill-estate/image.png",
             ),
           },
           {
-            access: 'public',
-            filename: 'havenhill-estate-2.png',
-            mimeType: 'image/png',
+            access: "public",
+            filename: "cambodian-body-wave-wig-2.png",
+            mimeType: "image/png",
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/products/havenhill-estate/image1.png',
+              "https://assets.agilo.com/fashion-starter/products/havenhill-estate/image1.png",
             ),
           },
         ],
       },
     })
-    .then((res) => res.result);
+    .then((res) => res.result)
 
   await createProductsWorkflow(container).run({
     input: {
       products: [
         {
-          title: 'Havenhill Estate',
-          handle: 'havenhill-estate',
+          title: "Cambodian Body Wave Wig",
+          handle: "cambodian-body-wave-wig",
           description:
-            'The Havenhill Estate brings a touch of traditional charm with its elegant curves and classic silhouette. Upholstered in durable, luxurious fabric, it’s a timeless piece that combines comfort and style, fitting seamlessly into any sophisticated home.',
-          category_ids: [oneSeaterCategoryId],
-          collection_id: timelessClassicsCollectionId,
-          type_id: armChairsProductTypeId,
+            "A full lace wig made from raw Cambodian body wave donor hair. Natural-looking with a realistic hairline and full density from root to tip. Easy to wear and style — ideal for everyday use or special occasions.",
+          category_ids: [wigsCategoryId],
+          collection_id: cambodianDonorCollectionId,
+          type_id: wigsProductTypeId,
           status: ProductStatus.PUBLISHED,
-          images: havenhillEstateImages,
+          images: cambodianWigImages,
           options: [
             {
-              title: 'Material',
-              values: ['Linen', 'Boucle'],
+              title: "Origin",
+              values: ["Peruvian", "Cambodian"],
             },
             {
-              title: 'Color',
-              values: ['Green', 'Light Gray', 'Yellow'],
+              title: "Color",
+              values: ["Natural Black", "Dark Brown", "Medium Brown"],
             },
           ],
           variants: [
             {
-              title: 'Linen / Green',
-              sku: 'HAVENHILL-ESTATE-LINEN-GREEN',
+              title: "Peruvian / Natural Black",
+              sku: "CAMBODIAN-BODY-WAVE-WIG-PERUVIAN-NATURAL-BLACK",
               options: {
-                Material: 'Linen',
-                Color: 'Green',
+                Origin: "Peruvian",
+                Color: "Natural Black",
               },
               manage_inventory: false,
               prices: [
                 {
                   amount: 1000,
-                  currency_code: 'eur',
+                  currency_code: "eur",
                 },
                 {
                   amount: 1200,
-                  currency_code: 'usd',
+                  currency_code: "usd",
                 },
               ],
             },
             {
-              title: 'Boucle / Light Gray',
-              sku: 'HAVENHILL-ESTATE-BOUCLE-LIGHT-GRAY',
+              title: "Cambodian / Dark Brown",
+              sku: "CAMBODIAN-BODY-WAVE-WIG-CAMBODIAN-DARK-BROWN",
               options: {
-                Material: 'Boucle',
-                Color: 'Light Gray',
+                Origin: "Cambodian",
+                Color: "Dark Brown",
               },
               manage_inventory: false,
               prices: [
                 {
                   amount: 1200,
-                  currency_code: 'eur',
+                  currency_code: "eur",
                 },
                 {
                   amount: 1400,
-                  currency_code: 'usd',
+                  currency_code: "usd",
                 },
               ],
             },
@@ -1496,111 +1473,111 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
         },
       ],
     },
-  });
+  })
 
-  const monacoFlairImages = await uploadFilesWorkflow(container)
+  const peruvianStraightBundleImages = await uploadFilesWorkflow(container)
     .run({
       input: {
         files: [
           {
-            access: 'public',
-            filename: 'monaco-flair.png',
-            mimeType: 'image/png',
+            access: "public",
+            filename: "peruvian-straight-bundle.png",
+            mimeType: "image/png",
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/products/monaco-flair/image.png',
+              "https://assets.agilo.com/fashion-starter/products/monaco-flair/image.png",
             ),
           },
           {
-            access: 'public',
-            filename: 'monaco-flair-2.png',
-            mimeType: 'image/png',
+            access: "public",
+            filename: "peruvian-straight-bundle-2.png",
+            mimeType: "image/png",
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/products/monaco-flair/image1.png',
+              "https://assets.agilo.com/fashion-starter/products/monaco-flair/image1.png",
             ),
           },
         ],
       },
     })
-    .then((res) => res.result);
+    .then((res) => res.result)
 
   await createProductsWorkflow(container).run({
     input: {
       products: [
         {
-          title: 'Monaco Flair',
-          handle: 'monaco-flair',
+          title: "Peruvian Straight Bundle",
+          handle: "peruvian-straight-bundle",
           description:
-            'The Monaco Flair combines sleek metallic accents with rich fabric, delivering a bold, luxurious statement. Its minimalist design and deep seating make it a standout piece for modern living rooms.',
-          category_ids: [threeSeaterCategoryId],
-          collection_id: modernLuxeCollectionId,
-          type_id: sofasProductTypeId,
+            "Raw Peruvian straight bundles — silky, smooth, and naturally lustrous. Lightweight with zero chemical processing. Blends effortlessly with most hair types and holds up beautifully through heat styling and washing.",
+          category_ids: [bundlesCategoryId],
+          collection_id: peruvianSilkyCollectionId,
+          type_id: extensionsProductTypeId,
           status: ProductStatus.PUBLISHED,
-          images: monacoFlairImages,
+          images: peruvianStraightBundleImages,
           options: [
             {
-              title: 'Material',
-              values: ['Linen', 'Boucle'],
+              title: "Origin",
+              values: ["Peruvian", "Cambodian"],
             },
             {
-              title: 'Color',
-              values: ['Green', 'Light Gray', 'Beige'],
+              title: "Color",
+              values: ["Natural Black", "Dark Brown", "Blonde 613"],
             },
           ],
           variants: [
             {
-              title: 'Linen / Green',
-              sku: 'MONACO-FLAIR-LINEN-GREEN',
+              title: "Peruvian / Natural Black",
+              sku: "PERUVIAN-STRAIGHT-BUNDLE-PERUVIAN-NATURAL-BLACK",
               options: {
-                Material: 'Linen',
-                Color: 'Green',
+                Origin: "Peruvian",
+                Color: "Natural Black",
               },
               manage_inventory: false,
               prices: [
                 {
                   amount: 1500,
-                  currency_code: 'eur',
+                  currency_code: "eur",
                 },
                 {
                   amount: 1700,
-                  currency_code: 'usd',
+                  currency_code: "usd",
                 },
               ],
             },
             {
-              title: 'Boucle / Light Gray',
-              sku: 'MONACO-FLAIR-BOUCLE-LIGHT-GRAY',
+              title: "Cambodian / Dark Brown",
+              sku: "PERUVIAN-STRAIGHT-BUNDLE-CAMBODIAN-DARK-BROWN",
               options: {
-                Material: 'Boucle',
-                Color: 'Light Gray',
+                Origin: "Cambodian",
+                Color: "Dark Brown",
               },
               manage_inventory: false,
               prices: [
                 {
                   amount: 2000,
-                  currency_code: 'eur',
+                  currency_code: "eur",
                 },
                 {
                   amount: 2200,
-                  currency_code: 'usd',
+                  currency_code: "usd",
                 },
               ],
             },
             {
-              title: 'Boucle / Beige',
-              sku: 'MONACO-FLAIR-BOUCLE-BEIGE',
+              title: "Cambodian / Blonde 613",
+              sku: "PERUVIAN-STRAIGHT-BUNDLE-CAMBODIAN-BLONDE-613",
               options: {
-                Material: 'Boucle',
-                Color: 'Beige',
+                Origin: "Cambodian",
+                Color: "Blonde 613",
               },
               manage_inventory: false,
               prices: [
                 {
                   amount: 2000,
-                  currency_code: 'eur',
+                  currency_code: "eur",
                 },
                 {
                   amount: 2200,
-                  currency_code: 'usd',
+                  currency_code: "usd",
                 },
               ],
             },
@@ -1613,111 +1590,111 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
         },
       ],
     },
-  });
+  })
 
-  const nordicBreezeImages = await uploadFilesWorkflow(container)
+  const brazilianLooseWaveWigImages = await uploadFilesWorkflow(container)
     .run({
       input: {
         files: [
           {
-            access: 'public',
-            filename: 'nordic-breeze.png',
-            mimeType: 'image/png',
+            access: "public",
+            filename: "brazilian-loose-wave-wig.png",
+            mimeType: "image/png",
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/products/nordic-breeze/image.png',
+              "https://assets.agilo.com/fashion-starter/products/nordic-breeze/image.png",
             ),
           },
           {
-            access: 'public',
-            filename: 'nordic-breeze-2.png',
-            mimeType: 'image/png',
+            access: "public",
+            filename: "brazilian-loose-wave-wig-2.png",
+            mimeType: "image/png",
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/products/nordic-breeze/image1.png',
+              "https://assets.agilo.com/fashion-starter/products/nordic-breeze/image1.png",
             ),
           },
         ],
       },
     })
-    .then((res) => res.result);
+    .then((res) => res.result)
 
   await createProductsWorkflow(container).run({
     input: {
       products: [
         {
-          title: 'Nordic Breeze',
-          handle: 'nordic-breeze',
+          title: "Brazilian Loose Wave Wig",
+          handle: "brazilian-loose-wave-wig",
           description:
-            'The Nordic Breeze is a refined expression of Scandinavian minimalism, with its crisp silhouette and airy aesthetic. Crafted for both comfort and simplicity, it’s perfect for creating a serene living space.',
-          category_ids: [oneSeaterCategoryId],
-          collection_id: scandinavianSimplicityCollectionId,
-          type_id: armChairsProductTypeId,
+            "A lace front wig crafted from raw Brazilian loose wave donor hair. Soft, natural wave pattern with full body and shine. Comfortable fit with a natural-looking hairline and versatile parting options.",
+          category_ids: [wigsCategoryId],
+          collection_id: brazilianVirginCollectionId,
+          type_id: wigsProductTypeId,
           status: ProductStatus.PUBLISHED,
-          images: nordicBreezeImages,
+          images: brazilianLooseWaveWigImages,
           options: [
             {
-              title: 'Material',
-              values: ['Boucle', 'Linen'],
+              title: "Origin",
+              values: ["Cambodian", "Brazilian"],
             },
             {
-              title: 'Color',
-              values: ['Beige', 'White', 'Light Gray'],
+              title: "Color",
+              values: ["Natural Black", "Dark Brown", "Off Black"],
             },
           ],
           variants: [
             {
-              title: 'Boucle / Beige',
-              sku: 'NORDIC-BREEZE-BOUCLE-BEIGE',
+              title: "Cambodian / Natural Black",
+              sku: "BRAZILIAN-LOOSE-WAVE-WIG-CAMBODIAN-NATURAL-BLACK",
               options: {
-                Material: 'Boucle',
-                Color: 'Beige',
+                Origin: "Cambodian",
+                Color: "Natural Black",
               },
               manage_inventory: false,
               prices: [
                 {
                   amount: 1200,
-                  currency_code: 'eur',
+                  currency_code: "eur",
                 },
                 {
                   amount: 1400,
-                  currency_code: 'usd',
+                  currency_code: "usd",
                 },
               ],
             },
             {
-              title: 'Boucle / White',
-              sku: 'NORDIC-BREEZE-BOUCLE-WHITE',
+              title: "Brazilian / Dark Brown",
+              sku: "BRAZILIAN-LOOSE-WAVE-WIG-BRAZILIAN-DARK-BROWN",
               options: {
-                Material: 'Boucle',
-                Color: 'White',
+                Origin: "Brazilian",
+                Color: "Dark Brown",
               },
               manage_inventory: false,
               prices: [
                 {
                   amount: 1200,
-                  currency_code: 'eur',
+                  currency_code: "eur",
                 },
                 {
                   amount: 1400,
-                  currency_code: 'usd',
+                  currency_code: "usd",
                 },
               ],
             },
             {
-              title: 'Linen / Light Gray',
-              sku: 'NORDIC-BREEZE-LINEN-LIGHT-GRAY',
+              title: "Brazilian / Off Black",
+              sku: "BRAZILIAN-LOOSE-WAVE-WIG-BRAZILIAN-OFF-BLACK",
               options: {
-                Material: 'Linen',
-                Color: 'Light Gray',
+                Origin: "Brazilian",
+                Color: "Off Black",
               },
               manage_inventory: false,
               prices: [
                 {
                   amount: 1800,
-                  currency_code: 'eur',
+                  currency_code: "eur",
                 },
                 {
                   amount: 2000,
-                  currency_code: 'usd',
+                  currency_code: "usd",
                 },
               ],
             },
@@ -1730,111 +1707,111 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
         },
       ],
     },
-  });
+  })
 
-  const nordicHavenImages = await uploadFilesWorkflow(container)
+  const brazilianBodyWaveImages = await uploadFilesWorkflow(container)
     .run({
       input: {
         files: [
           {
-            access: 'public',
-            filename: 'nordic-haven.png',
-            mimeType: 'image/png',
+            access: "public",
+            filename: "brazilian-body-wave-bundle.png",
+            mimeType: "image/png",
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/products/nordic-haven/image.png',
+              "https://assets.agilo.com/fashion-starter/products/nordic-haven/image.png",
             ),
           },
           {
-            access: 'public',
-            filename: 'nordic-haven-2.png',
-            mimeType: 'image/png',
+            access: "public",
+            filename: "brazilian-body-wave-bundle-2.png",
+            mimeType: "image/png",
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/products/nordic-haven/image1.png',
+              "https://assets.agilo.com/fashion-starter/products/nordic-haven/image1.png",
             ),
           },
         ],
       },
     })
-    .then((res) => res.result);
+    .then((res) => res.result)
 
   await createProductsWorkflow(container).run({
     input: {
       products: [
         {
-          title: 'Nordic Haven',
-          handle: 'nordic-haven',
+          title: "Brazilian Body Wave Bundle",
+          handle: "brazilian-body-wave-bundle",
           description:
-            'The Nordic Haven features clean lines and soft textures, embodying the essence of Scandinavian design. Its natural tones and minimalist frame bring effortless serenity and comfort to any home.',
-          category_ids: [threeSeaterCategoryId],
-          collection_id: scandinavianSimplicityCollectionId,
-          type_id: sofasProductTypeId,
+            "Pure raw Brazilian body wave bundles — soft, flowing wave pattern with incredible natural movement. Unprocessed donor hair that holds its wave after washing and styling. A bestseller for its blend of versatility and longevity.",
+          category_ids: [bundlesCategoryId],
+          collection_id: brazilianVirginCollectionId,
+          type_id: extensionsProductTypeId,
           status: ProductStatus.PUBLISHED,
-          images: nordicHavenImages,
+          images: brazilianBodyWaveImages,
           options: [
             {
-              title: 'Material',
-              values: ['Linen', 'Boucle'],
+              title: "Origin",
+              values: ["Peruvian", "Brazilian"],
             },
             {
-              title: 'Color',
-              values: ['Light Gray', 'White', 'Beige'],
+              title: "Color",
+              values: ["Natural Black", "Dark Brown", "Medium Brown"],
             },
           ],
           variants: [
             {
-              title: 'Linen / Light Gray',
-              sku: 'NORDIC-HAVEN-LINEN-LIGHT-GRAY',
+              title: "Peruvian / Natural Black",
+              sku: "BRAZILIAN-BODY-WAVE-PERUVIAN-NATURAL-BLACK",
               options: {
-                Material: 'Linen',
-                Color: 'Light Gray',
+                Origin: "Peruvian",
+                Color: "Natural Black",
               },
               manage_inventory: false,
               prices: [
                 {
                   amount: 1500,
-                  currency_code: 'eur',
+                  currency_code: "eur",
                 },
                 {
                   amount: 1700,
-                  currency_code: 'usd',
+                  currency_code: "usd",
                 },
               ],
             },
             {
-              title: 'Boucle / White',
-              sku: 'NORDIC-HAVEN-BOUCLE-WHITE',
+              title: "Brazilian / Dark Brown",
+              sku: "BRAZILIAN-BODY-WAVE-BRAZILIAN-DARK-BROWN",
               options: {
-                Material: 'Boucle',
-                Color: 'White',
+                Origin: "Brazilian",
+                Color: "Dark Brown",
               },
               manage_inventory: false,
               prices: [
                 {
                   amount: 2000,
-                  currency_code: 'eur',
+                  currency_code: "eur",
                 },
                 {
                   amount: 2200,
-                  currency_code: 'usd',
+                  currency_code: "usd",
                 },
               ],
             },
             {
-              title: 'Boucle / Beige',
-              sku: 'NORDIC-HAVEN-BOUCLE-BEIGE',
+              title: "Brazilian / Medium Brown",
+              sku: "BRAZILIAN-BODY-WAVE-BRAZILIAN-MEDIUM-BROWN",
               options: {
-                Material: 'Boucle',
-                Color: 'Beige',
+                Origin: "Brazilian",
+                Color: "Medium Brown",
               },
               manage_inventory: false,
               prices: [
                 {
                   amount: 2000,
-                  currency_code: 'eur',
+                  currency_code: "eur",
                 },
                 {
                   amount: 2200,
-                  currency_code: 'usd',
+                  currency_code: "usd",
                 },
               ],
             },
@@ -1847,111 +1824,111 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
         },
       ],
     },
-  });
+  })
 
-  const osloDriftImages = await uploadFilesWorkflow(container)
+  const brazilianClosureImages = await uploadFilesWorkflow(container)
     .run({
       input: {
         files: [
           {
-            access: 'public',
-            filename: 'oslo-drift.png',
-            mimeType: 'image/png',
+            access: "public",
+            filename: "brazilian-4x4-body-wave-closure.png",
+            mimeType: "image/png",
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/products/oslo-drift/image.png',
+              "https://assets.agilo.com/fashion-starter/products/oslo-drift/image.png",
             ),
           },
           {
-            access: 'public',
-            filename: 'oslo-drift-2.png',
-            mimeType: 'image/png',
+            access: "public",
+            filename: "brazilian-4x4-body-wave-closure-2.png",
+            mimeType: "image/png",
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/products/oslo-drift/image1.png',
+              "https://assets.agilo.com/fashion-starter/products/oslo-drift/image1.png",
             ),
           },
         ],
       },
     })
-    .then((res) => res.result);
+    .then((res) => res.result)
 
   await createProductsWorkflow(container).run({
     input: {
       products: [
         {
-          title: 'Oslo Drift',
-          handle: 'oslo-drift',
+          title: "Brazilian 4x4 Body Wave Closure",
+          handle: "brazilian-4x4-body-wave-closure",
           description:
-            'The Oslo Drift is designed for ultimate relaxation, with soft, supportive cushions and a sleek, modern frame. Its understated elegance and neutral tones make it an ideal fit for contemporary, minimalist homes.',
-          category_ids: [twoSeaterCategoryId],
-          collection_id: scandinavianSimplicityCollectionId,
-          type_id: sofasProductTypeId,
+            "A 4x4 HD lace closure made from raw Brazilian body wave hair. Thin, transparent lace that melts into the scalp for an undetectable finish. Pairs perfectly with Brazilian body wave bundles for a complete install.",
+          category_ids: [closuresFrontalsCategoryId],
+          collection_id: brazilianVirginCollectionId,
+          type_id: extensionsProductTypeId,
           status: ProductStatus.PUBLISHED,
-          images: osloDriftImages,
+          images: brazilianClosureImages,
           options: [
             {
-              title: 'Material',
-              values: ['Boucle', 'Linen'],
+              title: "Origin",
+              values: ["Cambodian", "Brazilian"],
             },
             {
-              title: 'Color',
-              values: ['White', 'Beige', 'Light Gray'],
+              title: "Color",
+              values: ["Natural Black", "Dark Brown", "Off Black"],
             },
           ],
           variants: [
             {
-              title: 'Boucle / White',
-              sku: 'OSLO-DRIFT-BOUCLE-WHITE',
+              title: "Cambodian / Natural Black",
+              sku: "BRAZILIAN-4X4-CLOSURE-CAMBODIAN-NATURAL-BLACK",
               options: {
-                Material: 'Boucle',
-                Color: 'White',
+                Origin: "Cambodian",
+                Color: "Natural Black",
               },
               manage_inventory: false,
               prices: [
                 {
                   amount: 1500,
-                  currency_code: 'eur',
+                  currency_code: "eur",
                 },
                 {
                   amount: 1700,
-                  currency_code: 'usd',
+                  currency_code: "usd",
                 },
               ],
             },
             {
-              title: 'Boucle / Beige',
-              sku: 'OSLO-DRIFT-BOUCLE-BEIGE',
+              title: "Brazilian / Dark Brown",
+              sku: "BRAZILIAN-4X4-CLOSURE-BRAZILIAN-DARK-BROWN",
               options: {
-                Material: 'Boucle',
-                Color: 'Beige',
+                Origin: "Brazilian",
+                Color: "Dark Brown",
               },
               manage_inventory: false,
               prices: [
                 {
                   amount: 2000,
-                  currency_code: 'eur',
+                  currency_code: "eur",
                 },
                 {
                   amount: 2200,
-                  currency_code: 'usd',
+                  currency_code: "usd",
                 },
               ],
             },
             {
-              title: 'Linen / Light Gray',
-              sku: 'OSLO-DRIFT-LINEN-LIGHT-GRAY',
+              title: "Brazilian / Off Black",
+              sku: "BRAZILIAN-4X4-CLOSURE-BRAZILIAN-OFF-BLACK",
               options: {
-                Material: 'Linen',
-                Color: 'Light Gray',
+                Origin: "Brazilian",
+                Color: "Off Black",
               },
               manage_inventory: false,
               prices: [
                 {
                   amount: 2000,
-                  currency_code: 'eur',
+                  currency_code: "eur",
                 },
                 {
                   amount: 2200,
-                  currency_code: 'usd',
+                  currency_code: "usd",
                 },
               ],
             },
@@ -1964,92 +1941,92 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
         },
       ],
     },
-  });
+  })
 
-  const osloSerenityImages = await uploadFilesWorkflow(container)
+  const brazilianFrontalImages = await uploadFilesWorkflow(container)
     .run({
       input: {
         files: [
           {
-            access: 'public',
-            filename: 'oslo-serenity.png',
-            mimeType: 'image/png',
+            access: "public",
+            filename: "brazilian-13x4-lace-frontal.png",
+            mimeType: "image/png",
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/products/oslo-serenity/image.png',
+              "https://assets.agilo.com/fashion-starter/products/oslo-serenity/image.png",
             ),
           },
           {
-            access: 'public',
-            filename: 'oslo-serenity-2.png',
-            mimeType: 'image/png',
+            access: "public",
+            filename: "brazilian-13x4-lace-frontal-2.png",
+            mimeType: "image/png",
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/products/oslo-serenity/image1.png',
+              "https://assets.agilo.com/fashion-starter/products/oslo-serenity/image1.png",
             ),
           },
         ],
       },
     })
-    .then((res) => res.result);
+    .then((res) => res.result)
 
   await createProductsWorkflow(container).run({
     input: {
       products: [
         {
-          title: 'Oslo Serenity',
-          handle: 'oslo-serenity',
+          title: "Brazilian 13x4 Lace Frontal",
+          handle: "brazilian-13x4-lace-frontal",
           description:
-            'The Oslo Serenity embodies Scandinavian minimalism with clean lines and a soft, neutral palette. Its tailored silhouette and plush cushions deliver a balance of simplicity and comfort, making it perfect for those who value understated elegance.',
-          category_ids: [twoSeaterCategoryId],
-          collection_id: scandinavianSimplicityCollectionId,
-          type_id: sofasProductTypeId,
+            "A 13x4 lace frontal made from raw Brazilian straight donor hair. Full ear-to-ear coverage with a natural hairline. HD lace melts seamlessly for a flawless, undetectable finish. Perfect for any protective style.",
+          category_ids: [closuresFrontalsCategoryId],
+          collection_id: brazilianVirginCollectionId,
+          type_id: extensionsProductTypeId,
           status: ProductStatus.PUBLISHED,
-          images: osloSerenityImages,
+          images: brazilianFrontalImages,
           options: [
             {
-              title: 'Material',
-              values: ['Leather'],
+              title: "Origin",
+              values: ["Malaysian"],
             },
             {
-              title: 'Color',
-              values: ['Violet', 'Beige'],
+              title: "Color",
+              values: ["Natural Black", "Dark Brown"],
             },
           ],
           variants: [
             {
-              title: 'Leather / Violet',
-              sku: 'OSLO-SERENITY-LEATHER-VIOLET',
+              title: "Malaysian / Natural Black",
+              sku: "BRAZILIAN-13X4-FRONTAL-MALAYSIAN-NATURAL-BLACK",
               options: {
-                Material: 'Leather',
-                Color: 'Violet',
+                Origin: "Malaysian",
+                Color: "Natural Black",
               },
               manage_inventory: false,
               prices: [
                 {
                   amount: 1500,
-                  currency_code: 'eur',
+                  currency_code: "eur",
                 },
                 {
                   amount: 1700,
-                  currency_code: 'usd',
+                  currency_code: "usd",
                 },
               ],
             },
             {
-              title: 'Leather / Beige',
-              sku: 'OSLO-SERENITY-LEATHER-BEIGE',
+              title: "Malaysian / Dark Brown",
+              sku: "BRAZILIAN-13X4-FRONTAL-MALAYSIAN-DARK-BROWN",
               options: {
-                Material: 'Leather',
-                Color: 'Beige',
+                Origin: "Malaysian",
+                Color: "Dark Brown",
               },
               manage_inventory: false,
               prices: [
                 {
                   amount: 2000,
-                  currency_code: 'eur',
+                  currency_code: "eur",
                 },
                 {
                   amount: 2200,
-                  currency_code: 'usd',
+                  currency_code: "usd",
                 },
               ],
             },
@@ -2062,111 +2039,111 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
         },
       ],
     },
-  });
+  })
 
-  const palomaHavenImages = await uploadFilesWorkflow(container)
+  const peruvianStraightWigImages = await uploadFilesWorkflow(container)
     .run({
       input: {
         files: [
           {
-            access: 'public',
-            filename: 'paloma-haven.png',
-            mimeType: 'image/png',
+            access: "public",
+            filename: "peruvian-straight-wig.png",
+            mimeType: "image/png",
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/products/paloma-haven/image.png',
+              "https://assets.agilo.com/fashion-starter/products/paloma-haven/image.png",
             ),
           },
           {
-            access: 'public',
-            filename: 'paloma-haven-2.png',
-            mimeType: 'image/png',
+            access: "public",
+            filename: "peruvian-straight-wig-2.png",
+            mimeType: "image/png",
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/products/paloma-haven/image1.png',
+              "https://assets.agilo.com/fashion-starter/products/paloma-haven/image1.png",
             ),
           },
         ],
       },
     })
-    .then((res) => res.result);
+    .then((res) => res.result)
 
   await createProductsWorkflow(container).run({
     input: {
       products: [
         {
-          title: 'Paloma Haven',
-          handle: 'paloma-haven',
+          title: "Peruvian Straight Wig",
+          handle: "peruvian-straight-wig",
           description:
-            'Minimalistic designs, neutral colors, and high-quality textures. Perfect for those who seek comfort with a clean and understated aesthetic. This collection brings the essence of Scandinavian elegance to your living room.',
-          category_ids: [oneSeaterCategoryId],
-          collection_id: modernLuxeCollectionId,
-          type_id: armChairsProductTypeId,
+            "A sleek lace front wig made from raw Peruvian straight donor hair. Silky and lightweight with a smooth finish and natural shine. Low maintenance and easy to style — lay it flat or add curls, it delivers every time.",
+          category_ids: [wigsCategoryId],
+          collection_id: peruvianSilkyCollectionId,
+          type_id: wigsProductTypeId,
           status: ProductStatus.PUBLISHED,
-          images: palomaHavenImages,
+          images: peruvianStraightWigImages,
           options: [
             {
-              title: 'Material',
-              values: ['Linen', 'Boucle'],
+              title: "Origin",
+              values: ["Peruvian", "Cambodian"],
             },
             {
-              title: 'Color',
-              values: ['Light Gray', 'Green', 'Beige'],
+              title: "Color",
+              values: ["Natural Black", "Dark Brown", "Medium Brown"],
             },
           ],
           variants: [
             {
-              title: 'Linen / Light Gray',
-              sku: 'PALOMA-HAVEN-LINEN-LIGHT-GRAY',
+              title: "Peruvian / Natural Black",
+              sku: "PERUVIAN-STRAIGHT-WIG-PERUVIAN-NATURAL-BLACK",
               options: {
-                Material: 'Linen',
-                Color: 'Light Gray',
+                Origin: "Peruvian",
+                Color: "Natural Black",
               },
               manage_inventory: false,
               prices: [
                 {
                   amount: 900,
-                  currency_code: 'eur',
+                  currency_code: "eur",
                 },
                 {
                   amount: 1100,
-                  currency_code: 'usd',
+                  currency_code: "usd",
                 },
               ],
             },
             {
-              title: 'Linen / Green',
-              sku: 'PALOMA-HAVEN-LINEN-GREEN',
+              title: "Peruvian / Dark Brown",
+              sku: "PERUVIAN-STRAIGHT-WIG-PERUVIAN-DARK-BROWN",
               options: {
-                Material: 'Linen',
-                Color: 'Green',
+                Origin: "Peruvian",
+                Color: "Dark Brown",
               },
               manage_inventory: false,
               prices: [
                 {
                   amount: 900,
-                  currency_code: 'eur',
+                  currency_code: "eur",
                 },
                 {
                   amount: 1100,
-                  currency_code: 'usd',
+                  currency_code: "usd",
                 },
               ],
             },
             {
-              title: 'Boucle / Beige',
-              sku: 'PALOMA-HAVEN-BOUCLE-BEIGE',
+              title: "Cambodian / Medium Brown",
+              sku: "PERUVIAN-STRAIGHT-WIG-CAMBODIAN-MEDIUM-BROWN",
               options: {
-                Material: 'Boucle',
-                Color: 'Beige',
+                Origin: "Cambodian",
+                Color: "Medium Brown",
               },
               manage_inventory: false,
               prices: [
                 {
                   amount: 1200,
-                  currency_code: 'eur',
+                  currency_code: "eur",
                 },
                 {
                   amount: 1400,
-                  currency_code: 'usd',
+                  currency_code: "usd",
                 },
               ],
             },
@@ -2179,111 +2156,111 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
         },
       ],
     },
-  });
+  })
 
-  const savannahGroveImages = await uploadFilesWorkflow(container)
+  const indianDeepWaveWigImages = await uploadFilesWorkflow(container)
     .run({
       input: {
         files: [
           {
-            access: 'public',
-            filename: 'savannah-grove.png',
-            mimeType: 'image/png',
+            access: "public",
+            filename: "indian-deep-wave-wig.png",
+            mimeType: "image/png",
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/products/savannah-grove/image.png',
+              "https://assets.agilo.com/fashion-starter/products/savannah-grove/image.png",
             ),
           },
           {
-            access: 'public',
-            filename: 'savannah-grove-2.png',
-            mimeType: 'image/png',
+            access: "public",
+            filename: "indian-deep-wave-wig-2.png",
+            mimeType: "image/png",
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/products/savannah-grove/image1.png',
+              "https://assets.agilo.com/fashion-starter/products/savannah-grove/image1.png",
             ),
           },
         ],
       },
     })
-    .then((res) => res.result);
+    .then((res) => res.result)
 
   await createProductsWorkflow(container).run({
     input: {
       products: [
         {
-          title: 'Savannah Grove',
-          handle: 'savannah-grove',
+          title: "Indian Deep Wave Wig",
+          handle: "indian-deep-wave-wig",
           description:
-            'The Savannah Grove captures the essence of boho style with its relaxed, oversized form and eclectic fabric choices. Designed for both comfort and personality, it’s the ideal piece for those who seek a cozy, free-spirited vibe in their living spaces.',
-          category_ids: [oneSeaterCategoryId],
-          collection_id: bohoChicCollectionId,
-          type_id: armChairsProductTypeId,
+            "A glueless lace wig made from raw Indian deep wave donor hair. Full, bouncy, and defined waves with incredible density. The deep wave pattern holds beautifully and springs back after washing — no frizz, no flat.",
+          category_ids: [wigsCategoryId],
+          collection_id: indianRawCollectionId,
+          type_id: wigsProductTypeId,
           status: ProductStatus.PUBLISHED,
-          images: savannahGroveImages,
+          images: indianDeepWaveWigImages,
           options: [
             {
-              title: 'Material',
-              values: ['Boucle', 'Linen'],
+              title: "Origin",
+              values: ["Indian", "Brazilian"],
             },
             {
-              title: 'Color',
-              values: ['Light Gray', 'Yellow'],
+              title: "Color",
+              values: ["Natural Black", "Off Black"],
             },
           ],
           variants: [
             {
-              title: 'Boucle / Light Gray',
-              sku: 'SAVANNAH-GROVE-BOUCLE-LIGHT-GRAY',
+              title: "Indian / Natural Black",
+              sku: "INDIAN-DEEP-WAVE-WIG-INDIAN-NATURAL-BLACK",
               options: {
-                Material: 'Boucle',
-                Color: 'Light Gray',
+                Origin: "Indian",
+                Color: "Natural Black",
               },
               manage_inventory: false,
               prices: [
                 {
                   amount: 1200,
-                  currency_code: 'eur',
+                  currency_code: "eur",
                 },
                 {
                   amount: 1400,
-                  currency_code: 'usd',
+                  currency_code: "usd",
                 },
               ],
             },
             {
-              title: 'Linen / Yellow',
-              sku: 'SAVANNAH-GROVE-LINEN-YELLOW',
+              title: "Brazilian / Off Black",
+              sku: "INDIAN-DEEP-WAVE-WIG-BRAZILIAN-OFF-BLACK",
               options: {
-                Material: 'Linen',
-                Color: 'Yellow',
+                Origin: "Brazilian",
+                Color: "Off Black",
               },
               manage_inventory: false,
               prices: [
                 {
                   amount: 900,
-                  currency_code: 'eur',
+                  currency_code: "eur",
                 },
                 {
                   amount: 1100,
-                  currency_code: 'usd',
+                  currency_code: "usd",
                 },
               ],
             },
             {
-              title: 'Linen / Light Gray',
-              sku: 'SAVANNAH-GROVE-LINEN-LIGHT-GRAY',
+              title: "Brazilian / Natural Black",
+              sku: "INDIAN-DEEP-WAVE-WIG-BRAZILIAN-NATURAL-BLACK",
               options: {
-                Material: 'Linen',
-                Color: 'Light Gray',
+                Origin: "Brazilian",
+                Color: "Natural Black",
               },
               manage_inventory: false,
               prices: [
                 {
                   amount: 900,
-                  currency_code: 'eur',
+                  currency_code: "eur",
                 },
                 {
                   amount: 1100,
-                  currency_code: 'usd',
+                  currency_code: "usd",
                 },
               ],
             },
@@ -2296,111 +2273,111 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
         },
       ],
     },
-  });
+  })
 
-  const serenaMeadowImages = await uploadFilesWorkflow(container)
+  const cambodianWaterWaveImages = await uploadFilesWorkflow(container)
     .run({
       input: {
         files: [
           {
-            access: 'public',
-            filename: 'serena-meadow.png',
-            mimeType: 'image/png',
+            access: "public",
+            filename: "cambodian-water-wave-closure.png",
+            mimeType: "image/png",
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/products/serena-meadow/image.png',
+              "https://assets.agilo.com/fashion-starter/products/serena-meadow/image.png",
             ),
           },
           {
-            access: 'public',
-            filename: 'serena-meadow-2.png',
-            mimeType: 'image/png',
+            access: "public",
+            filename: "cambodian-water-wave-closure-2.png",
+            mimeType: "image/png",
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/products/serena-meadow/image1.png',
+              "https://assets.agilo.com/fashion-starter/products/serena-meadow/image1.png",
             ),
           },
         ],
       },
     })
-    .then((res) => res.result);
+    .then((res) => res.result)
 
   await createProductsWorkflow(container).run({
     input: {
       products: [
         {
-          title: 'Serena Meadow',
-          handle: 'serena-meadow',
+          title: "Cambodian Water Wave Closure",
+          handle: "cambodian-water-wave-closure",
           description:
-            'The Serena Meadow combines a classic silhouette with modern comfort, offering a relaxed yet polished look. Its soft upholstery and subtle curves bring a timeless elegance to any living room.',
-          category_ids: [twoSeaterCategoryId],
-          collection_id: timelessClassicsCollectionId,
-          type_id: sofasProductTypeId,
+            "A 5x5 HD lace closure made from raw Cambodian water wave donor hair. Loose, natural wave pattern with a wet-and-wavy finish. Thick and durable with a natural-looking part and seamless blending.",
+          category_ids: [closuresFrontalsCategoryId],
+          collection_id: cambodianDonorCollectionId,
+          type_id: extensionsProductTypeId,
           status: ProductStatus.PUBLISHED,
-          images: serenaMeadowImages,
+          images: cambodianWaterWaveImages,
           options: [
             {
-              title: 'Material',
-              values: ['Microfiber', 'Velvet'],
+              title: "Origin",
+              values: ["Cambodian", "Indian"],
             },
             {
-              title: 'Color',
-              values: ['Black', 'Dark Gray'],
+              title: "Color",
+              values: ["Natural Black", "Dark Brown"],
             },
           ],
           variants: [
             {
-              title: 'Microfiber / Black',
-              sku: 'SERENA-MEADOW-MICROFIBER-BLACK',
+              title: "Cambodian / Natural Black",
+              sku: "CAMBODIAN-WATER-WAVE-CLOSURE-CAMBODIAN-NATURAL-BLACK",
               options: {
-                Material: 'Microfiber',
-                Color: 'Black',
+                Origin: "Cambodian",
+                Color: "Natural Black",
               },
               manage_inventory: false,
               prices: [
                 {
                   amount: 1500,
-                  currency_code: 'eur',
+                  currency_code: "eur",
                 },
                 {
                   amount: 1700,
-                  currency_code: 'usd',
+                  currency_code: "usd",
                 },
               ],
             },
             {
-              title: 'Microfiber / Dark Gray',
-              sku: 'SERENA-MEADOW-MICROFIBER-DARK-GRAY',
+              title: "Cambodian / Dark Brown",
+              sku: "CAMBODIAN-WATER-WAVE-CLOSURE-CAMBODIAN-DARK-BROWN",
               options: {
-                Material: 'Microfiber',
-                Color: 'Dark Gray',
+                Origin: "Cambodian",
+                Color: "Dark Brown",
               },
               manage_inventory: false,
               prices: [
                 {
                   amount: 2000,
-                  currency_code: 'eur',
+                  currency_code: "eur",
                 },
                 {
                   amount: 2200,
-                  currency_code: 'usd',
+                  currency_code: "usd",
                 },
               ],
             },
             {
-              title: 'Velvet / Black',
-              sku: 'SERENA-MEADOW-VELVET-BLACK',
+              title: "Indian / Natural Black",
+              sku: "CAMBODIAN-WATER-WAVE-CLOSURE-INDIAN-NATURAL-BLACK",
               options: {
-                Material: 'Velvet',
-                Color: 'Black',
+                Origin: "Indian",
+                Color: "Natural Black",
               },
               manage_inventory: false,
               prices: [
                 {
                   amount: 2000,
-                  currency_code: 'eur',
+                  currency_code: "eur",
                 },
                 {
                   amount: 2200,
-                  currency_code: 'usd',
+                  currency_code: "usd",
                 },
               ],
             },
@@ -2413,92 +2390,92 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
         },
       ],
     },
-  });
+  })
 
-  const suttonRoyaleImages = await uploadFilesWorkflow(container)
+  const indianFrontalImages = await uploadFilesWorkflow(container)
     .run({
       input: {
         files: [
           {
-            access: 'public',
-            filename: 'sutton-royale.png',
-            mimeType: 'image/png',
+            access: "public",
+            filename: "indian-kinky-curly-frontal.png",
+            mimeType: "image/png",
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/products/sutton-royale/image.png',
+              "https://assets.agilo.com/fashion-starter/products/sutton-royale/image.png",
             ),
           },
           {
-            access: 'public',
-            filename: 'sutton-royale-2.png',
-            mimeType: 'image/png',
+            access: "public",
+            filename: "indian-kinky-curly-frontal-2.png",
+            mimeType: "image/png",
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/products/sutton-royale/image1.png',
+              "https://assets.agilo.com/fashion-starter/products/sutton-royale/image1.png",
             ),
           },
         ],
       },
     })
-    .then((res) => res.result);
+    .then((res) => res.result)
 
   await createProductsWorkflow(container).run({
     input: {
       products: [
         {
-          title: 'Sutton Royale',
-          handle: 'sutton-royale',
+          title: "Indian Kinky Curly Frontal",
+          handle: "indian-kinky-curly-frontal",
           description:
-            'The Sutton Royale blends eclectic design with classic bohemian comfort, featuring soft, tufted fabric and a wide, welcoming frame. Its unique style adds a touch of vintage flair to any space.',
-          category_ids: [twoSeaterCategoryId],
-          collection_id: bohoChicCollectionId,
-          type_id: sofasProductTypeId,
+            "A 13x4 lace frontal made from raw Indian kinky curly donor hair. Tight, defined curls with maximum volume and density. Undetectable hairline, full ear-to-ear coverage, and a curl pattern that thrives with moisture.",
+          category_ids: [closuresFrontalsCategoryId],
+          collection_id: indianRawCollectionId,
+          type_id: extensionsProductTypeId,
           status: ProductStatus.PUBLISHED,
-          images: suttonRoyaleImages,
+          images: indianFrontalImages,
           options: [
             {
-              title: 'Material',
-              values: ['Velvet', 'Microfiber'],
+              title: "Origin",
+              values: ["Indian", "Cambodian"],
             },
             {
-              title: 'Color',
-              values: ['Purple', 'Dark Gray'],
+              title: "Color",
+              values: ["Natural Black", "Off Black"],
             },
           ],
           variants: [
             {
-              title: 'Velvet / Purple',
-              sku: 'SUTTON-ROYALE-VELVET-PURPLE',
+              title: "Indian / Natural Black",
+              sku: "INDIAN-KINKY-CURLY-FRONTAL-INDIAN-NATURAL-BLACK",
               options: {
-                Material: 'Velvet',
-                Color: 'Purple',
+                Origin: "Indian",
+                Color: "Natural Black",
               },
               manage_inventory: false,
               prices: [
                 {
                   amount: 1500,
-                  currency_code: 'eur',
+                  currency_code: "eur",
                 },
                 {
                   amount: 1700,
-                  currency_code: 'usd',
+                  currency_code: "usd",
                 },
               ],
             },
             {
-              title: 'Microfiber / Dark Gray',
-              sku: 'SUTTON-ROYALE-MICROFIBER-DARK-GRAY',
+              title: "Cambodian / Off Black",
+              sku: "INDIAN-KINKY-CURLY-FRONTAL-CAMBODIAN-OFF-BLACK",
               options: {
-                Material: 'Microfiber',
-                Color: 'Dark Gray',
+                Origin: "Cambodian",
+                Color: "Off Black",
               },
               manage_inventory: false,
               prices: [
                 {
                   amount: 2000,
-                  currency_code: 'eur',
+                  currency_code: "eur",
                 },
                 {
                   amount: 2200,
-                  currency_code: 'usd',
+                  currency_code: "usd",
                 },
               ],
             },
@@ -2511,92 +2488,92 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
         },
       ],
     },
-  });
+  })
 
-  const velarLoftImages = await uploadFilesWorkflow(container)
+  const peruvianBodyWaveWigImages = await uploadFilesWorkflow(container)
     .run({
       input: {
         files: [
           {
-            access: 'public',
-            filename: 'velar-loft.png',
-            mimeType: 'image/png',
+            access: "public",
+            filename: "peruvian-body-wave-wig.png",
+            mimeType: "image/png",
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/products/velar-loft/image.png',
+              "https://assets.agilo.com/fashion-starter/products/velar-loft/image.png",
             ),
           },
           {
-            access: 'public',
-            filename: 'velar-loft-2.png',
-            mimeType: 'image/png',
+            access: "public",
+            filename: "peruvian-body-wave-wig-2.png",
+            mimeType: "image/png",
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/products/velar-loft/image1.png',
+              "https://assets.agilo.com/fashion-starter/products/velar-loft/image1.png",
             ),
           },
         ],
       },
     })
-    .then((res) => res.result);
+    .then((res) => res.result)
 
   await createProductsWorkflow(container).run({
     input: {
       products: [
         {
-          title: 'Velar Loft',
-          handle: 'velar-loft',
+          title: "Peruvian Body Wave Wig",
+          handle: "peruvian-body-wave-wig",
           description:
-            'The Velar Loft offers a refined blend of modern design and opulent comfort. Upholstered in rich fabric with sleek metallic accents, this sofa delivers both luxury and a contemporary edge, making it a striking centerpiece for sophisticated interiors.',
-          category_ids: [oneSeaterCategoryId],
-          collection_id: modernLuxeCollectionId,
-          type_id: armChairsProductTypeId,
+            "A lace front wig made from raw Peruvian body wave donor hair. Lightweight, natural-looking waves with a silky finish. Easy to style from straight to wavy and back. A go-to unit for everyday luxury.",
+          category_ids: [wigsCategoryId],
+          collection_id: peruvianSilkyCollectionId,
+          type_id: wigsProductTypeId,
           status: ProductStatus.PUBLISHED,
-          images: velarLoftImages,
+          images: peruvianBodyWaveWigImages,
           options: [
             {
-              title: 'Material',
-              values: ['Velvet', 'Microfiber'],
+              title: "Origin",
+              values: ["Indian", "Cambodian"],
             },
             {
-              title: 'Color',
-              values: ['Black', 'Orange'],
+              title: "Color",
+              values: ["Natural Black", "Dark Brown"],
             },
           ],
           variants: [
             {
-              title: 'Velvet / Black',
-              sku: 'VELAR-LOFT-VELVET-BLACK',
+              title: "Indian / Natural Black",
+              sku: "PERUVIAN-BODY-WAVE-WIG-INDIAN-NATURAL-BLACK",
               options: {
-                Material: 'Velvet',
-                Color: 'Black',
+                Origin: "Indian",
+                Color: "Natural Black",
               },
               manage_inventory: false,
               prices: [
                 {
                   amount: 1300,
-                  currency_code: 'eur',
+                  currency_code: "eur",
                 },
                 {
                   amount: 1500,
-                  currency_code: 'usd',
+                  currency_code: "usd",
                 },
               ],
             },
             {
-              title: 'Microfiber / Orange',
-              sku: 'VELAR-LOFT-MICROFIBER-ORANGE',
+              title: "Cambodian / Dark Brown",
+              sku: "PERUVIAN-BODY-WAVE-WIG-CAMBODIAN-DARK-BROWN",
               options: {
-                Material: 'Microfiber',
-                Color: 'Orange',
+                Origin: "Cambodian",
+                Color: "Dark Brown",
               },
               manage_inventory: false,
               prices: [
                 {
                   amount: 1100,
-                  currency_code: 'eur',
+                  currency_code: "eur",
                 },
                 {
                   amount: 1300,
-                  currency_code: 'usd',
+                  currency_code: "usd",
                 },
               ],
             },
@@ -2609,92 +2586,92 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
         },
       ],
     },
-  });
+  })
 
-  const veloraLuxeImages = await uploadFilesWorkflow(container)
+  const indianLooseWaveImages = await uploadFilesWorkflow(container)
     .run({
       input: {
         files: [
           {
-            access: 'public',
-            filename: 'velora-luxe.png',
-            mimeType: 'image/png',
+            access: "public",
+            filename: "indian-loose-wave-bundle.png",
+            mimeType: "image/png",
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/products/velora-luxe/image.png',
+              "https://assets.agilo.com/fashion-starter/products/velora-luxe/image.png",
             ),
           },
           {
-            access: 'public',
-            filename: 'velora-luxe-2.png',
-            mimeType: 'image/png',
+            access: "public",
+            filename: "indian-loose-wave-bundle-2.png",
+            mimeType: "image/png",
             content: await getImageUrlContent(
-              'https://assets.agilo.com/fashion-starter/products/velora-luxe/image1.png',
+              "https://assets.agilo.com/fashion-starter/products/velora-luxe/image1.png",
             ),
           },
         ],
       },
     })
-    .then((res) => res.result);
+    .then((res) => res.result)
 
   await createProductsWorkflow(container).run({
     input: {
       products: [
         {
-          title: 'Velora Luxe',
-          handle: 'velora-luxe',
+          title: "Indian Loose Wave Bundle",
+          handle: "indian-loose-wave-bundle",
           description:
-            'The Velora Luxe brings a touch of luxury to bohemian design with its bold patterns and plush comfort. Its oversized shape and inviting cushions make it an ideal centerpiece for laid-back, stylish interiors.',
-          category_ids: [threeSeaterCategoryId],
-          collection_id: bohoChicCollectionId,
-          type_id: sofasProductTypeId,
+            "Raw Indian loose wave bundles with a relaxed, natural wave pattern and incredible softness. Full density from roots to ends, minimal shedding, and a texture that responds beautifully to moisture and styling.",
+          category_ids: [bundlesCategoryId],
+          collection_id: indianRawCollectionId,
+          type_id: extensionsProductTypeId,
           status: ProductStatus.PUBLISHED,
-          images: veloraLuxeImages,
+          images: indianLooseWaveImages,
           options: [
             {
-              title: 'Material',
-              values: ['Linen', 'Boucle'],
+              title: "Origin",
+              values: ["Peruvian", "Indian"],
             },
             {
-              title: 'Color',
-              values: ['Yellow', 'Light Gray'],
+              title: "Color",
+              values: ["Natural Black", "Dark Brown"],
             },
           ],
           variants: [
             {
-              title: 'Linen / Yellow',
-              sku: 'VELORA-LUXE-LINEN-YELLOW',
+              title: "Peruvian / Natural Black",
+              sku: "INDIAN-LOOSE-WAVE-BUNDLE-PERUVIAN-NATURAL-BLACK",
               options: {
-                Material: 'Linen',
-                Color: 'Yellow',
+                Origin: "Peruvian",
+                Color: "Natural Black",
               },
               manage_inventory: false,
               prices: [
                 {
                   amount: 1500,
-                  currency_code: 'eur',
+                  currency_code: "eur",
                 },
                 {
                   amount: 1700,
-                  currency_code: 'usd',
+                  currency_code: "usd",
                 },
               ],
             },
             {
-              title: 'Boucle / Light Gray',
-              sku: 'VELORA-LUXE-BOUCLE-LIGHT-GRAY',
+              title: "Indian / Dark Brown",
+              sku: "INDIAN-LOOSE-WAVE-BUNDLE-INDIAN-DARK-BROWN",
               options: {
-                Material: 'Boucle',
-                Color: 'Light Gray',
+                Origin: "Indian",
+                Color: "Dark Brown",
               },
               manage_inventory: false,
               prices: [
                 {
                   amount: 2000,
-                  currency_code: 'eur',
+                  currency_code: "eur",
                 },
                 {
                   amount: 2200,
-                  currency_code: 'usd',
+                  currency_code: "usd",
                 },
               ],
             },
@@ -2707,7 +2684,7 @@ Perfect for creating a warm, inviting atmosphere that never goes out of style.`,
         },
       ],
     },
-  });
+  })
 
-  logger.info('Finished seeding product data.');
+  logger.info("Finished seeding product data.")
 }

@@ -157,7 +157,7 @@ export default async function sendOrderConfirmationHandler({
       entity: 'country',
       fields: ['iso_2', 'name', 'display_name'],
       filters: {
-        iso_2: countryCodes,
+        iso_2: countryCodes.filter((c): c is string => !!c),
       },
     })) as QueryGraphResult<Country>;
     const { data: countries } = countryQueryResult;

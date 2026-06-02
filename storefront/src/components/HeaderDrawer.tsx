@@ -53,7 +53,7 @@ export const HeaderDrawer: React.FC<{
                   About
                 </LocalizedLink>
                 <LocalizedLink href="/inspiration" onClick={() => setIsMenuOpen(false)}>
-                  Inspiration
+                  Hair Guide
                 </LocalizedLink>
                 <LocalizedLink href="/store" onClick={() => setIsMenuOpen(false)}>
                   Shop
