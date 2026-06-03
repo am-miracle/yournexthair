@@ -1,11 +1,15 @@
 import { Metadata } from "next"
 import { StoreRegion } from "@medusajs/types"
 import { listRegions } from "@lib/data/regions"
+import { getCanonicalPath } from "@lib/util/seo"
 import { Layout, LayoutColumn } from "@/components/Layout"
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
   description: "Learn how we protect your privacy",
+  alternates: {
+    canonical: getCanonicalPath("/privacy-policy"),
+  },
 }
 export async function generateStaticParams() {
   const countryCodes = await listRegions().then((regions: StoreRegion[]) =>

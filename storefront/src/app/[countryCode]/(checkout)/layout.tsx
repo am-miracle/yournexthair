@@ -1,7 +1,15 @@
 import * as React from "react"
+import { Metadata } from "next"
 import { Layout, LayoutColumn } from "@/components/Layout"
 import { LocalizedLink } from "@/components/LocalizedLink"
 import dynamic from "next/dynamic"
+
+export const metadata: Metadata = {
+  robots: {
+    index: false,
+    follow: false,
+  },
+}
 
 const CheckoutSummaryWrapper = dynamic(
   () => import("@modules/checkout/components/checkout-summary-wrapper"),

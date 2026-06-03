@@ -7,6 +7,7 @@ import {
   getProductByHandle,
   getProductFashionDataByHandle,
 } from "@lib/data/products"
+import { SITE_NAME, getCanonicalPath, getCanonicalUrl } from "@lib/util/seo"
 import ProductTemplate from "@modules/products/templates"
 
 type Props = {
@@ -68,11 +69,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   return {
-    title: `${product.title} | Medusa Store`,
-    description: `${product.title}`,
+    title: product.title,
+    description:
+      product.description ??
+      `${product.title} from ${SITE_NAME}. Raw and virgin donor hair shipped nationwide and worldwide.`,
+    alternates: {
+      canonical: getCanonicalPath(`/products/${handle}`),
+    },
     openGraph: {
-      title: `${product.title} | Medusa Store`,
-      description: `${product.title}`,
+      title: `${product.title} | ${SITE_NAME}`,
+      description:
+        product.description ??
+        `${product.title} from ${SITE_NAME}. Raw and virgin donor hair shipped nationwide and worldwide.`,
+      url: getCanonicalUrl(`/products/${handle}`),
       images: product.thumbnail ? [product.thumbnail] : [],
     },
   }

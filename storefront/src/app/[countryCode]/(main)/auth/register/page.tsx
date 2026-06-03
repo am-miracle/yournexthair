@@ -9,6 +9,10 @@ import { LocalizedLink } from "@/components/LocalizedLink"
 export const metadata: Metadata = {
   title: "Register",
   description: "Create an account",
+  robots: {
+    index: false,
+    follow: false,
+  },
 }
 
 export default async function RegisterPage({

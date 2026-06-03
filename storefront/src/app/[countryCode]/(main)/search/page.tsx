@@ -15,6 +15,10 @@ type Props = {
 export const metadata: Metadata = {
   title: "Search",
   description: "Search for products",
+  robots: {
+    index: false,
+    follow: true,
+  },
 }
 
 export default async function SearchPage({ params, searchParams }: Props) {

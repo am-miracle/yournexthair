@@ -2,6 +2,7 @@ import { Metadata } from "next"
 import Image from "next/image"
 import { StoreRegion } from "@medusajs/types"
 import { listRegions } from "@lib/data/regions"
+import { getCanonicalPath } from "@lib/util/seo"
 import { Layout, LayoutColumn } from "@/components/Layout"
 import { LocalizedLink } from "@/components/LocalizedLink"
 import { CollectionsSection } from "@/components/CollectionsSection"
@@ -9,6 +10,9 @@ import { CollectionsSection } from "@/components/CollectionsSection"
 export const metadata: Metadata = {
   title: "Hair Guide",
   description: "Your guide to raw and virgin donor hair, textures, origins, and how to choose.",
+  alternates: {
+    canonical: getCanonicalPath("/inspiration"),
+  },
 }
 
 export async function generateStaticParams() {
@@ -38,7 +42,7 @@ export default function InspirationPage() {
           width={2880}
           height={1500}
           alt="Your Next Hair Guide"
-          className="mb-8 h-[32rem] w-full object-cover sm:h-[36rem] md:mb-26 md:h-screen"
+          className="mb-8 h-128 w-full object-cover sm:h-144 md:mb-26 md:h-screen"
         />
         <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent" />
         <div className="absolute bottom-8 left-0 right-0 px-4 sm:px-6 md:bottom-14 md:px-16 lg:px-24">

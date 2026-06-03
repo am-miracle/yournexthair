@@ -7,6 +7,10 @@ import { Layout, LayoutColumn } from "@/components/Layout"
 export const metadata: Metadata = {
   title: "Reset password",
   description: "Reset your password",
+  robots: {
+    index: false,
+    follow: false,
+  },
 }
 
 export default async function ResetPasswordPage({

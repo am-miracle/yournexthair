@@ -5,6 +5,10 @@ import { CheckoutForm } from "@modules/checkout/components/checkout-form"
 
 export const metadata: Metadata = {
   title: "Checkout",
+  robots: {
+    index: false,
+    follow: false,
+  },
 }
 
 export default async function Checkout({

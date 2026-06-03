@@ -2,11 +2,15 @@ import { Metadata } from "next"
 import Image from "next/image"
 import { StoreRegion } from "@medusajs/types"
 import { listRegions } from "@lib/data/regions"
+import { getCanonicalPath } from "@lib/util/seo"
 import { Layout, LayoutColumn } from "@/components/Layout"
 
 export const metadata: Metadata = {
   title: "About",
   description: "Learn more about Your Next Hair, raw and virgin donor hair extensions and wigs.",
+  alternates: {
+    canonical: getCanonicalPath("/about"),
+  },
 }
 
 export async function generateStaticParams() {
@@ -36,7 +40,7 @@ export default function AboutPage() {
           width={2880}
           height={1500}
           alt="Your Next Hair"
-          className="h-[32rem] w-full object-cover sm:h-[36rem] md:h-screen"
+          className="h-128 w-full object-cover sm:h-144 md:h-screen"
         />
         <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent" />
         <div className="absolute bottom-8 left-0 right-0 px-4 sm:px-6 md:bottom-10 md:px-16 lg:px-24">

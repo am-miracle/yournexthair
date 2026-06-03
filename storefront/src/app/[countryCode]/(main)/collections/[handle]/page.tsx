@@ -6,6 +6,7 @@ import {
   getCollectionsList,
 } from "@lib/data/collections"
 import { listRegions } from "@lib/data/regions"
+import { SITE_NAME, getCanonicalPath, getCanonicalUrl } from "@lib/util/seo"
 import { withDefinedProp } from "@lib/util/optional-props"
 import { StoreCollection, StoreRegion } from "@medusajs/types"
 import CollectionTemplate from "@modules/collections/templates"
@@ -71,11 +72,27 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   )
 
   const metadata = {
-    title: `${collection.title} | Medusa Store`,
+    title: collection.title,
     description:
       collectionDetails.success && collectionDetails.data.description
         ? collectionDetails.data.description
         : `${collection.title} collection`,
+    alternates: {
+      canonical: getCanonicalPath(`/collections/${handle}`),
+    },
+    openGraph: {
+      title: `${collection.title} | ${SITE_NAME}`,
+      description:
+        collectionDetails.success && collectionDetails.data.description
+          ? collectionDetails.data.description
+          : `${collection.title} collection`,
+      url: getCanonicalUrl(`/collections/${handle}`),
+      ...(collectionDetails.success &&
+      collectionDetails.data.collection_page_image &&
+      typeof collectionDetails.data.collection_page_image.url === "string"
+        ? { images: [collectionDetails.data.collection_page_image.url] }
+        : {}),
+    },
   } as Metadata
 
   return metadata

@@ -2,13 +2,17 @@ import { Metadata } from "next"
 import Image from "next/image"
 import { getRegion } from "@lib/data/regions"
 import { getProductTypesList } from "@lib/data/product-types"
+import { SITE_DESCRIPTION, getCanonicalPath } from "@lib/util/seo"
 import { Layout, LayoutColumn } from "@/components/Layout"
 import { LocalizedLink } from "@/components/LocalizedLink"
 import { CollectionsSection } from "@/components/CollectionsSection"
 
 export const metadata: Metadata = {
-  title: "YourNextHair",
-  description: "Raw and virgin donor hair extensions and wigs shipped nationwide and worldwide.",
+  title: "Raw & Virgin Hair Extensions and Wigs",
+  description: SITE_DESCRIPTION,
+  alternates: {
+    canonical: getCanonicalPath("/"),
+  },
 }
 
 const ProductTypesSection: React.FC = async () => {
@@ -24,22 +28,23 @@ const ProductTypesSection: React.FC = async () => {
         <h3 className="text-md md:text-2xl mb-8 md:mb-15">Shop by category</h3>
       </LayoutColumn>
       <LayoutColumn className="col-span-full">
-        <div className="flex flex-wrap gap-x-2 gap-y-8 md:gap-x-4 md:gap-y-12">
+        <div className="flex items-center gap-x-3 gap-y-8 md:gap-x-10 md:gap-y-12">
           {productTypes.productTypes.map((productType, index) => (
-            <div key={productType.id} className="w-[calc(50%-0.25rem)] md:w-72">
+            <div key={productType.id} className="w-full">
               <LocalizedLink href={`/store?type=${productType.value}`}>
                 {typeof productType.metadata?.image === "object" &&
                   productType.metadata.image &&
                   "url" in productType.metadata.image &&
                   typeof productType.metadata.image.url === "string" && (
-                    <div className="relative mb-4 md:mb-6 w-full aspect-3/4">
+                    <div className="mb-4 md:mb-6 overflow-hidden">
                       <Image
                         src={productType.metadata.image.url}
+                        width={1200}
+                        height={900}
                         alt={productType.value}
                         priority={index === 0}
                         loading={index === 0 ? "eager" : "lazy"}
-                        sizes="(max-width: 640px) 50vw, 18rem"
-                        fill
+                        className="h-64 w-full object-cover sm:h-72 md:h-80 lg:h-96"
                       />
                     </div>
                   )}

@@ -2,9 +2,14 @@ import { Metadata } from "next"
 import { StoreRegion } from "@medusajs/types"
 import { Layout, LayoutColumn } from "@/components/Layout"
 import { listRegions } from "@lib/data/regions"
+import { getCanonicalPath } from "@lib/util/seo"
 
 export const metadata: Metadata = {
   title: "Cookie Policy",
+  description: "Learn how Your Next Hair uses cookies and similar technologies.",
+  alternates: {
+    canonical: getCanonicalPath("/cookie-policy"),
+  },
 }
 
 export async function generateStaticParams() {

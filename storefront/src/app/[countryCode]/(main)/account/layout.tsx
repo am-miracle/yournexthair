@@ -1,7 +1,15 @@
 import * as React from "react"
+import { Metadata } from "next"
 
 import { SignOutButton } from "@modules/account/components/SignOutButton"
 import { SidebarNav } from "@modules/account/components/SidebarNav"
+
+export const metadata: Metadata = {
+  robots: {
+    index: false,
+    follow: false,
+  },
+}
 
 export default function AccountLayout(props: { children: React.ReactNode }) {
   return (

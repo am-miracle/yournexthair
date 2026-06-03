@@ -9,6 +9,10 @@ import { LocalizedLink } from "@/components/LocalizedLink"
 export const metadata: Metadata = {
   title: "Log in",
   description: "Log in to your account",
+  robots: {
+    index: false,
+    follow: false,
+  },
 }
 
 export default async function LoginPage({ params }: { params: Promise<{ countryCode: string }> }) {
