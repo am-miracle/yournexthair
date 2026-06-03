@@ -8,16 +8,14 @@ export default async function LoginLoadingPage() {
   return (
     <div className="flex min-h-screen">
       <Image
-        src="/images/content/gray-backrest-sofa-wooden-coffee-table.png"
+        src="/images/content/short-wig.jpg"
         width={1440}
         height={1632}
-        alt="Gray backrest sofa and wooden coffee table"
+        alt="Your Next Hair login"
         className="max-lg:hidden lg:w-1/2 shrink-0 object-cover"
       />
       <div className="shrink-0 max-w-100 lg:max-w-96 w-full mx-auto pt-30 lg:pt-37 pb-16 max-sm:px-4">
-        <h1 className="text-xl md:text-2xl mb-10 md:mb-16">
-          Welcome back to Sofa Society!
-        </h1>
+        <h1 className="text-xl md:text-2xl mb-10 md:mb-16">Welcome back to Your Next Hair</h1>
         <form className="flex flex-col gap-6 md:gap-8 mb-8 md:mb-16">
           <Input
             placeholder="Email"
@@ -46,13 +44,13 @@ export default async function LoginLoadingPage() {
           <Button isLoading>Log in</Button>
         </form>
         <p className="text-grayscale-500">
-          Don&apos;t have an account yet? You can{" "}
+          New here? You can{" "}
           <LocalizedLink
             href="/auth/register"
             variant="underline"
             className="text-black md:pb-0.5"
           >
-            register here
+            create your account here
           </LocalizedLink>
           .
         </p>

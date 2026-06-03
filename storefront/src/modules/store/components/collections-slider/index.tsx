@@ -10,12 +10,7 @@ export const CollectionsSlider: React.FC<{
   heading?: React.ReactNode
   className?: string
 }> = async ({ heading = "Collections", className }) => {
-  const collections = await getCollectionsList(0, 20, [
-    "id",
-    "title",
-    "handle",
-    "metadata",
-  ])
+  const collections = await getCollectionsList(0, 20, ["id", "title", "handle", "metadata"])
 
   if (!collections || !collections.collections.length) {
     return null
@@ -27,17 +22,19 @@ export const CollectionsSlider: React.FC<{
       className={twMerge("mb-26 md:mb-36", className)}
     >
       {collections.collections.map((c) => (
-        <div
-          key={c.id}
-          className="w-[70%] sm:w-[60%] lg:w-full max-w-72 flex-shrink-0"
-        >
+        <div key={c.id} className="w-[70%] sm:w-[60%] lg:w-full max-w-72 shrink-0">
           <LocalizedLink href={`/collections/${c.handle}`}>
             {typeof c.metadata?.image === "object" &&
               c.metadata.image &&
               "url" in c.metadata.image &&
               typeof c.metadata.image.url === "string" && (
-                <div className="relative mb-4 md:mb-6 w-full aspect-[3/4]">
-                  <Image src={c.metadata.image.url} alt={c.title} fill />
+                <div className="relative mb-4 md:mb-6 w-full aspect-3/4">
+                  <Image
+                    src={c.metadata.image.url}
+                    alt={c.title}
+                    sizes="(max-width: 640px) 70vw, (max-width: 1024px) 60vw, 18rem"
+                    fill
+                  />
                 </div>
               )}
             <h3>{c.title}</h3>

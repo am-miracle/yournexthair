@@ -6,6 +6,7 @@ import { PencilSquare } from '@medusajs/icons';
 import { z } from 'zod';
 import { ImageField, imageFieldSchema } from '../components/Form/ImageField';
 import { Form } from '../components/Form/Form';
+import { withQueryClient } from '../components/QueryClientProvider';
 
 const detailsFormSchema = z.object({
   image: imageFieldSchema().optional(),
@@ -143,4 +144,4 @@ export const config = defineWidgetConfig({
   zone: 'product_type.details.after',
 });
 
-export default ProductTypeDetailsWidget;
+export default withQueryClient(ProductTypeDetailsWidget);

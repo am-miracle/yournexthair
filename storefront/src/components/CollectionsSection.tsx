@@ -37,7 +37,12 @@ export const CollectionsSection: React.FC<{ className?: string }> = async ({ cla
               "url" in collection.metadata.image &&
               typeof collection.metadata.image.url === "string" && (
                 <div className="relative mb-4 md:mb-10 w-full aspect-3/4">
-                  <Image src={collection.metadata.image.url} alt={collection.title} fill />
+                  <Image
+                    src={collection.metadata.image.url}
+                    alt={collection.title}
+                    sizes="(max-width: 640px) 70vw, (max-width: 1024px) 60vw, 33vw"
+                    fill
+                  />
                 </div>
               )}
             <h3 className="md:text-lg mb-2 md:mb-4">{collection.title}</h3>

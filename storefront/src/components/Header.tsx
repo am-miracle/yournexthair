@@ -49,28 +49,28 @@ export const Header: React.FC = async () => {
           <LayoutColumn>
             <div className="flex justify-between items-center h-18 md:h-21">
               <h1 className="font-medium text-md">
-                <LocalizedLink href="/">YourNextHair</LocalizedLink>
+                <LocalizedLink href="/" className="cursor-pointer">YourNextHair</LocalizedLink>
               </h1>
               <div className="flex items-center gap-8 max-md:hidden">
-                <LocalizedLink href="/about">About</LocalizedLink>
-                <LocalizedLink href="/inspiration">Hair Guide</LocalizedLink>
-                <LocalizedLink href="/store">Shop</LocalizedLink>
+                <LocalizedLink href="/about" className="hover:text-purple-600 hover:underline underline-offset-4 decoration-purple-600 transition-colors">About</LocalizedLink>
+                <LocalizedLink href="/inspiration" className="hover:text-purple-600 hover:underline underline-offset-4 decoration-purple-600 transition-colors">Hair Guide</LocalizedLink>
+                <LocalizedLink href="/store" className="hover:text-purple-600 hover:underline underline-offset-4 decoration-purple-600 transition-colors">Shop</LocalizedLink>
               </div>
               <div className="flex items-center gap-3 lg:gap-6 max-md:hidden">
                 <RegionSwitcher
                   countryOptions={countryOptions}
-                  className="w-16"
-                  selectButtonClassName="h-auto !gap-0 !p-1 transition-none"
+                  className="w-16 cursor-pointer"
+                  selectButtonClassName="h-auto !gap-0 !p-1 transition-none cursor-pointer"
                   selectIconClassName="text-current"
                 />
                 <React.Suspense>
                   <SearchField countryOptions={countryOptions} />
                 </React.Suspense>
-                <LoginLink className="p-1 group-data-[light=true]:md:text-white group-data-[sticky=true]:md:text-black" />
+                <LoginLink className="p-1 cursor-pointer group-data-[light=true]:md:text-white group-data-[sticky=true]:md:text-black" />
                 <CartDrawer />
               </div>
               <div className="flex items-center gap-4 md:hidden">
-                <LoginLink className="p-1 group-data-[light=true]:md:text-white" />
+                <LoginLink className="p-1 cursor-pointer group-data-[light=true]:md:text-white" />
                 <CartDrawer />
                 <React.Suspense>
                   <HeaderDrawer countryOptions={countryOptions} />

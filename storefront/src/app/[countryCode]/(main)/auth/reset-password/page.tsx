@@ -16,12 +16,7 @@ export default async function ResetPasswordPage({
 }) {
   const { email, token } = await searchParams
 
-  if (
-    typeof email !== "string" ||
-    typeof token !== "string" ||
-    !email ||
-    !token
-  ) {
+  if (typeof email !== "string" || typeof token !== "string" || !email || !token) {
     notFound()
   }
 

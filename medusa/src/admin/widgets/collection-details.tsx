@@ -9,6 +9,7 @@ import { ImageField, imageFieldSchema } from '../components/Form/ImageField';
 import { Form } from '../components/Form/Form';
 import { TextareaField } from '../components/Form/TextareaField';
 import { InputField } from '../components/Form/InputField';
+import { withQueryClient } from '../components/QueryClientProvider';
 
 const detailsFormSchema = z.object({
   image: imageFieldSchema().optional(),
@@ -275,4 +276,4 @@ export const config = defineWidgetConfig({
   zone: 'product_collection.details.after',
 });
 
-export default CollectionDetailsWidget;
+export default withQueryClient(CollectionDetailsWidget);

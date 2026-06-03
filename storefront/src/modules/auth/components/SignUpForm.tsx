@@ -43,7 +43,7 @@ export const SignUpForm = withReactQueryProvider(() => {
               inputProps={{ autoComplete: "email" }}
             />
             <InputField
-              placeholder="Phone"
+              placeholder="Phone (Optional)"
               name="phone"
               className=" flex-1"
               type="tel"
@@ -65,7 +65,7 @@ export const SignUpForm = withReactQueryProvider(() => {
             />
             {data?.error && <p className="text-red-primary text-sm">{data.error}</p>}
             <SubmitButton isDisabled={isDisabled} isPending={isPending}>
-              Register
+              Create account
             </SubmitButton>
           </div>
         )

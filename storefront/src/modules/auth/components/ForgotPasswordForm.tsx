@@ -25,12 +25,12 @@ export const ForgotPasswordForm: React.FC = () => {
   if (formState.state === "success") {
     return (
       <>
-        <h1 className="text-xl md:text-2xl mb-8">Your password is waiting for you!</h1>
+        <h1 className="text-xl md:text-2xl mb-8">Check your inbox</h1>
         <div className="mb-8">
           <p>We&apos;ve sent you an email with further instructions on retrieving your account.</p>
         </div>
         <LocalizedButtonLink href="/" isFullWidth>
-          Back to home page
+          Back to homepage
         </LocalizedButtonLink>
       </>
     )

@@ -7,7 +7,7 @@ export const Layout = React.forwardRef<HTMLDivElement, React.ComponentPropsWithR
       {...rest}
       ref={ref}
       className={twMerge(
-        "mx-auto grid grid-cols-12 gap-x-4 md:gap-x-12 px-4 sm:container",
+        "mx-auto grid grid-cols-12 gap-x-4 md:gap-x-12 px-6 md:px-16 lg:px-24",
         className,
       )}
     />

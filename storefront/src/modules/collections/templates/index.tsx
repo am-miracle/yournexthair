@@ -42,16 +42,26 @@ export default async function CollectionTemplate({
 
   return (
     <>
-      <div className="max-md:mt-18 relative aspect-2/1 md:h-screen w-full max-w-full mb-8 md:mb-19">
+      <div className="relative pt-18 md:pt-0">
         <Image
           src={
             collectionDetails.data?.collection_page_image?.url ||
             "/images/content/living-room-gray-two-seater-puffy-sofa.png"
           }
-          fill
+          width={2880}
+          height={1440}
           alt={collection.title + " image"}
-          className="object-cover z-0"
+          className="mb-8 h-128 w-full object-cover sm:h-144 md:mb-19 md:h-screen"
         />
+        <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent" />
+        <div className="absolute bottom-8 left-0 right-0 px-4 sm:px-6 md:bottom-14 md:px-16 lg:px-24">
+          <p className="mb-3 text-xs uppercase tracking-widest text-white/70 md:text-sm">
+            Your Next Hair
+          </p>
+          <h1 className="mb-8 max-w-xl text-3xl font-medium leading-tight text-white sm:text-4xl md:mb-19 md:max-w-2xl md:text-5xl lg:text-6xl">
+            {collection.title}
+          </h1>
+        </div>
       </div>
       {collectionDetails.success &&
         ((typeof collectionDetails.data.collection_page_heading === "string" &&

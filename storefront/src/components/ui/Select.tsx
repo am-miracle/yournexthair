@@ -71,10 +71,12 @@ export const UiSelectListBoxItem: React.FC<ReactAria.ListBoxItemProps> = ({
 
 export const UiSelectDialog: React.FC<ReactAria.DialogProps> = ({
   className,
+  "aria-label": ariaLabel = "Options",
   ...props
 }) => (
   <ReactAria.Dialog
     {...props}
+    aria-label={ariaLabel}
     className={twMerge(
       "border border-grayscale-200 bg-white rounded-xs focus-visible:outline-none",
       className

@@ -74,6 +74,7 @@ module.exports = defineConfig({
   admin: {
     backendUrl: process.env.BACKEND_URL ?? "https://sofa-society-starter.medusajs.app",
     ...(process.env.STOREFRONT_URL ? { storefrontUrl: process.env.STOREFRONT_URL } : {}),
+    maxUploadFileSize: 10 * 1024 * 1024, // 10MB
   },
   projectConfig: {
     ...(process.env.DATABASE_URL ? { databaseUrl: process.env.DATABASE_URL } : {}),

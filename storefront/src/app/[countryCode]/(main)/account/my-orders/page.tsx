@@ -23,11 +23,7 @@ const OrderStatus: React.FC<{
 }> = ({ order, className }) => {
   if (order.fulfillment_status === "canceled") {
     return (
-      <UiTag
-        iconName="close"
-        isActive
-        className={twMerge("self-start mt-auto", className)}
-      >
+      <UiTag iconName="close" isActive className={twMerge("self-start mt-auto", className)}>
         Canceled
       </UiTag>
     )
@@ -35,11 +31,7 @@ const OrderStatus: React.FC<{
 
   if (order.fulfillment_status === "delivered") {
     return (
-      <UiTag
-        iconName="check"
-        isActive
-        className={twMerge("self-start mt-auto", className)}
-      >
+      <UiTag iconName="check" isActive className={twMerge("self-start mt-auto", className)}>
         Delivered
       </UiTag>
     )
@@ -50,22 +42,14 @@ const OrderStatus: React.FC<{
     order.fulfillment_status === "partially_delivered"
   ) {
     return (
-      <UiTag
-        iconName="truck"
-        isActive
-        className={twMerge("self-start mt-auto", className)}
-      >
+      <UiTag iconName="truck" isActive className={twMerge("self-start mt-auto", className)}>
         Delivering
       </UiTag>
     )
   }
 
   return (
-    <UiTag
-      iconName="package"
-      isActive
-      className={twMerge("self-start mt-auto", className)}
-    >
+    <UiTag iconName="package" isActive className={twMerge("self-start mt-auto", className)}>
       Packing
     </UiTag>
   )
@@ -89,10 +73,7 @@ export default async function AccountMyOrdersPage({ searchParams }: PageProps) {
   }
 
   const pageNumber = page ? parseInt(page, 10) : 1
-  const { orders, count } = await listOrders(
-    ORDERS_PER_PAGE,
-    (pageNumber - 1) * ORDERS_PER_PAGE
-  )
+  const { orders, count } = await listOrders(ORDERS_PER_PAGE, (pageNumber - 1) * ORDERS_PER_PAGE)
   const totalPages = Math.ceil(count / ORDERS_PER_PAGE)
 
   return (
@@ -107,20 +88,15 @@ export default async function AccountMyOrdersPage({ searchParams }: PageProps) {
                 className="rounded-xs border border-grayscale-200 flex flex-col gap-6 sm:gap-8 md:gap-6 lg:gap-8 p-4"
               >
                 <div className="flex max-sm:flex-col-reverse md:flex-col-reverse lg:flex-row gap-y-6 gap-x-10 justify-between">
-                  <div className="flex-shrink-0">
+                  <div className="shrink-0">
                     <OrderStatus order={order} className="sm:hidden mb-6" />
                     <div className="mb-2">
-                      <LocalizedLink
-                        href={`/account/my-orders/${order.id}`}
-                        className="text-md"
-                      >
-                        <span className="font-semibold">Order:</span>{" "}
-                        {order.display_id}
+                      <LocalizedLink href={`/account/my-orders/${order.id}`} className="text-md">
+                        <span className="font-semibold">Order:</span> {order.display_id}
                       </LocalizedLink>
                     </div>
                     <p className="text-grayscale-500">
-                      Order date:{" "}
-                      {new Date(order.created_at).toLocaleDateString()}
+                      Order date: {new Date(order.created_at).toLocaleDateString()}
                     </p>
                   </div>
                   <div className="flex gap-3 overflow-x-auto sm:max-w-91 md:max-w-full lg:max-w-91">
@@ -130,7 +106,7 @@ export default async function AccountMyOrdersPage({ searchParams }: PageProps) {
                         <LocalizedLink
                           key={item.id}
                           href={`/products/${item.product_handle}`}
-                          className="shrink-0 w-19 aspect-[3/4] rounded-2xs relative overflow-hidden"
+                          className="shrink-0 w-19 aspect-3/4 rounded-2xs relative overflow-hidden"
                         >
                           <Image
                             src={item.thumbnail!}
@@ -164,9 +140,7 @@ export default async function AccountMyOrdersPage({ searchParams }: PageProps) {
               </div>
             ))}
           </div>
-          {totalPages > 1 && (
-            <Pagination page={pageNumber} totalPages={totalPages} />
-          )}
+          {totalPages > 1 && <Pagination page={pageNumber} totalPages={totalPages} />}
         </div>
       ) : (
         <p className="text-md mt-16">You haven&apos;t ordered anything yet</p>

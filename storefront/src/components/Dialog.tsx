@@ -13,10 +13,12 @@ export const UiDialogTrigger: React.FC<ReactAria.DialogTriggerProps> = ({
 export const UiDialog: React.FC<ReactAria.DialogProps> = ({
   children,
   className,
+  "aria-label": ariaLabel = "Dialog",
   ...rest
 }) => (
   <ReactAria.Dialog
     {...rest}
+    aria-label={ariaLabel}
     className={twMerge("focus-visible:outline-none", className)}
   >
     {children}

@@ -59,6 +59,55 @@ async function getImageUrlContent(url: string) {
   return Buffer.from(arrayBuffer).toString("binary")
 }
 
+const NGN_PER_USD = 1600
+
+type SeedPrice = {
+  amount: number
+  currency_code?: string
+  region_id?: string
+}
+
+type SeedVariant = {
+  prices?: SeedPrice[]
+}
+
+type SeedProduct = {
+  variants?: SeedVariant[]
+}
+
+function appendNgnPrice(prices: SeedPrice[]): SeedPrice[] {
+  if (prices.some((price) => price.currency_code === "ngn")) {
+    return prices
+  }
+
+  const usdPrice = prices.find((price) => price.currency_code === "usd")
+
+  if (!usdPrice) {
+    return prices
+  }
+
+  return [
+    ...prices,
+    {
+      amount: usdPrice.amount * NGN_PER_USD,
+      currency_code: "ngn",
+    },
+  ]
+}
+
+function withNgnVariantPrices<T extends { products: SeedProduct[] }>(input: T): T {
+  return {
+    ...input,
+    products: input.products.map((product) => ({
+      ...product,
+      variants: product.variants?.map((variant) => ({
+        ...variant,
+        prices: variant.prices ? appendNgnPrice(variant.prices) : variant.prices,
+      })),
+    })),
+  }
+}
+
 export default async function seedDemoData({ container }: ExecArgs) {
   const logger = container.resolve(ContainerRegistrationKeys.LOGGER)
   const remoteLink = container.resolve(ContainerRegistrationKeys.LINK)
@@ -69,30 +118,12 @@ export default async function seedDemoData({ container }: ExecArgs) {
   const storeModuleService: IStoreModuleService = container.resolve(Modules.STORE)
   const fashionModuleService: FashionModuleService = container.resolve("fashionModuleService")
 
-  const countries = [
-    "ng",
-    "gb",
+  const nigeriaCountries = ["ng"]
+  const usdCountries = [
     "us",
     "ca",
     "au",
-    "de",
-    "fr",
-    "es",
-    "it",
-    "nl",
-    "be",
-    "se",
-    "no",
-    "dk",
-    "fi",
-    "ie",
-    "pt",
-    "ch",
-    "at",
-    "pl",
-    "cz",
-    "hu",
-    "hr",
+    "gb",
     "gh",
     "ke",
     "za",
@@ -114,6 +145,8 @@ export default async function seedDemoData({ container }: ExecArgs) {
     "qa",
     "nz",
   ]
+  const eurCountries = ["de", "fr", "es", "it", "nl", "be", "se", "no", "dk", "fi", "ie", "pt", "ch", "at", "pl", "cz", "hu", "hr"]
+  const countries = [...nigeriaCountries, ...usdCountries, ...eurCountries]
 
   logger.info("Seeding store data...")
   const store = requireFirst(
@@ -148,16 +181,27 @@ export default async function seedDemoData({ container }: ExecArgs) {
         {
           name: "Nigeria",
           currency_code: "ngn",
-          countries,
+          countries: nigeriaCountries,
+          payment_providers: ["pp_stripe_stripe"],
+        },
+        {
+          name: "International",
+          currency_code: "usd",
+          countries: usdCountries,
+          payment_providers: ["pp_stripe_stripe"],
+        },
+        {
+          name: "Europe",
+          currency_code: "eur",
+          countries: eurCountries,
           payment_providers: ["pp_stripe_stripe"],
         },
       ],
     },
   })
-  const region = requireFirst(
-    regionResult,
-    "Expected a region to be created while seeding demo data.",
-  )
+  const nigeriaRegion = requireFound(regionResult, (region) => region.name === "Nigeria", 'Expected "Nigeria" region to be created while seeding demo data.')
+  requireFound(regionResult, (region) => region.name === "International", 'Expected "International" region to be created while seeding demo data.')
+  requireFound(regionResult, (region) => region.name === "Europe", 'Expected "Europe" region to be created while seeding demo data.')
   logger.info("Finished seeding regions.")
 
   await updateStoresWorkflow(container).run({
@@ -177,7 +221,7 @@ export default async function seedDemoData({ container }: ExecArgs) {
           },
         ],
         default_sales_channel_id: defaultSalesChannelId,
-        default_region_id: region.id,
+        default_region_id: nigeriaRegion.id,
       },
     },
   })
@@ -285,8 +329,12 @@ export default async function seedDemoData({ container }: ExecArgs) {
             amount: 10,
           },
           {
-            region_id: region.id,
-            amount: 10,
+            currency_code: "ngn",
+            amount: 10 * NGN_PER_USD,
+          },
+          {
+            region_id: nigeriaRegion.id,
+            amount: 10 * NGN_PER_USD,
           },
         ],
         rules: [
@@ -323,8 +371,12 @@ export default async function seedDemoData({ container }: ExecArgs) {
             amount: 10,
           },
           {
-            region_id: region.id,
-            amount: 10,
+            currency_code: "ngn",
+            amount: 10 * NGN_PER_USD,
+          },
+          {
+            region_id: nigeriaRegion.id,
+            amount: 10 * NGN_PER_USD,
           },
         ],
         rules: [
@@ -395,7 +447,11 @@ export default async function seedDemoData({ container }: ExecArgs) {
             amount: 0,
           },
           {
-            region_id: region.id,
+            currency_code: "ngn",
+            amount: 0,
+          },
+          {
+            region_id: nigeriaRegion.id,
             amount: 0,
           },
         ],
@@ -992,7 +1048,7 @@ Perfect for clients who want bold, full-bodied hair that lasts.`,
     .then((res) => res.result)
 
   await createProductsWorkflow(container).run({
-    input: {
+    input: withNgnVariantPrices({
       products: [
         {
           title: "Indian Body Wave Bundle",
@@ -1061,7 +1117,7 @@ Perfect for clients who want bold, full-bodied hair that lasts.`,
           ],
         },
       ],
-    },
+    }),
   })
 
   const cambodianClosureImages = await uploadFilesWorkflow(container)
@@ -1090,7 +1146,7 @@ Perfect for clients who want bold, full-bodied hair that lasts.`,
     .then((res) => res.result)
 
   await createProductsWorkflow(container).run({
-    input: {
+    input: withNgnVariantPrices({
       products: [
         {
           title: "Cambodian 4x4 Straight Closure",
@@ -1178,7 +1234,7 @@ Perfect for clients who want bold, full-bodied hair that lasts.`,
           ],
         },
       ],
-    },
+    }),
   })
 
   const cambodianDeepWaveImages = await uploadFilesWorkflow(container)
@@ -1207,7 +1263,7 @@ Perfect for clients who want bold, full-bodied hair that lasts.`,
     .then((res) => res.result)
 
   await createProductsWorkflow(container).run({
-    input: {
+    input: withNgnVariantPrices({
       products: [
         {
           title: "Cambodian Deep Wave Bundle",
@@ -1276,7 +1332,7 @@ Perfect for clients who want bold, full-bodied hair that lasts.`,
           ],
         },
       ],
-    },
+    }),
   })
 
   const peruvianFrontalImages = await uploadFilesWorkflow(container)
@@ -1305,7 +1361,7 @@ Perfect for clients who want bold, full-bodied hair that lasts.`,
     .then((res) => res.result)
 
   await createProductsWorkflow(container).run({
-    input: {
+    input: withNgnVariantPrices({
       products: [
         {
           title: "Peruvian 13x4 Loose Wave Frontal",
@@ -1374,7 +1430,7 @@ Perfect for clients who want bold, full-bodied hair that lasts.`,
           ],
         },
       ],
-    },
+    }),
   })
 
   const cambodianWigImages = await uploadFilesWorkflow(container)
@@ -1403,7 +1459,7 @@ Perfect for clients who want bold, full-bodied hair that lasts.`,
     .then((res) => res.result)
 
   await createProductsWorkflow(container).run({
-    input: {
+    input: withNgnVariantPrices({
       products: [
         {
           title: "Cambodian Body Wave Wig",
@@ -1472,7 +1528,7 @@ Perfect for clients who want bold, full-bodied hair that lasts.`,
           ],
         },
       ],
-    },
+    }),
   })
 
   const peruvianStraightBundleImages = await uploadFilesWorkflow(container)
@@ -1501,7 +1557,7 @@ Perfect for clients who want bold, full-bodied hair that lasts.`,
     .then((res) => res.result)
 
   await createProductsWorkflow(container).run({
-    input: {
+    input: withNgnVariantPrices({
       products: [
         {
           title: "Peruvian Straight Bundle",
@@ -1589,7 +1645,7 @@ Perfect for clients who want bold, full-bodied hair that lasts.`,
           ],
         },
       ],
-    },
+    }),
   })
 
   const brazilianLooseWaveWigImages = await uploadFilesWorkflow(container)
@@ -1618,7 +1674,7 @@ Perfect for clients who want bold, full-bodied hair that lasts.`,
     .then((res) => res.result)
 
   await createProductsWorkflow(container).run({
-    input: {
+    input: withNgnVariantPrices({
       products: [
         {
           title: "Brazilian Loose Wave Wig",
@@ -1706,7 +1762,7 @@ Perfect for clients who want bold, full-bodied hair that lasts.`,
           ],
         },
       ],
-    },
+    }),
   })
 
   const brazilianBodyWaveImages = await uploadFilesWorkflow(container)
@@ -1735,7 +1791,7 @@ Perfect for clients who want bold, full-bodied hair that lasts.`,
     .then((res) => res.result)
 
   await createProductsWorkflow(container).run({
-    input: {
+    input: withNgnVariantPrices({
       products: [
         {
           title: "Brazilian Body Wave Bundle",
@@ -1823,7 +1879,7 @@ Perfect for clients who want bold, full-bodied hair that lasts.`,
           ],
         },
       ],
-    },
+    }),
   })
 
   const brazilianClosureImages = await uploadFilesWorkflow(container)
@@ -1852,7 +1908,7 @@ Perfect for clients who want bold, full-bodied hair that lasts.`,
     .then((res) => res.result)
 
   await createProductsWorkflow(container).run({
-    input: {
+    input: withNgnVariantPrices({
       products: [
         {
           title: "Brazilian 4x4 Body Wave Closure",
@@ -1940,7 +1996,7 @@ Perfect for clients who want bold, full-bodied hair that lasts.`,
           ],
         },
       ],
-    },
+    }),
   })
 
   const brazilianFrontalImages = await uploadFilesWorkflow(container)
@@ -1969,7 +2025,7 @@ Perfect for clients who want bold, full-bodied hair that lasts.`,
     .then((res) => res.result)
 
   await createProductsWorkflow(container).run({
-    input: {
+    input: withNgnVariantPrices({
       products: [
         {
           title: "Brazilian 13x4 Lace Frontal",
@@ -2038,7 +2094,7 @@ Perfect for clients who want bold, full-bodied hair that lasts.`,
           ],
         },
       ],
-    },
+    }),
   })
 
   const peruvianStraightWigImages = await uploadFilesWorkflow(container)
@@ -2067,7 +2123,7 @@ Perfect for clients who want bold, full-bodied hair that lasts.`,
     .then((res) => res.result)
 
   await createProductsWorkflow(container).run({
-    input: {
+    input: withNgnVariantPrices({
       products: [
         {
           title: "Peruvian Straight Wig",
@@ -2155,7 +2211,7 @@ Perfect for clients who want bold, full-bodied hair that lasts.`,
           ],
         },
       ],
-    },
+    }),
   })
 
   const indianDeepWaveWigImages = await uploadFilesWorkflow(container)
@@ -2184,7 +2240,7 @@ Perfect for clients who want bold, full-bodied hair that lasts.`,
     .then((res) => res.result)
 
   await createProductsWorkflow(container).run({
-    input: {
+    input: withNgnVariantPrices({
       products: [
         {
           title: "Indian Deep Wave Wig",
@@ -2272,7 +2328,7 @@ Perfect for clients who want bold, full-bodied hair that lasts.`,
           ],
         },
       ],
-    },
+    }),
   })
 
   const cambodianWaterWaveImages = await uploadFilesWorkflow(container)
@@ -2301,7 +2357,7 @@ Perfect for clients who want bold, full-bodied hair that lasts.`,
     .then((res) => res.result)
 
   await createProductsWorkflow(container).run({
-    input: {
+    input: withNgnVariantPrices({
       products: [
         {
           title: "Cambodian Water Wave Closure",
@@ -2389,7 +2445,7 @@ Perfect for clients who want bold, full-bodied hair that lasts.`,
           ],
         },
       ],
-    },
+    }),
   })
 
   const indianFrontalImages = await uploadFilesWorkflow(container)
@@ -2418,7 +2474,7 @@ Perfect for clients who want bold, full-bodied hair that lasts.`,
     .then((res) => res.result)
 
   await createProductsWorkflow(container).run({
-    input: {
+    input: withNgnVariantPrices({
       products: [
         {
           title: "Indian Kinky Curly Frontal",
@@ -2487,7 +2543,7 @@ Perfect for clients who want bold, full-bodied hair that lasts.`,
           ],
         },
       ],
-    },
+    }),
   })
 
   const peruvianBodyWaveWigImages = await uploadFilesWorkflow(container)
@@ -2516,7 +2572,7 @@ Perfect for clients who want bold, full-bodied hair that lasts.`,
     .then((res) => res.result)
 
   await createProductsWorkflow(container).run({
-    input: {
+    input: withNgnVariantPrices({
       products: [
         {
           title: "Peruvian Body Wave Wig",
@@ -2585,7 +2641,7 @@ Perfect for clients who want bold, full-bodied hair that lasts.`,
           ],
         },
       ],
-    },
+    }),
   })
 
   const indianLooseWaveImages = await uploadFilesWorkflow(container)
@@ -2614,7 +2670,7 @@ Perfect for clients who want bold, full-bodied hair that lasts.`,
     .then((res) => res.result)
 
   await createProductsWorkflow(container).run({
-    input: {
+    input: withNgnVariantPrices({
       products: [
         {
           title: "Indian Loose Wave Bundle",
@@ -2683,7 +2739,7 @@ Perfect for clients who want bold, full-bodied hair that lasts.`,
           ],
         },
       ],
-    },
+    }),
   })
 
   logger.info("Finished seeding product data.")

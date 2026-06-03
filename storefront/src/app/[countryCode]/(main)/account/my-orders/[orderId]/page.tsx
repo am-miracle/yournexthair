@@ -101,9 +101,7 @@ export default async function AccountOrderPage({
 
   return (
     <>
-      <h1 className="text-md md:text-lg mb-8 md:mb-16">
-        Order: {order.display_id}
-      </h1>
+      <h1 className="text-md md:text-lg mb-8 md:mb-16">Order: {order.display_id}</h1>
       <div className="flex flex-col gap-6">
         <div className="rounded-xs border border-grayscale-200 flex flex-wrap justify-between p-4">
           <div className="flex gap-4 items-center">
@@ -127,24 +125,16 @@ export default async function AccountOrderPage({
             </div>
             <div>
               <p>
-                {[
-                  order.shipping_address?.first_name,
-                  order.shipping_address?.last_name,
-                ]
+                {[order.shipping_address?.first_name, order.shipping_address?.last_name]
                   .filter(Boolean)
                   .join(" ")}
               </p>
-              {Boolean(order.shipping_address?.company) && (
-                <p>{order.shipping_address?.company}</p>
-              )}
+              {Boolean(order.shipping_address?.company) && <p>{order.shipping_address?.company}</p>}
               <p>
                 {[
                   order.shipping_address?.address_1,
                   order.shipping_address?.address_2,
-                  [
-                    order.shipping_address?.postal_code,
-                    order.shipping_address?.city,
-                  ]
+                  [order.shipping_address?.postal_code, order.shipping_address?.city]
                     .filter(Boolean)
                     .join(" "),
                   order.shipping_address?.country?.display_name,
@@ -152,9 +142,7 @@ export default async function AccountOrderPage({
                   .filter(Boolean)
                   .join(", ")}
               </p>
-              {Boolean(order.shipping_address?.phone) && (
-                <p>{order.shipping_address?.phone}</p>
-              )}
+              {Boolean(order.shipping_address?.phone) && <p>{order.shipping_address?.phone}</p>}
             </div>
           </div>
           <div className="flex-1 overflow-hidden rounded-xs border border-grayscale-200 p-4">
@@ -164,24 +152,16 @@ export default async function AccountOrderPage({
             </div>
             <div>
               <p>
-                {[
-                  order.billing_address?.first_name,
-                  order.billing_address?.last_name,
-                ]
+                {[order.billing_address?.first_name, order.billing_address?.last_name]
                   .filter(Boolean)
                   .join(" ")}
               </p>
-              {Boolean(order.billing_address?.company) && (
-                <p>{order.billing_address?.company}</p>
-              )}
+              {Boolean(order.billing_address?.company) && <p>{order.billing_address?.company}</p>}
               <p>
                 {[
                   order.billing_address?.address_1,
                   order.billing_address?.address_2,
-                  [
-                    order.billing_address?.postal_code,
-                    order.billing_address?.city,
-                  ]
+                  [order.billing_address?.postal_code, order.billing_address?.city]
                     .filter(Boolean)
                     .join(" "),
                   order.billing_address?.country?.display_name,
@@ -189,9 +169,7 @@ export default async function AccountOrderPage({
                   .filter(Boolean)
                   .join(", ")}
               </p>
-              {Boolean(order.billing_address?.phone) && (
-                <p>{order.billing_address?.phone}</p>
-              )}
+              {Boolean(order.billing_address?.phone) && <p>{order.billing_address?.phone}</p>}
             </div>
           </div>
         </div>
@@ -204,14 +182,9 @@ export default async function AccountOrderPage({
               {item.thumbnail && (
                 <LocalizedLink
                   href={`/products/${item.product_handle}`}
-                  className="max-w-25 sm:max-w-37 aspect-[3/4] w-full relative overflow-hidden"
+                  className="max-w-25 sm:max-w-37 aspect-3/4 w-full relative overflow-hidden"
                 >
-                  <Image
-                    src={item.thumbnail}
-                    alt={item.title}
-                    fill
-                    className="object-cover"
-                  />
+                  <Image src={item.thumbnail} alt={item.title} fill className="object-cover" />
                 </LocalizedLink>
               )}
               <div className="flex flex-col flex-1">
@@ -224,9 +197,7 @@ export default async function AccountOrderPage({
                   <div>
                     {item.variant?.options?.map((option) => (
                       <p className="mb-1" key={option.id}>
-                        <span className="text-grayscale-500 mr-2">
-                          {option.option?.title}:
-                        </span>
+                        <span className="text-grayscale-500 mr-2">{option.option?.title}:</span>
                         {option.value}
                       </p>
                     ))}
@@ -234,9 +205,7 @@ export default async function AccountOrderPage({
                   <div className="mt-auto flex max-xs:flex-col gap-x-10 gap-y-6.5 xs:items-center justify-between relative">
                     <div className="xs:self-end sm:mb-1">
                       <p>
-                        <span className="text-grayscale-500 mr-2">
-                          Quantity:
-                        </span>
+                        <span className="text-grayscale-500 mr-2">Quantity:</span>
                         {item.quantity}
                       </p>
                     </div>

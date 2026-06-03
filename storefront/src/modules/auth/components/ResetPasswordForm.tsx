@@ -24,10 +24,7 @@ const forgotPasswordSchema = z.object({
   confirm_new_password: z.string().min(6),
 })
 
-const baseSchema = z.discriminatedUnion("type", [
-  resetPasswordSchema,
-  forgotPasswordSchema,
-])
+const baseSchema = z.discriminatedUnion("type", [resetPasswordSchema, forgotPasswordSchema])
 
 const resetPasswordFormSchema = baseSchema.superRefine((data, ctx) => {
   if (data.new_password !== data.confirm_new_password) {
@@ -52,10 +49,11 @@ export const ChangePasswordForm: React.FC<{
   token: string
   customer?: boolean
 }> = ({ email, token, customer }) => {
-  const [formState, formAction, isPending] = React.useActionState(
-    resetPassword,
-    { email, token, state: "initial" }
-  )
+  const [formState, formAction, isPending] = React.useActionState(resetPassword, {
+    email,
+    token,
+    state: "initial",
+  })
 
   const isModalOpen = formState.state === "success"
 
@@ -110,13 +108,10 @@ export const ChangePasswordForm: React.FC<{
           <UiDialog>
             <p className="text-md mb-12">Password reset successful!</p>
             <p className="text-grayscale-500">
-              Your password has been successfully reset. You may now use your
-              new password to log in.
+              Your password has been updated. You can now log in to Your Next Hair with your new
+              password.
             </p>
-            <UiCloseButton
-              variant="ghost"
-              className="absolute top-4 right-6 p-0"
-            >
+            <UiCloseButton variant="ghost" className="absolute top-4 right-6 p-0">
               <Icon name="close" className="w-6 h-6" />
             </UiCloseButton>
           </UiDialog>

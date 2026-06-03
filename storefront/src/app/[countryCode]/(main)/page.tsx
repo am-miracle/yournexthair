@@ -19,33 +19,36 @@ const ProductTypesSection: React.FC = async () => {
   }
 
   return (
-    <Layout className="mb-26 md:mb-36 max-md:gap-x-2">
+    <Layout className="mb-26 md:mb-36">
       <LayoutColumn>
         <h3 className="text-md md:text-2xl mb-8 md:mb-15">Shop by category</h3>
       </LayoutColumn>
-      {productTypes.productTypes.map((productType, index) => (
-        <LayoutColumn
-          key={productType.id}
-          start={index % 2 === 0 ? 1 : 7}
-          end={index % 2 === 0 ? 7 : 13}
-        >
-          <LocalizedLink href={`/store?type=${productType.value}`}>
-            {typeof productType.metadata?.image === "object" &&
-              productType.metadata.image &&
-              "url" in productType.metadata.image &&
-              typeof productType.metadata.image.url === "string" && (
-                <Image
-                  src={productType.metadata.image.url}
-                  width={1200}
-                  height={900}
-                  alt={productType.value}
-                  className="mb-2 md:mb-8"
-                />
-              )}
-            <p className="text-xs md:text-md">{productType.value}</p>
-          </LocalizedLink>
-        </LayoutColumn>
-      ))}
+      <LayoutColumn className="col-span-full">
+        <div className="flex flex-wrap gap-x-2 gap-y-8 md:gap-x-4 md:gap-y-12">
+          {productTypes.productTypes.map((productType, index) => (
+            <div key={productType.id} className="w-[calc(50%-0.25rem)] md:w-72">
+              <LocalizedLink href={`/store?type=${productType.value}`}>
+                {typeof productType.metadata?.image === "object" &&
+                  productType.metadata.image &&
+                  "url" in productType.metadata.image &&
+                  typeof productType.metadata.image.url === "string" && (
+                    <div className="relative mb-4 md:mb-6 w-full aspect-3/4">
+                      <Image
+                        src={productType.metadata.image.url}
+                        alt={productType.value}
+                        priority={index === 0}
+                        loading={index === 0 ? "eager" : "lazy"}
+                        sizes="(max-width: 640px) 50vw, 18rem"
+                        fill
+                      />
+                    </div>
+                  )}
+                <p className="text-xs md:text-md">{productType.value}</p>
+              </LocalizedLink>
+            </div>
+          ))}
+        </div>
+      </LayoutColumn>
     </Layout>
   )
 }
@@ -60,14 +63,33 @@ export default async function Home({ params }: { params: Promise<{ countryCode: 
 
   return (
     <>
-      <div className="max-md:pt-18">
-        <Image
-          src="/images/content/living-room-gray-armchair-two-seater-sofa.png"
-          width={2880}
-          height={1500}
-          alt="Living room with gray armchair and two-seater sofa"
-          className="md:h-screen md:object-cover"
-        />
+      <div className="relative pt-18 md:pt-0">
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          poster="/images/content/yournexthairvideo-poster.jpg"
+          className="h-128 w-full object-cover sm:h-144 md:h-screen"
+        >
+          <source src="/images/content/yournexthairvideo.webm" type="video/webm" />
+          <source src="/images/content/yournexthairvideo-web.mp4" type="video/mp4" />
+        </video>
+        <div className="absolute inset-0 bg-linear-to-t from-black/50 via-transparent to-transparent" />
+        <div className="absolute bottom-8 left-0 right-0 px-4 sm:px-6 md:bottom-10 md:px-16 lg:px-24">
+          <p className="mb-3 text-xs uppercase tracking-widest text-white/70 md:text-sm">
+            Raw. Virgin. Donor.
+          </p>
+          <h1 className="max-w-xl text-3xl font-medium leading-tight text-white sm:text-4xl md:max-w-2xl md:text-5xl lg:text-6xl">
+            Hair that starts at the source
+          </h1>
+          <LocalizedLink
+            href="/store"
+            className="inline-block mt-5 border-b border-white/60 pb-0.5 text-sm text-white transition-colors hover:border-white md:mt-6 md:text-md"
+          >
+            Shop now
+          </LocalizedLink>
+        </div>
       </div>
       <div className="pt-8 pb-26 md:pt-26 md:pb-36">
         <Layout className="mb-26 md:mb-36">
@@ -93,11 +115,11 @@ export default async function Home({ params }: { params: Promise<{ countryCode: 
           <LayoutColumn className="col-span-full">
             <h3 className="text-md md:text-2xl mb-8 md:mb-16">About Your Next Hair</h3>
             <Image
-              src="/images/content/gray-sofa-against-concrete-wall.png"
+              src="/images/content/wigstore.jpg"
               width={2496}
               height={1400}
               alt="Gray sofa against concrete wall"
-              className="mb-8 md:mb-16 max-md:aspect-3/2 max-md:object-cover"
+              className="w-full aspect-video object-cover mb-8 md:mb-16"
             />
           </LayoutColumn>
           <LayoutColumn start={1} end={{ base: 13, md: 7 }}>
@@ -108,12 +130,10 @@ export default async function Home({ params }: { params: Promise<{ countryCode: 
           <LayoutColumn start={{ base: 1, md: 8 }} end={13} className="mt-6 md:mt-19">
             <div className="md:text-md">
               <p className="mb-5 md:mb-9">
-                Bundles, closures, frontals, and wigs that blend naturally and hold up with wear.
-                No guesswork, no mixed hair.
+                Bundles, closures, frontals, and wigs that blend naturally and hold up with wear. No
+                guesswork, no mixed hair.
               </p>
-              <p className="mb-5 md:mb-3">
-                Ships nationwide and worldwide. Zelle accepted.
-              </p>
+              <p className="mb-5 md:mb-3">Ships nationwide and worldwide.</p>
               <LocalizedLink href="/about" variant="underline">
                 Learn more about Your Next Hair
               </LocalizedLink>
