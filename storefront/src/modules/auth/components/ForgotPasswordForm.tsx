@@ -45,8 +45,18 @@ export const ForgotPasswordForm: React.FC = () => {
           password.
         </p>
       </div>
-      <InputField placeholder="Email" name="email" className="flex-1 mb-8" type="email" />
-      {formState.state === "error" && <p className="text-red-primary text-sm">{formState.error}</p>}
+      <InputField
+        placeholder="Email"
+        name="email"
+        className="flex-1 mb-8"
+        type="email"
+        inputProps={{ "aria-label": "Email" }}
+      />
+      {formState.state === "error" && (
+        <p className="text-red-primary text-sm" role="alert">
+          {formState.error}
+        </p>
+      )}
       <SubmitButton isFullWidth>Reset your password</SubmitButton>
     </Form>
   )

@@ -26,13 +26,13 @@ export const SignUpForm = withReactQueryProvider(() => {
                 placeholder="First name"
                 name="first_name"
                 className=" flex-1"
-                inputProps={{ autoComplete: "given-name" }}
+                inputProps={{ autoComplete: "given-name", "aria-label": "First name" }}
               />
               <InputField
                 placeholder="Last name"
                 name="last_name"
                 className=" flex-1"
-                inputProps={{ autoComplete: "family-name" }}
+                inputProps={{ autoComplete: "family-name", "aria-label": "Last name" }}
               />
             </div>
             <InputField
@@ -40,30 +40,34 @@ export const SignUpForm = withReactQueryProvider(() => {
               name="email"
               className=" flex-1"
               type="email"
-              inputProps={{ autoComplete: "email" }}
+              inputProps={{ autoComplete: "email", "aria-label": "Email" }}
             />
             <InputField
               placeholder="Phone (Optional)"
               name="phone"
               className=" flex-1"
               type="tel"
-              inputProps={{ autoComplete: "tel" }}
+              inputProps={{ autoComplete: "tel", "aria-label": "Phone" }}
             />
             <InputField
               placeholder="Password"
               name="password"
               type="password"
               className=" flex-1"
-              inputProps={{ autoComplete: "new-password" }}
+              inputProps={{ autoComplete: "new-password", "aria-label": "Password" }}
             />
             <InputField
               placeholder="Confirm password"
               name="confirm_password"
               type="password"
               className=" flex-1"
-              inputProps={{ autoComplete: "new-password" }}
+              inputProps={{ autoComplete: "new-password", "aria-label": "Confirm password" }}
             />
-            {data?.error && <p className="text-red-primary text-sm">{data.error}</p>}
+            {data?.error && (
+              <p className="text-red-primary text-sm" role="alert">
+                {data.error}
+              </p>
+            )}
             <SubmitButton isDisabled={isDisabled} isPending={isPending}>
               Create account
             </SubmitButton>

@@ -41,6 +41,7 @@ export const CartDrawer = withReactQueryProvider(() => {
         )}
       </Button>
       <Drawer
+        aria-label="Shopping cart"
         colorScheme="light"
         animateFrom="right"
         isOpen={isCartDrawerOpen}
@@ -53,9 +54,9 @@ export const CartDrawer = withReactQueryProvider(() => {
               <div>
                 <p className="text-md">Cart</p>
               </div>
-              <button onClick={close} aria-label="Close cart">
+              <Button variant="ghost" onPress={close} aria-label="Close cart" className="p-0">
                 <Icon name="close" className="w-6" />
-              </button>
+              </Button>
             </div>
             {cart?.items?.length ? (
               <>

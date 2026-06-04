@@ -38,6 +38,9 @@ const StoreTemplate = async ({
 
   return (
     <div className="md:pt-47 py-26 md:pb-36">
+      <div className="sr-only">
+        <h1>Shop</h1>
+      </div>
       <CollectionsSlider />
       <RefinementList
         collections={Object.fromEntries(

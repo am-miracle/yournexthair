@@ -54,14 +54,14 @@ const Addresses = ({ cart }: { cart: StoreCart }) => {
     <>
       <div className="flex justify-between mb-6 md:mb-8 border-t border-grayscale-200 pt-8 mt-8">
         <div>
-          <p
+          <h2
               className={twJoin(
                 "transition-[font-weight] duration-75",
                 isOpen && "font-semibold"
               )}
           >
             2. Delivery details
-          </p>
+          </h2>
         </div>
         {!isOpen && cart?.shipping_address && (
           <Button

@@ -48,6 +48,22 @@ export default function PrivacyPolicyPage() {
         end={{ base: 13, lg: 10, xl: 9 }}
         className="article"
       >
+        <nav aria-labelledby="privacy-contents" className="mb-12">
+          <h2 id="privacy-contents" className="text-md mb-4">
+            On this page
+          </h2>
+          <ol className="list-decimal pl-5">
+            <li><a href="#privacy-information-collected">Information we collect</a></li>
+            <li><a href="#privacy-use">How we use your information</a></li>
+            <li><a href="#privacy-cookies">Cookies and similar technologies</a></li>
+            <li><a href="#privacy-sharing">Data sharing and disclosure</a></li>
+            <li><a href="#privacy-security">Data security</a></li>
+            <li><a href="#privacy-choices">Your choices</a></li>
+            <li><a href="#privacy-children">Children&apos;s privacy</a></li>
+            <li><a href="#privacy-changes">Changes to this privacy policy</a></li>
+            <li><a href="#privacy-contact">Contact us</a></li>
+          </ol>
+        </nav>
         <p>
           At Your Next Hair, we value your privacy and are committed to protecting
           your personal information. This Privacy Policy outlines how we
@@ -55,7 +71,7 @@ export default function PrivacyPolicyPage() {
           our website, services, and products. By using our platform, you
           consent to the practices described in this policy.
         </p>
-        <h2>1. Information We Collect:</h2>
+        <h2 id="privacy-information-collected">1. Information We Collect</h2>
         <p>
           We may collect personal information you provide directly to us, such
           as:
@@ -85,7 +101,7 @@ export default function PrivacyPolicyPage() {
             referring website.
           </li>
         </ul>
-        <h2>2. How We Use Your Information:</h2>
+        <h2 id="privacy-use">2. How We Use Your Information</h2>
         <p>
           We may use your personal information for various purposes, including
           but not limited to:
@@ -105,14 +121,14 @@ export default function PrivacyPolicyPage() {
             Complying with legal obligations and enforcing our Terms of Service.
           </li>
         </ul>
-        <h2>3. Cookies and Similar Technologies:</h2>
+        <h2 id="privacy-cookies">3. Cookies and Similar Technologies</h2>
         <p>
           We use cookies and similar technologies to collect information about
           your browsing activity on our website. These technologies help us
           analyze usage patterns and enhance user experience. You can manage
           your cookie preferences through your browser settings.
         </p>
-        <h2>4. Data Sharing and Disclosure:</h2>
+        <h2 id="privacy-sharing">4. Data Sharing and Disclosure</h2>
         <p>
           We may share your personal information with third parties under
           certain circumstances, including:
@@ -128,14 +144,14 @@ export default function PrivacyPolicyPage() {
           We do not sell or rent your personal information to third parties for
           their marketing purposes.
         </p>
-        <h2>5. Data Security:</h2>
+        <h2 id="privacy-security">5. Data Security</h2>
         <p>
           We implement reasonable security measures to protect your personal
           information from unauthorized access, alteration, or disclosure.
           However, no method of transmission over the internet or electronic
           storage is completely secure.
         </p>
-        <h2>6. Your Choices:</h2>
+        <h2 id="privacy-choices">6. Your Choices</h2>
         <p>You have the right to:</p>
         <ul>
           <li>
@@ -147,36 +163,41 @@ export default function PrivacyPolicyPage() {
             Delete your account (subject to applicable laws and regulations).
           </li>
         </ul>
-        <h2>7. Children&apos;s Privacy:</h2>
+        <h2 id="privacy-children">7. Children&apos;s Privacy</h2>
         <p>
           Our services are not intended for individuals under the age of 16. If
           we become aware that we have collected personal information from
           children without parental consent, we will take prompt action to
           delete such data.
         </p>
-        <h2>8. Changes to this Privacy Policy:</h2>
+        <h2 id="privacy-changes">8. Changes to this Privacy Policy</h2>
         <p>
           We may update this Privacy Policy from time to time to reflect changes
           in our practices or for other operational, legal, or regulatory
           reasons. We will notify you of any material changes via email or by
           prominently posting a notice on our website.
         </p>
-        <h2>9. Contact Us:</h2>
+        <h2 id="privacy-contact">9. Contact Us</h2>
         <p>
           If you have any questions, concerns, or requests regarding this
           Privacy Policy or how we handle your personal information, please
           contact us at:
         </p>
-        <p>
-          Email: judemiraco0@gmail.com
-          <br />
-          WhatsApp:{" "}
-          <a href="https://api.whatsapp.com/send?phone=2348156197614" target="_blank">
-            +234 815 619 7614
-          </a>
-          <br />
-          Location: Port Harcourt, Rivers State, Nigeria
-        </p>
+        <address className="not-italic">
+          <p>Email: <a href="mailto:judemiraco0@gmail.com">judemiraco0@gmail.com</a></p>
+          <p>
+            WhatsApp:{" "}
+            <a
+              href="https://api.whatsapp.com/send?phone=2348156197614"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Chat with Your Next Hair on WhatsApp (opens in a new tab)"
+            >
+              +234 815 619 7614
+            </a>
+          </p>
+          <p>Location: Port Harcourt, Rivers State, Nigeria</p>
+        </address>
       </LayoutColumn>
     </Layout>
   )

@@ -14,19 +14,19 @@ export const Footer: React.FC = () => {
   const isAuthPage = currentPath === "/register" || currentPath === "/login"
 
   return (
-    <div className={twMerge("bg-grayscale-50 py-8 md:py-20", isAuthPage && "hidden")}>
+    <footer className={twMerge("bg-grayscale-50 py-8 md:py-20", isAuthPage && "hidden")}>
       <Layout>
         <LayoutColumn className="col-span-13">
           <div className="flex max-lg:flex-col justify-between md:gap-20 max-md:px-4">
             <div className="flex flex-1 max-lg:w-full max-lg:order-2 max-sm:flex-col justify-between sm:gap-30 lg:gap-20 md:items-center">
               <div className="max-w-35 md:flex-1 max-md:mb-9">
-                <h1 className="text-lg md:text-xl mb-2 md:mb-6 leading-none md:leading-[0.9]">
+                <p className="text-lg md:text-xl mb-2 md:mb-6 leading-none md:leading-[0.9]">
                   Your Next Hair
-                </h1>
+                </p>
                 <p className="text-xs">&copy; {new Date().getFullYear()}, Your Next Hair</p>
               </div>
               <div className="flex gap-10 xl:gap-18 max-md:text-xs flex-1 justify-between lg:justify-center">
-                <ul className="flex flex-col gap-6 md:gap-3.5">
+                <ul aria-label="Company" className="flex flex-col gap-6 md:gap-3.5">
                   <li>
                     <LocalizedLink href="/about">About Us</LocalizedLink>
                   </li>
@@ -37,24 +37,39 @@ export const Footer: React.FC = () => {
                     <LocalizedLink href="/store">Shop</LocalizedLink>
                   </li>
                 </ul>
-                <ul className="flex flex-col gap-6 md:gap-3.5">
+                <ul aria-label="Social" className="flex flex-col gap-6 md:gap-3.5">
                   <li>
-                    <a href="https://www.instagram.com/yournexthair/" target="_blank">
+                    <a
+                      href="https://www.instagram.com/yournexthair/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label="Visit Your Next Hair on Instagram"
+                    >
                       Instagram
                     </a>
                   </li>
                   <li>
-                    <a href="https://www.facebook.com/1412930315494374" target="_blank">
+                    <a
+                      href="https://www.facebook.com/1412930315494374"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label="Visit Your Next Hair on Facebook"
+                    >
                       Facebook
                     </a>
                   </li>
                   <li>
-                    <a href="https://api.whatsapp.com/send?phone=2348156197614" target="_blank">
+                    <a
+                      href="https://api.whatsapp.com/send?phone=2348156197614"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label="Chat with Your Next Hair on WhatsApp"
+                    >
                       WhatsApp
                     </a>
                   </li>
                 </ul>
-                <ul className="flex flex-col gap-6 md:gap-3.5">
+                <ul aria-label="Legal" className="flex flex-col gap-6 md:gap-3.5">
                   <li>
                     <LocalizedLink href="/privacy-policy">Privacy Policy</LocalizedLink>
                   </li>
@@ -72,6 +87,6 @@ export const Footer: React.FC = () => {
           </div>
         </LayoutColumn>
       </Layout>
-    </div>
+    </footer>
   )
 }

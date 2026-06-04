@@ -17,7 +17,7 @@ export default function AccountLayout(props: { children: React.ReactNode }) {
       <div className="sticky left-0 shrink-0 z-30 top-0 md:max-w-75 lg:max-w-93 py-2 max-md:mt-18 max-md:top-18 md:pt-45 md:pb-9 max-md:border-b max-md:border-grayscale-200 max-md:overflow-x-auto bg-white md:bg-grayscale-50 w-full md:h-screen">
         <div className="md:max-w-54 mx-auto flex max-md:items-center md:flex-col md:justify-between h-full max-md:px-4 max-md:sm:container max-md:mx-auto">
           <div className="max-md:flex max-md:gap-22">
-            <h1 className="text-lg mb-14 max-md:hidden">My account</h1>
+            <p className="text-lg mb-14 max-md:hidden">My account</p>
             <SidebarNav />
           </div>
           <SignOutButton

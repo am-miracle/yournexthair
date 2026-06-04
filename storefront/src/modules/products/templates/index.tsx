@@ -83,7 +83,7 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
                 <div className="relative mb-8 md:mb-20 aspect-3/2">
                   <Image
                     src={collectionDetails.data.product_page_image.url}
-                    alt="Collection product page image"
+                    alt={product.collection?.title || product.title}
                     fill
                     className="object-cover"
                   />
@@ -98,7 +98,7 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
           <div className="relative mb-8 md:mb-20 aspect-3/2 md:aspect-7/3">
             <Image
               src={collectionDetails.data.product_page_wide_image.url}
-              alt="Collection product page wide image"
+              alt={product.collection?.title || product.title}
               fill
               className="object-cover"
             />
@@ -117,7 +117,7 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
                   <Image
                     src={collectionDetails.data.product_page_cta_image.url}
                     fill
-                    alt="Collection product page CTA image"
+                    alt={product.collection?.title || product.title}
                   />
                 </div>
               </LayoutColumn>

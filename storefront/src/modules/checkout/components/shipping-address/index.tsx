@@ -159,7 +159,7 @@ const ShippingAddress = ({
         <div className="w-full border border-grayscale-200 rounded-xs p-4 flex flex-wrap gap-8 max-lg:flex-col mb-8">
           <div className="flex flex-1 gap-8">
             <Icon name="user" className="w-6 h-6 mt-2.5" />
-            <div className="flex flex-col gap-8 flex-1">
+            <address className="flex flex-col gap-8 flex-1 not-italic">
               <div className="flex flex-wrap justify-between gap-6">
                 <div className="grow basis-0">
                   <p className="text-xs text-grayscale-500 mb-1.5">Country</p>
@@ -194,7 +194,7 @@ const ShippingAddress = ({
                   <p>{currentShippingAddress.city}</p>
                 </div>
               </div>
-            </div>
+            </address>
           </div>
           <UiDialogTrigger>
             <Button variant="outline" size="sm" className="shrink-0">
@@ -202,11 +202,11 @@ const ShippingAddress = ({
             </Button>
             <UiModalOverlay>
               <UiModal>
-                <UiDialog>
-                  <p className="text-md mb-10">Change address</p>
+                <UiDialog aria-label="Change shipping address">
+                  <h3 className="text-md mb-10">Change address</h3>
                   <ReactAria.RadioGroup
                     className="flex flex-col gap-4 mb-10"
-                    aria-label="Shipping methods"
+                    aria-label="Saved shipping addresses"
                     onChange={(value) => {
                       const selectedAddress = addressesInRegion?.find(
                         (a) => a.id === value
@@ -293,7 +293,7 @@ const ShippingAddress = ({
                       <Button>Add new address</Button>
                       <UiModalOverlay>
                         <UiModal>
-                          <UiDialog>
+                          <UiDialog aria-label="Add shipping address">
                             <UpsertAddressForm
                               region={cart?.region}
                               {...withDefinedProp(
@@ -317,43 +317,44 @@ const ShippingAddress = ({
           <InputField
             placeholder="First name"
             name="shipping_address.first_name"
-            inputProps={{ autoComplete: "given-name" }}
+            inputProps={{ autoComplete: "given-name", "aria-label": "Shipping first name" }}
             data-testid="shipping-first-name-input"
           />
           <InputField
             placeholder="Last name"
             name="shipping_address.last_name"
-            inputProps={{ autoComplete: "family-name" }}
+            inputProps={{ autoComplete: "family-name", "aria-label": "Shipping last name" }}
             data-testid="shipping-last-name-input"
           />
           <InputField
             placeholder="Address"
             name="shipping_address.address_1"
-            inputProps={{ autoComplete: "address-line1" }}
+            inputProps={{ autoComplete: "address-line1", "aria-label": "Shipping address line 1" }}
             data-testid="shipping-address-input"
           />
           <InputField
             placeholder="Company"
             name="shipping_address.company"
-            inputProps={{ autoComplete: "organization" }}
+            inputProps={{ autoComplete: "organization", "aria-label": "Shipping company" }}
             data-testid="shipping-company-input"
           />
           <InputField
             placeholder="Postal code"
             name="shipping_address.postal_code"
-            inputProps={{ autoComplete: "postal-code" }}
+            inputProps={{ autoComplete: "postal-code", "aria-label": "Shipping postal code" }}
             data-testid="shipping-postal-code-input"
           />
           <InputField
             placeholder="City"
             name="shipping_address.city"
-            inputProps={{ autoComplete: "address-level2" }}
+            inputProps={{ autoComplete: "address-level2", "aria-label": "Shipping city" }}
             data-testid="shipping-city-input"
           />
           <CountrySelectField
             name="shipping_address.country_code"
             selectProps={{
               autoComplete: "country",
+              "aria-label": "Shipping country",
               ...withDefinedProp("region", cart?.region),
             }}
             data-testid="shipping-country-select"
@@ -361,13 +362,13 @@ const ShippingAddress = ({
           <InputField
             placeholder="State / Province"
             name="shipping_address.province"
-            inputProps={{ autoComplete: "address-level1" }}
+            inputProps={{ autoComplete: "address-level1", "aria-label": "Shipping state or province" }}
             data-testid="shipping-province-input"
           />
           <InputField
             placeholder="Phone"
             name="shipping_address.phone"
-            inputProps={{ autoComplete: "tel" }}
+            inputProps={{ autoComplete: "tel", "aria-label": "Shipping phone" }}
             data-testid="shipping-phone-input"
           />
         </div>

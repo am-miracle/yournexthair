@@ -57,9 +57,9 @@ export default function InspirationPage() {
       <div className="pb-26 md:pb-36">
         <Layout>
           <LayoutColumn start={1} end={{ base: 13, md: 8 }}>
-            <h3 className="text-md mb-6 md:mb-16 md:text-2xl">
+            <h2 className="text-md mb-6 md:mb-16 md:text-2xl">
               Raw vs Virgin Hair. What is the difference?
-            </h3>
+            </h2>
             <div className="md:text-md max-md:mb-16 max-w-135">
               <p>
                 Raw hair is collected directly from a single donor with the cuticles intact and
@@ -75,7 +75,7 @@ export default function InspirationPage() {
                 src="/images/content/bundle.jpg"
                 width={768}
                 height={572}
-                alt="Raw donor bundles"
+                alt="Raw Bundles"
                 className="mb-4 md:mb-6"
               />
               <div className="flex justify-between">
@@ -96,9 +96,9 @@ export default function InspirationPage() {
             />
           </LayoutColumn>
           <LayoutColumn start={1} end={{ base: 13, md: 8 }}>
-            <h3 className="text-md mb-6 md:mb-16 md:text-2xl">
+            <h2 className="text-md mb-6 md:mb-16 md:text-2xl">
               Choosing the right texture for your lifestyle.
-            </h3>
+            </h2>
             <div className="md:text-md max-md:mb-16 max-w-135">
               <p>
                 Body wave and loose wave are the most versatile. They hold curls, lay flat, and
@@ -118,7 +118,7 @@ export default function InspirationPage() {
                 src="/images/content/closure.jpg"
                 width={768}
                 height={572}
-                alt="Closures and frontals"
+                alt="Closures & Frontals"
                 className="mb-4 md:mb-6"
               />
               <div className="flex justify-between">
@@ -133,7 +133,7 @@ export default function InspirationPage() {
                 src="/images/content/wigs.jpg"
                 width={768}
                 height={572}
-                alt="Wigs and units"
+                alt="Wigs & Units"
                 className="mb-4 md:mb-6"
               />
               <div className="flex justify-between">
@@ -154,9 +154,9 @@ export default function InspirationPage() {
         />
         <Layout>
           <LayoutColumn start={1} end={{ base: 13, md: 8 }}>
-            <h3 className="text-md mb-6 md:mb-16 md:text-2xl">
+            <h2 className="text-md mb-6 md:mb-16 md:text-2xl">
               Brazilian, Peruvian, Indian, Malaysian, Cambodian. Origins matter.
-            </h3>
+            </h2>
             <div className="md:text-md max-md:mb-16 max-w-135">
               <p>
                 Brazilian is soft and full with natural body movement. Peruvian is lightweight with
@@ -173,7 +173,7 @@ export default function InspirationPage() {
                 src="/images/content/abouthair.jpg"
                 width={768}
                 height={572}
-                alt="Shop all hair"
+                alt="Shop All Hair"
                 className="mb-4 md:mb-6"
               />
               <div className="flex justify-between">

@@ -48,6 +48,21 @@ export default function TermsOfUsePage() {
         end={{ base: 13, lg: 10, xl: 9 }}
         className="article"
       >
+        <nav aria-labelledby="terms-contents" className="mb-12">
+          <h2 id="terms-contents" className="text-md mb-4">
+            On this page
+          </h2>
+          <ol className="list-decimal pl-5">
+            <li><a href="#terms-content">Ownership of content</a></li>
+            <li><a href="#terms-website-use">Use of the website</a></li>
+            <li><a href="#terms-third-party">Third-party links and content</a></li>
+            <li><a href="#terms-warranties">Disclaimer of warranties</a></li>
+            <li><a href="#terms-liability">Limitation of liability</a></li>
+            <li><a href="#terms-indemnification">Indemnification</a></li>
+            <li><a href="#terms-modifications">Modifications to the terms</a></li>
+            <li><a href="#terms-law">Governing law and jurisdiction</a></li>
+          </ol>
+        </nav>
         <p>
           Welcome to Your Next Hair. These Terms of Use govern your access to and
           use of our website, products, and services. By accessing or using our
@@ -55,15 +70,15 @@ export default function TermsOfUsePage() {
           do not agree with any part of these terms, please do not use our
           website.
         </p>
-        <h2>1. Terms of Use:</h2>
+        <h2 id="terms-content">1. Ownership of Content</h2>
         <p>
           All content and materials on our website, including text, graphics,
-          logos, images, videos, and trademarks, are the property of Sofa
-          Society or its licensors and are protected by intellectual property
+          logos, images, videos, and trademarks, are the property of Your Next
+          Hair or its licensors and are protected by intellectual property
           laws. You may not use, reproduce, modify, or distribute any of our
           content without our prior written permission.
         </p>
-        <h2>2. Use of the Website:</h2>
+        <h2 id="terms-website-use">2. Use of the Website</h2>
         <ol>
           <li>
             Eligibility: You must be at least 16 years old to use our website.
@@ -100,7 +115,7 @@ export default function TermsOfUsePage() {
             </ul>
           </li>
         </ol>
-        <h2>3. Third-Party Links and Content:</h2>
+        <h2 id="terms-third-party">3. Third-Party Links and Content</h2>
         <p>
           Our website may contain links to third-party websites or display
           content from third parties. We do not endorse or control these
@@ -108,7 +123,7 @@ export default function TermsOfUsePage() {
           risk. We are not responsible for the accuracy, reliability, or
           legality of any third-party websites or content.
         </p>
-        <h2>4. Disclaimer of Warranties:</h2>
+        <h2 id="terms-warranties">4. Disclaimer of Warranties</h2>
         <p>
           Our website is provided on an &quot;as is&quot; and &quot;as
           available&quot; basis. We do not make any warranties, express or
@@ -116,7 +131,7 @@ export default function TermsOfUsePage() {
           website or the content therein. Your use of our website is at your
           sole risk.
         </p>
-        <h2>5. Limitation of Liability:</h2>
+        <h2 id="terms-liability">5. Limitation of Liability</h2>
         <p>
           To the maximum extent permitted by law, Your Next Hair and its
           affiliates, officers, directors, employees, and agents shall not be
@@ -124,7 +139,7 @@ export default function TermsOfUsePage() {
           damages arising out of or in connection with your use of our website,
           even if advised of the possibility of such damages.
         </p>
-        <h2>6. Indemnification:</h2>
+        <h2 id="terms-indemnification">6. Indemnification</h2>
         <p>
           You agree to indemnify, defend, and hold harmless Your Next Hair and its
           affiliates, officers, directors, employees, and agents from and
@@ -133,20 +148,21 @@ export default function TermsOfUsePage() {
           connection with your use of our website or violation of these Terms of
           Use.
         </p>
-        <h2>7. Modifications to the Terms:</h2>
+        <h2 id="terms-modifications">7. Modifications to the Terms</h2>
         <p>
-          You agree to indemnify, defend, and hold harmless Your Next Hair and its
-          affiliates, officers, directors, employees, and agents from and
-          against any claims, liabilities, damages, losses, and expenses,
-          including reasonable attorney&apos;s fees, arising out of or in
-          connection with your use of our website or violation of these Terms of
-          Use.
+          We may update these Terms of Use from time to time to reflect changes
+          to our services, operations, or legal obligations. When we make
+          material changes, we will post the updated terms on this page and
+          update the effective date where applicable. Your continued use of the
+          website after those changes take effect means you accept the revised
+          terms.
         </p>
-        <h2>8. Governing Law and Jurisdiction:</h2>
+        <h2 id="terms-law">8. Governing Law and Jurisdiction</h2>
         <p>
           These Terms of Use shall be governed by and construed in accordance
-          with the laws. Any disputes arising out of or in connection with these
-          terms shall be subject to the exclusive jurisdiction of the courts.
+          with applicable law. Any disputes arising out of or in connection
+          with these terms shall be subject to the jurisdiction of the
+          appropriate courts.
         </p>
       </LayoutColumn>
     </Layout>

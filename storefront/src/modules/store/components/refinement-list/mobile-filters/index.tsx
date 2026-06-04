@@ -44,7 +44,7 @@ export const MobileFilters: React.FC<{
           animateFrom="bottom"
           className="top-36 w-full pb-26 max-w-full"
         >
-          <UiDialog>
+          <UiDialog aria-label="Filter products">
             {({ close }) => (
               <form
                 onSubmit={(event) => {
@@ -75,7 +75,7 @@ export const MobileFilters: React.FC<{
                     name="collection"
                     defaultValue={collection ?? []}
                   >
-                    <ReactAria.Label className="block text-md font-semibold mb-3">
+                    <ReactAria.Label id="mobile-filter-collections" className="block text-md font-semibold mb-3">
                       Collections
                     </ReactAria.Label>
                     {Object.entries(collections).map(([key, value]) => (
@@ -104,7 +104,7 @@ export const MobileFilters: React.FC<{
                     name="category"
                     defaultValue={category ?? []}
                   >
-                    <ReactAria.Label className="block text-md font-semibold mb-3">
+                    <ReactAria.Label id="mobile-filter-categories" className="block text-md font-semibold mb-3">
                       Categories
                     </ReactAria.Label>
                     {Object.entries(categories).map(([key, value]) => (
@@ -133,7 +133,7 @@ export const MobileFilters: React.FC<{
                     name="type"
                     defaultValue={type ?? []}
                   >
-                    <ReactAria.Label className="block text-md font-semibold mb-3">
+                    <ReactAria.Label id="mobile-filter-types" className="block text-md font-semibold mb-3">
                       Types
                     </ReactAria.Label>
                     {Object.entries(types).map(([key, value]) => (

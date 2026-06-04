@@ -49,12 +49,25 @@ export default function CookiePolicyPage() {
         end={{ base: 13, lg: 10, xl: 9 }}
         className="article"
       >
+        <nav aria-labelledby="cookie-contents" className="mb-12">
+          <h2 id="cookie-contents" className="text-md mb-4">
+            On this page
+          </h2>
+          <ol className="list-decimal pl-5">
+            <li><a href="#cookie-what">What are cookies</a></li>
+            <li><a href="#cookie-types">Types of cookies we use</a></li>
+            <li><a href="#cookie-third-party">Third-party cookies</a></li>
+            <li><a href="#cookie-management">Cookie management</a></li>
+            <li><a href="#cookie-updates">Updates to the cookie policy</a></li>
+            <li><a href="#cookie-contact">Contact us</a></li>
+          </ol>
+        </nav>
         <p>
           This Cookie Policy explains how Your Next Hair uses cookies and similar
           technologies on our website. By using our website, you consent to the
           use of cookies as described in this policy.
         </p>
-        <h2>1. What Are Cookies:</h2>
+        <h2 id="cookie-what">1. What Are Cookies</h2>
         <p>
           Cookies are small text files that are placed on your computer or
           device when you visit a website. They are widely used to make websites
@@ -62,7 +75,7 @@ export default function CookiePolicyPage() {
           Cookies also enable website owners to collect certain information
           about visitors.
         </p>
-        <h2>2. Types of Cookies We Use:</h2>
+        <h2 id="cookie-types">2. Types of Cookies We Use</h2>
         <p>We use the following types of cookies on our website:</p>
         <ul>
           <li>
@@ -91,14 +104,14 @@ export default function CookiePolicyPage() {
             measure the effectiveness of advertising campaigns.
           </li>
         </ul>
-        <h2>3. Third-Party Cookies:</h2>
+        <h2 id="cookie-third-party">3. Third-Party Cookies</h2>
         <p>
           We may allow third-party service providers, such as analytics and
           advertising companies, to place cookies on our website. These third
           parties may collect information about your online activities over time
           and across different websites.
         </p>
-        <h2>4. Cookie Management:</h2>
+        <h2 id="cookie-management">4. Cookie Management</h2>
         <p>
           You can manage and control cookies through your browser settings. Most
           web browsers allow you to block or delete cookies. However, please
@@ -109,29 +122,34 @@ export default function CookiePolicyPage() {
           For more information on how to manage cookies, you can visit the help
           or settings section of your browser.
         </p>
-        <h2>5. Updates to the Cookie Policy:</h2>
+        <h2 id="cookie-updates">5. Updates to the Cookie Policy</h2>
         <p>
           We may update this Cookie Policy from time to time to reflect changes
           in our use of cookies or for other operational, legal, or regulatory
           reasons. We will notify you of any material changes by posting a
           prominent notice on our website.
         </p>
-        <h2>6. Contact Us:</h2>
+        <h2 id="cookie-contact">6. Contact Us</h2>
         <p>
           If you have any questions, concerns, or requests regarding this
           Privacy Policy or how we handle your personal information, please
           contact us at:
         </p>
-        <p>
-          Email: judemiraco0@gmail.com
-          <br />
-          WhatsApp:{" "}
-          <a href="https://api.whatsapp.com/send?phone=2348156197614" target="_blank">
-            +234 815 619 7614
-          </a>
-          <br />
-          Location: Port Harcourt, Rivers State, Nigeria
-        </p>
+        <address className="not-italic">
+          <p>Email: <a href="mailto:judemiraco0@gmail.com">judemiraco0@gmail.com</a></p>
+          <p>
+            WhatsApp:{" "}
+            <a
+              href="https://api.whatsapp.com/send?phone=2348156197614"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Chat with Your Next Hair on WhatsApp (opens in a new tab)"
+            >
+              +234 815 619 7614
+            </a>
+          </p>
+          <p>Location: Port Harcourt, Rivers State, Nigeria</p>
+        </address>
       </LayoutColumn>
     </Layout>
   )

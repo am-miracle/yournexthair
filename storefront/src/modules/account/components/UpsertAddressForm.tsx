@@ -69,9 +69,9 @@ export const UpsertAddressForm = withReactQueryProvider<{
           !formState.isDirty
         return (
           <>
-            <p className="text-md mb-8 md:mb-10">
+            <h3 className="text-md mb-8 md:mb-10">
               {addressId ? "Change address" : "Add another address"}
-            </p>
+            </h3>
             <div className="flex flex-col gap-4 md:gap-8 mb-8 md:mb-10">
               <div className="flex max-xs:flex-col gap-4 md:gap-6">
                 <InputField
@@ -80,6 +80,7 @@ export const UpsertAddressForm = withReactQueryProvider<{
                   className=" flex-1"
                   inputProps={{
                     autoComplete: "given-name",
+                    "aria-label": "First name",
                   }}
                 />
                 <InputField
@@ -88,6 +89,7 @@ export const UpsertAddressForm = withReactQueryProvider<{
                   className=" flex-1"
                   inputProps={{
                     autoComplete: "family-name",
+                    "aria-label": "Last name",
                   }}
                 />
               </div>
@@ -97,6 +99,7 @@ export const UpsertAddressForm = withReactQueryProvider<{
                 className=" flex-1"
                 inputProps={{
                   autoComplete: "organization",
+                  "aria-label": "Company",
                 }}
               />
               <InputField
@@ -104,6 +107,7 @@ export const UpsertAddressForm = withReactQueryProvider<{
                 name="address_1"
                 inputProps={{
                   autoComplete: "address-line1",
+                  "aria-label": "Address line 1",
                 }}
               />
               <InputField
@@ -111,6 +115,7 @@ export const UpsertAddressForm = withReactQueryProvider<{
                 name="address_2"
                 inputProps={{
                   autoComplete: "address-line2",
+                  "aria-label": "Address line 2",
                 }}
               />
               <InputField
@@ -119,6 +124,7 @@ export const UpsertAddressForm = withReactQueryProvider<{
                 type="tel"
                 inputProps={{
                   autoComplete: "tel",
+                  "aria-label": "Phone",
                 }}
               />
               <div className="flex max-xs:flex-col gap-4 md:gap-6">
@@ -128,13 +134,14 @@ export const UpsertAddressForm = withReactQueryProvider<{
                   className=" flex-1"
                   inputProps={{
                     autoComplete: "postal-code",
+                    "aria-label": "Postal code",
                   }}
                 />
                 <InputField
                   placeholder="City"
                   name="city"
                   className=" flex-1"
-                  inputProps={{ autoComplete: "address-level2" }}
+                  inputProps={{ autoComplete: "address-level2", "aria-label": "City" }}
                 />
               </div>
               <div className="flex max-xs:flex-col gap-4 md:gap-6">
@@ -142,13 +149,14 @@ export const UpsertAddressForm = withReactQueryProvider<{
                   placeholder="Province (Optional)"
                   name="province"
                   className=" flex-1"
-                  inputProps={{ autoComplete: "address-level1" }}
+                  inputProps={{ autoComplete: "address-level1", "aria-label": "State or province" }}
                 />
                 <CountrySelectField
                   selectProps={{
                     ...withDefinedProp("region", region),
                     ...withNonNullProp("defaultValue", defaultValues?.country_code),
                     autoComplete: "country",
+                    "aria-label": "Country",
                   }}
                   name="country_code"
                   className="flex-1"

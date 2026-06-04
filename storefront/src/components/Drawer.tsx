@@ -8,7 +8,7 @@ import { withDefinedProp } from "@lib/util/optional-props"
 export interface DrawerProps
   extends Omit<ReactAria.ModalOverlayProps, "children">,
     UiModalOwnProps,
-    Pick<ReactAria.DialogProps, "children"> {
+    Pick<ReactAria.DialogProps, "children" | "aria-label"> {
   colorScheme?: "light" | "dark"
   className?: string
 }
@@ -18,6 +18,7 @@ export const Drawer: React.FC<DrawerProps> = ({
   animateFrom,
   className,
   children,
+  "aria-label": ariaLabel,
   ...rest
 }) => {
   return (
@@ -32,7 +33,9 @@ export const Drawer: React.FC<DrawerProps> = ({
           className
         )}
       >
-        <UiDialog className="flex flex-col flex-1">{children}</UiDialog>
+        <UiDialog {...withDefinedProp("aria-label", ariaLabel)} className="flex flex-col flex-1">
+          {children}
+        </UiDialog>
       </UiModal>
     </UiModalOverlay>
   )

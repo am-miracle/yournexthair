@@ -11,7 +11,7 @@ type ItemProps = {
 
 const Item = ({ item, className }: ItemProps) => {
   return (
-    <div
+    <li
       className={twMerge(
         "flex gap-x-6 sm:gap-x-8 gap-y-6 mb-6 pb-6 border-b border-grayscale-100 last:border-0 last:mb-0 last:pb-0",
         className
@@ -56,7 +56,7 @@ const Item = ({ item, className }: ItemProps) => {
           </div>
         </div>
       </div>
-    </div>
+    </li>
   )
 }
 

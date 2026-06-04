@@ -123,7 +123,7 @@ export default async function AccountOrderPage({
               <Icon name="map-pin" />
               <p className="text-grayscale-500">Delivery address</p>
             </div>
-            <div>
+            <address className="not-italic">
               <p>
                 {[order.shipping_address?.first_name, order.shipping_address?.last_name]
                   .filter(Boolean)
@@ -143,14 +143,14 @@ export default async function AccountOrderPage({
                   .join(", ")}
               </p>
               {Boolean(order.shipping_address?.phone) && <p>{order.shipping_address?.phone}</p>}
-            </div>
+            </address>
           </div>
           <div className="flex-1 overflow-hidden rounded-xs border border-grayscale-200 p-4">
             <div className="flex gap-4 items-center mb-8">
               <Icon name="receipt" />
               <p className="text-grayscale-500">Billing address</p>
             </div>
-            <div>
+            <address className="not-italic">
               <p>
                 {[order.billing_address?.first_name, order.billing_address?.last_name]
                   .filter(Boolean)
@@ -170,12 +170,13 @@ export default async function AccountOrderPage({
                   .join(", ")}
               </p>
               {Boolean(order.billing_address?.phone) && <p>{order.billing_address?.phone}</p>}
-            </div>
+            </address>
           </div>
         </div>
-        <div className="rounded-xs border border-grayscale-200 p-4 flex flex-col gap-6">
-          {order.items?.map((item) => (
-            <div
+        <div className="rounded-xs border border-grayscale-200 p-4">
+          <ul className="flex flex-col gap-6">
+            {order.items?.map((item) => (
+            <li
               key={item.id}
               className="flex gap-x-4 sm:gap-x-8 gap-y-6 pb-6 border-b border-grayscale-100 last:border-0 last:pb-0"
             >
@@ -220,8 +221,9 @@ export default async function AccountOrderPage({
                   </div>
                 </div>
               </div>
-            </div>
+            </li>
           ))}
+          </ul>
         </div>
         <div className="rounded-xs border border-grayscale-200 p-4 flex max-sm:flex-col gap-y-4 gap-x-10 md:flex-wrap justify-between">
           <div className="flex items-center self-baseline gap-4">

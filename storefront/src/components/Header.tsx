@@ -43,19 +43,36 @@ export const Header: React.FC = async () => {
     .sort((a, b) => a.label.localeCompare(b.label))
 
   return (
-    <>
-      <HeaderWrapper>
+    <HeaderWrapper>
+      <header>
         <Layout>
           <LayoutColumn>
             <div className="flex justify-between items-center h-18 md:h-21">
-              <h1 className="font-medium text-md">
-                <LocalizedLink href="/" className="cursor-pointer">YourNextHair</LocalizedLink>
-              </h1>
-              <div className="flex items-center gap-8 max-md:hidden">
-                <LocalizedLink href="/about" className="hover:text-purple-600 hover:underline underline-offset-4 decoration-purple-600 transition-colors">About</LocalizedLink>
-                <LocalizedLink href="/inspiration" className="hover:text-purple-600 hover:underline underline-offset-4 decoration-purple-600 transition-colors">Hair Guide</LocalizedLink>
-                <LocalizedLink href="/store" className="hover:text-purple-600 hover:underline underline-offset-4 decoration-purple-600 transition-colors">Shop</LocalizedLink>
-              </div>
+              <p className="font-medium text-md">
+                <LocalizedLink href="/" className="cursor-pointer">
+                  YourNextHair
+                </LocalizedLink>
+              </p>
+              <nav aria-label="Primary" className="flex items-center gap-8 max-md:hidden">
+                <LocalizedLink
+                  href="/about"
+                  className="hover:text-purple-600 hover:underline underline-offset-4 decoration-purple-600 transition-colors"
+                >
+                  About
+                </LocalizedLink>
+                <LocalizedLink
+                  href="/inspiration"
+                  className="hover:text-purple-600 hover:underline underline-offset-4 decoration-purple-600 transition-colors"
+                >
+                  Hair Guide
+                </LocalizedLink>
+                <LocalizedLink
+                  href="/store"
+                  className="hover:text-purple-600 hover:underline underline-offset-4 decoration-purple-600 transition-colors"
+                >
+                  Shop
+                </LocalizedLink>
+              </nav>
               <div className="flex items-center gap-3 lg:gap-6 max-md:hidden">
                 <RegionSwitcher
                   countryOptions={countryOptions}
@@ -79,7 +96,7 @@ export const Header: React.FC = async () => {
             </div>
           </LayoutColumn>
         </Layout>
-      </HeaderWrapper>
-    </>
+      </header>
+    </HeaderWrapper>
   )
 }

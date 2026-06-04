@@ -36,9 +36,9 @@ export default async function SearchPage({ params, searchParams }: Props) {
     <div className="md:pt-47 py-26 md:pb-36">
       <Layout>
         <LayoutColumn>
-          <h2 className="mb-8 md:mb-16 text-lg md:text-2xl">
+          <h1 className="mb-8 md:mb-16 text-lg md:text-2xl">
             Search results for &apos;{query}&apos;
-          </h2>
+          </h1>
         </LayoutColumn>
       </Layout>
       <Suspense fallback={<SkeletonProductGrid />}>

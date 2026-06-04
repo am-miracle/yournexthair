@@ -31,7 +31,7 @@ export const MobileSort: React.FC<{
           animateFrom="bottom"
           className="w-full rounded-none max-w-full shadow-none pb-21"
         >
-          <UiDialog>
+          <UiDialog aria-label="Sort products">
             {({ close }) => (
               <form
                 onSubmit={(event) => {

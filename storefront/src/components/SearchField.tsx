@@ -111,7 +111,13 @@ export const SearchField: React.FC<{
         onPress={buttonPressHandle}
         variant="ghost"
         className="p-1 max-md:text-white group-data-[light=true]:md:text-white group-data-[sticky=true]:md:text-black"
-        aria-label="Open search"
+        aria-label={
+          !isInputShown
+            ? "Open search"
+            : list.filterText
+              ? "Search for products"
+              : "Close search"
+        }
       >
         <Icon name="search" className="w-5 h-5" />
       </Button>
@@ -131,7 +137,11 @@ export const SearchField: React.FC<{
             isInputShown ? "w-full md:w-30" : "md:w-0",
           )}
         >
-          <Input className="px-0 disabled:bg-transparent py-0! h-7 md:h-6 max-md:border-0 border-black rounded-none border-t-0 border-x-0 group-data-[light=true]:md:border-white group-data-[sticky=true]:md:border-black ml-2 md:ml-1" />
+          <Input
+            aria-label="Search products"
+            placeholder="Search products"
+            className="px-0 disabled:bg-transparent py-0! h-7 md:h-6 max-md:border-0 border-black rounded-none border-t-0 border-x-0 group-data-[light=true]:md:border-white group-data-[sticky=true]:md:border-black ml-2 md:ml-1"
+          />
         </div>
         <ReactAria.Popover
           placement="bottom end"

@@ -28,7 +28,7 @@ const ProductTypesSection: React.FC = async () => {
         <h3 className="text-md md:text-2xl mb-8 md:mb-15">Shop by category</h3>
       </LayoutColumn>
       <LayoutColumn className="col-span-full">
-        <div className="flex items-center gap-x-3 gap-y-8 md:gap-x-10 md:gap-y-12">
+        <div className="flex items-start gap-x-3 gap-y-8 md:gap-x-10 md:gap-y-12">
           {productTypes.productTypes.map((productType, index) => (
             <div key={productType.id} className="w-full">
               <LocalizedLink href={`/store?type=${productType.value}`}>
@@ -75,6 +75,7 @@ export default async function Home({ params }: { params: Promise<{ countryCode: 
           loop
           playsInline
           poster="/images/content/yournexthairvideo-poster.jpg"
+          aria-hidden="true"
           className="h-128 w-full object-cover sm:h-144 md:h-screen"
         >
           <source src="/images/content/yournexthairvideo.webm" type="video/webm" />

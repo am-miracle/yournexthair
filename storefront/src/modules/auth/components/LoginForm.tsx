@@ -43,7 +43,7 @@ export const LoginForm = withReactQueryProvider<{
         <InputField
           placeholder="Email"
           name="email"
-          inputProps={{ autoComplete: "email" }}
+          inputProps={{ autoComplete: "email", "aria-label": "Email" }}
           className="flex-1"
         />
         <InputField
@@ -51,7 +51,7 @@ export const LoginForm = withReactQueryProvider<{
           name="password"
           type="password"
           className="flex-1"
-          inputProps={{ autoComplete: "current-password" }}
+          inputProps={{ autoComplete: "current-password", "aria-label": "Password" }}
         />
         <LocalizedLink
           href="/auth/forgot-password"
@@ -60,7 +60,11 @@ export const LoginForm = withReactQueryProvider<{
         >
           Forgot password?
         </LocalizedLink>
-        {!data?.success && <p className="text-red-primary text-sm">{data?.message}</p>}
+        {!data?.success && data?.message && (
+          <p className="text-red-primary text-sm" role="alert">
+            {data.message}
+          </p>
+        )}
         <SubmitButton isLoading={isPending}>Log in</SubmitButton>
       </div>
     </Form>

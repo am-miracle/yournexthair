@@ -43,7 +43,15 @@ export default function RootLayout(props: { children: React.ReactNode }) {
   return (
     <html lang="en" data-mode="light" className="antialiased">
       <body className={`${monaSans.className}`}>
-        <main className="relative">{props.children}</main>
+        <a
+          href="#main-content"
+          className="sr-only absolute left-4 top-4 z-50 rounded-xs bg-white px-4 py-2 text-sm text-black shadow-sm focus:not-sr-only"
+        >
+          Skip to main content
+        </a>
+        <main id="main-content" className="relative">
+          {props.children}
+        </main>
         <SpeedInsights />
         <WebMCPProvider />
       </body>

@@ -16,7 +16,7 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
           <p className="text-grayscale-500 mb-2">{product.collection.title}</p>
         </LocalizedLink>
       )}
-      <h2 className="text-md md:text-xl mb-2">{product.title}</h2>
+      <h1 className="text-md md:text-xl mb-2">{product.title}</h1>
     </>
   )
 }

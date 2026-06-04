@@ -75,24 +75,26 @@ export const ChangePasswordForm: React.FC<{
               type="password"
               placeholder="Current password"
               name="current_password"
-              inputProps={{ autoComplete: "current-password" }}
+              inputProps={{ autoComplete: "current-password", "aria-label": "Current password" }}
             />
           )}
           <InputField
             type="password"
             placeholder="New password"
             name="new_password"
-            inputProps={{ autoComplete: "new-password" }}
+            inputProps={{ autoComplete: "new-password", "aria-label": "New password" }}
           />
           <InputField
             type="password"
             placeholder="Confirm new password"
             name="confirm_new_password"
-            inputProps={{ autoComplete: "new-password" }}
+            inputProps={{ autoComplete: "new-password", "aria-label": "Confirm new password" }}
           />
         </div>
         {formState.state === "error" && (
-          <p className="text-red-primary text-sm mb-6">{formState.error}</p>
+          <p className="text-red-primary text-sm mb-6" role="alert">
+            {formState.error}
+          </p>
         )}
         <SubmitButton isLoading={isPending} isFullWidth>
           Reset password
@@ -105,8 +107,8 @@ export const ChangePasswordForm: React.FC<{
         className="bg-transparent"
       >
         <UiModal className="relative">
-          <UiDialog>
-            <p className="text-md mb-12">Password reset successful!</p>
+          <UiDialog aria-label="Password reset successful">
+            <h2 className="text-md mb-12">Password reset successful!</h2>
             <p className="text-grayscale-500">
               Your password has been updated. You can now log in to Your Next Hair with your new
               password.

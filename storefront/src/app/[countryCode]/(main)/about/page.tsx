@@ -55,9 +55,9 @@ export default function AboutPage() {
       <div className="pt-8 md:pt-26 pb-26 md:pb-36">
         <Layout>
           <LayoutColumn start={1} end={{ base: 13, lg: 7 }}>
-            <h3 className="text-md max-lg:mb-6 md:text-2xl">
+            <h2 className="text-md max-lg:mb-6 md:text-2xl">
               At Your Next Hair, we believe great hair starts at the source.
-            </h3>
+            </h2>
           </LayoutColumn>
           <LayoutColumn start={{ base: 1, lg: 8 }} end={13}>
             <div className="md:text-md lg:mt-18">
@@ -82,9 +82,9 @@ export default function AboutPage() {
             />
           </LayoutColumn>
           <LayoutColumn start={1} end={{ base: 13, lg: 8 }}>
-            <h3 className="text-md lg:mb-10 mb-6 md:text-2xl">
+            <h2 className="text-md lg:mb-10 mb-6 md:text-2xl">
               Strictly donor hair. Nothing less, nothing mixed.
-            </h3>
+            </h2>
           </LayoutColumn>
           <LayoutColumn start={1} end={{ base: 13, lg: 6 }}>
             <div className="mb-16 lg:mb-26">
@@ -133,9 +133,9 @@ export default function AboutPage() {
         />
         <Layout>
           <LayoutColumn start={1} end={{ base: 13, lg: 7 }}>
-            <h3 className="text-md max-lg:mb-6 md:text-2xl">
+            <h2 className="text-md max-lg:mb-6 md:text-2xl">
               Our clients are at the center of everything we do.
-            </h3>
+            </h2>
           </LayoutColumn>
           <LayoutColumn start={{ base: 1, lg: 8 }} end={13}>
             <div className="md:text-md lg:mt-18">
@@ -145,6 +145,8 @@ export default function AboutPage() {
                 <a
                   href="https://api.whatsapp.com/send?phone=2348156197614"
                   target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Chat with Your Next Hair on WhatsApp (opens in a new tab)"
                   className="underline"
                 >
                   WhatsApp
