@@ -32,7 +32,6 @@
   },
   "include": ["**/*", ".medusa/types/*"],
   "exclude": [
-    "**/__tests__",
     "**/__fixtures__",
     "node_modules",
     ".medusa/server",

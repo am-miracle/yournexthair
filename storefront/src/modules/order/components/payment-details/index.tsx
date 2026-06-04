@@ -1,6 +1,6 @@
 import { HttpTypes } from "@medusajs/types"
 
-import { isStripe, paymentInfoMap } from "@lib/constants"
+import { paymentInfoMap } from "@lib/constants"
 import { convertToLocale } from "@lib/util/money"
 
 type PaymentDetailsProps = {
@@ -20,12 +20,11 @@ const PaymentDetails = ({ order }: PaymentDetailsProps) => {
     <p className="text-grayscale-500">
       {paymentInfoMap[payment.provider_id]?.title ?? payment.provider_id}
       <br />
-      {isStripe(payment.provider_id) && payment.data?.card_last4
-        ? `**** **** **** ${payment.data.card_last4}`
-        : `${convertToLocale({
-            amount: payment.amount,
-            currency_code: order.currency_code,
-          })} paid at ${new Date(payment.created_at ?? "").toLocaleString()}`}
+      {convertToLocale({
+        amount: payment.amount,
+        currency_code: order.currency_code,
+      })}{" "}
+      paid at {new Date(payment.created_at ?? "").toLocaleString()}
     </p>
   )
 }

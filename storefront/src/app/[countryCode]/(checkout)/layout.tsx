@@ -1,5 +1,6 @@
 import * as React from "react"
 import { Metadata } from "next"
+import Script from "next/script"
 import { Layout, LayoutColumn } from "@/components/Layout"
 import { LocalizedLink } from "@/components/LocalizedLink"
 import dynamic from "next/dynamic"
@@ -13,20 +14,18 @@ export const metadata: Metadata = {
 
 const CheckoutSummaryWrapper = dynamic(
   () => import("@modules/checkout/components/checkout-summary-wrapper"),
-  { loading: () => <></> }
+  { loading: () => <></> },
 )
 
-const  MobileCheckoutSummaryWrapper= dynamic(
+const MobileCheckoutSummaryWrapper = dynamic(
   () => import("@modules/checkout/components/mobile-checkout-summary-wrapper"),
-  { loading: () => <></> }
+  { loading: () => <></> },
 )
-export default function CheckoutLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function CheckoutLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
+      <Script src="https://checkout.flutterwave.com/v3.js" strategy="lazyOnload" />
+      <Script src="https://js.paystack.co/v2/inline.js" strategy="lazyOnload" />
       <Layout className="lg:hidden">
         <LayoutColumn>
           <div className="flex justify-between items-center h-18">

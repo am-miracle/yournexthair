@@ -3,13 +3,11 @@ import {
   applyPromotions,
   deleteLineItem,
   getCartQuantity,
-  getPaymentMethod,
   initiatePaymentSession,
   placeOrder,
   retrieveCart,
   setAddresses,
   setEmail,
-  setPaymentMethod,
   setShippingMethod,
   updateLineItem,
   updateRegion,
@@ -542,46 +540,6 @@ export const useInitiatePaymentSession = (
   })
 }
 
-export const useSetPaymentMethod = (
-  options?: UseMutationOptions<
-    void,
-    Error,
-    { sessionId: string; token: string | null | undefined },
-    unknown
-  >
-) => {
-  const queryClient = useQueryClient()
-  return useMutation({
-    mutationKey: ["set-payment"],
-    mutationFn: async (payload) => {
-      const response = await setPaymentMethod(payload.sessionId, payload.token)
-
-      return response
-    },
-    ...options,
-    async onSuccess(...args) {
-      await queryClient.invalidateQueries({
-        exact: false,
-        queryKey: ["cart"],
-      })
-
-      await options?.onSuccess?.(...args)
-    },
-  })
-}
-
-export const useGetPaymentMethod = (id: string | undefined) => {
-  return useQuery({
-    queryKey: ["payment", id],
-    queryFn: async () => {
-      if (!id) {
-        return null
-      }
-      const res = await getPaymentMethod(id)
-      return res
-    },
-  })
-}
 
 export const usePlaceOrder = (
   options?: UseMutationOptions<

@@ -4,7 +4,6 @@ import { HttpTypes } from "@medusajs/types"
 import { revalidateTag, updateTag } from "next/cache"
 import { redirect } from "next/navigation"
 import { z } from "zod"
-import { PaymentMethod } from "@stripe/stripe-js"
 
 import { sdk } from "@lib/config"
 import medusaError from "@lib/util/medusa-error"
@@ -236,26 +235,21 @@ export async function setShippingMethod({
     .catch(medusaError)
 }
 
-export async function setPaymentMethod(
-  session_id: string,
-  token: string | null | undefined
-) {
-  await sdk.client
-    .fetch("/store/custom/stripe/set-payment-method", {
-      method: "POST",
-      body: { session_id, token },
-    })
-    .then((resp) => resp)
-    .catch(medusaError)
-}
-
-export async function getPaymentMethod(id: string) {
-  return await sdk.client
-    .fetch<PaymentMethod>(`/store/custom/stripe/get-payment-method/${id}`)
-    .then((resp: PaymentMethod) => {
-      return resp
-    })
-    .catch(medusaError)
+export async function recordFlutterwaveTransaction(
+  sessionId: string,
+  transactionId: number,
+  txRef: string
+): Promise<{ success: boolean; error?: string }> {
+  return sdk.client
+    .fetch<{ success: boolean; error?: string }>(
+      "/store/payment/flutterwave/callback",
+      {
+        method: "POST",
+        body: { session_id: sessionId, transaction_id: transactionId, tx_ref: txRef },
+        headers: { ...(await getAuthHeaders()) },
+      }
+    )
+    .catch(medusaError) as Promise<{ success: boolean; error?: string }>
 }
 
 export async function initiatePaymentSession(provider_id: unknown) {
@@ -274,6 +268,9 @@ export async function initiatePaymentSession(provider_id: unknown) {
       cart,
       {
         provider_id,
+        data: {
+          email: cart.email,
+        },
       },
       {},
       await getAuthHeaders()

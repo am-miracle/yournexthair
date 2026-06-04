@@ -89,25 +89,40 @@ module.exports = defineConfig({
     },
   },
   modules: [
-    ...(process.env.STRIPE_API_KEY
-      ? [
-          {
-            resolve: "@medusajs/medusa/payment",
-            options: {
-              providers: [
+    {
+      resolve: "@medusajs/medusa/payment",
+      options: {
+        providers: [
+          // Primary — handles all currencies (NGN, USD, EUR)
+          ...(process.env.FLW_SECRET_KEY
+            ? [
                 {
-                  id: "stripe",
-                  resolve: "@medusajs/medusa/payment-stripe",
+                  id: "flutterwave",
+                  resolve: "./src/modules/payment-flutterwave",
                   options: {
-                    apiKey: process.env.STRIPE_API_KEY,
-                    webhookSecret: process.env.STRIPE_WEBHOOK_SECRET,
+                    secret_key: process.env.FLW_SECRET_KEY,
+                    public_key: process.env.FLW_PUBLIC_KEY,
+                    webhook_secret: process.env.FLW_WEBHOOK_SECRET,
                   },
                 },
-              ],
-            },
-          },
-        ]
-      : []),
+              ]
+            : []),
+          // Secondary — NGN only, preferred by domestic Nigerian buyers
+          ...(process.env.PAYSTACK_SECRET_KEY
+            ? [
+                {
+                  id: "paystack",
+                  resolve: "medusa-payment-paystack",
+                  options: {
+                    secret_key: process.env.PAYSTACK_SECRET_KEY,
+                    webhook_secret: process.env.PAYSTACK_WEBHOOK_SECRET,
+                  },
+                },
+              ]
+            : []),
+        ],
+      },
+    },
     {
       resolve: "./src/modules/fashion",
     },

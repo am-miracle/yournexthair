@@ -1,3 +1,4 @@
+import { timingSafeEqual } from "crypto"
 import { revalidatePath, revalidateTag } from "next/cache"
 import { NextRequest, NextResponse } from "next/server"
 
@@ -27,8 +28,13 @@ const isAuthorized = (request: NextRequest) => {
   }
 
   const authHeader = request.headers.get("authorization")
+  const expected = `Bearer ${expectedSecret}`
 
-  return authHeader === `Bearer ${expectedSecret}`
+  if (!authHeader || authHeader.length !== expected.length) {
+    return false
+  }
+
+  return timingSafeEqual(Buffer.from(authHeader), Buffer.from(expected))
 }
 
 export async function POST(request: NextRequest) {

@@ -1,17 +1,15 @@
 "use client"
 
-import { OnApproveActions, OnApproveData } from "@paypal/paypal-js"
-import { PayPalButtons, usePayPalScriptReducer } from "@paypal/react-paypal-js"
-import { useStripe } from "@stripe/react-stripe-js"
 import React, { useState } from "react"
 import { HttpTypes } from "@medusajs/types"
 import { useRouter } from "next/navigation"
 
-import Spinner from "@modules/common/icons/spinner"
-import { isManual, isPaypal, isStripe } from "@lib/constants"
+import { isFlutterwave, isManual, isPaystack } from "@lib/constants"
+import { getCheckoutPaymentSession, getReviewPaymentSession } from "@lib/util/payment-session"
 import { withDefinedProp } from "@lib/util/optional-props"
 import { Button } from "@/components/Button"
 import ErrorMessage from "@modules/checkout/components/error-message"
+import { recordFlutterwaveTransaction } from "@lib/data/cart"
 import { usePlaceOrder } from "hooks/cart"
 
 type PaymentButtonProps = {
@@ -30,65 +28,46 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
     !cart.email ||
     (cart.shipping_methods?.length ?? 0) < 1
 
-  // TODO: Add this once gift cards are implemented
-  // const paidByGiftcard =
-  //   cart?.gift_cards && cart?.gift_cards?.length > 0 && cart?.total === 0
+  const paymentSession = getReviewPaymentSession(
+    cart.payment_collection?.payment_sessions
+  )
 
-  // if (paidByGiftcard) {
-  //   return <GiftCardPaymentButton />
-  // }
-
-  const paymentSession = cart.payment_collection?.payment_sessions?.[0]
+  if (paymentSession?.status === "authorized") {
+    return <AuthorizedPaymentButton notReady={notReady} />
+  }
 
   switch (true) {
-    case isStripe(paymentSession?.provider_id):
-      return <StripePaymentButton notReady={notReady} cart={cart} />
+    case isFlutterwave(paymentSession?.provider_id):
+      return (
+        <FlutterwavePaymentButton notReady={notReady} cart={cart} />
+      )
+    case isPaystack(paymentSession?.provider_id):
+      return (
+        <PaystackPaymentButton notReady={notReady} cart={cart} />
+      )
     case isManual(paymentSession?.provider_id):
       return <ManualTestPaymentButton notReady={notReady} />
-    case isPaypal(paymentSession?.provider_id):
-      return <PayPalPaymentButton notReady={notReady} cart={cart} />
     default:
       return (
-        <Button
-          className="w-full"
-          onPress={() => {
-            selectPaymentMethod()
-          }}
-        >
+        <Button className="w-full" onPress={selectPaymentMethod}>
           Select a payment method
         </Button>
       )
   }
 }
 
-// const GiftCardPaymentButton = () => {
-//   const [submitting, setSubmitting] = useState(false)
+// --------------------------------------------------------------------------
+// Shared order completion
+// --------------------------------------------------------------------------
 
-//   const handleOrder = async () => {
-//     setSubmitting(true)
-//     await placeOrder()
-//   }
-
-//   return (
-//     <Button onPress={handleOrder} isLoading={submitting} className="w-full">
-//       Place order
-//     </Button>
-//   )
-// }
-
-const StripePaymentButton = ({
-  cart,
-  notReady,
-}: {
-  cart: HttpTypes.StoreCart
-  notReady: boolean
-}) => {
-  const [submitting, setSubmitting] = useState(false)
-  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+function useCompleteOrder() {
   const placeOrder = usePlaceOrder()
   const router = useRouter()
 
-  const onPaymentCompleted = () => {
+  const complete = (
+    setSubmitting: (v: boolean) => void,
+    setErrorMessage: (v: string | null) => void
+  ) => {
     placeOrder.mutate(null, {
       onSuccess: (data) => {
         if (data?.type === "order") {
@@ -107,60 +86,116 @@ const StripePaymentButton = ({
     })
   }
 
-  const stripe = useStripe()
+  return complete
+}
 
-  const session = cart.payment_collection?.payment_sessions?.find(
-    (s) => s.status === "pending"
+// --------------------------------------------------------------------------
+// Flutterwave inline popup
+// --------------------------------------------------------------------------
+
+const FlutterwavePaymentButton = ({
+  cart,
+  notReady,
+}: {
+  cart: HttpTypes.StoreCart
+  notReady: boolean
+}) => {
+  const [submitting, setSubmitting] = useState(false)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const completeOrder = useCompleteOrder()
+
+  const paymentSession = getCheckoutPaymentSession(
+    cart.payment_collection?.payment_sessions,
+    "pp_flutterwave_flutterwave"
   )
 
-  const disabled = !stripe || !session?.data?.payment_method_id ? true : false
-
-  const handlePayment = async () => {
-    setSubmitting(true)
-
-    if (!stripe) {
-      setSubmitting(false)
+  const handlePayment = () => {
+    if (!paymentSession?.data?.tx_ref) {
+      setErrorMessage("Payment session not initialised. Please try again.")
       return
     }
-    const paymentMethodId = session?.data?.payment_method_id as string
 
-    await stripe
-      .confirmCardPayment(session?.data.client_secret as string, {
-        payment_method: paymentMethodId,
-      })
-      .then(({ error, paymentIntent }) => {
-        if (error) {
-          const pi = error.payment_intent
+    if (typeof window.FlutterwaveCheckout !== "function") {
+      setErrorMessage("Payment provider failed to load. Please refresh and try again.")
+      return
+    }
 
-          if (
-            (pi && pi.status === "requires_capture") ||
-            (pi && pi.status === "succeeded")
-          ) {
-            onPaymentCompleted()
-          }
+    const sessionData = paymentSession.data as {
+      tx_ref: string
+      amount: number
+      currency: string
+      customer_email: string | null
+    }
 
-          setErrorMessage(error.message || null)
+    setSubmitting(true)
+
+    window.FlutterwaveCheckout({
+      public_key: process.env.NEXT_PUBLIC_FLW_PUBLIC_KEY!,
+      tx_ref: sessionData.tx_ref,
+      // Flutterwave expects main currency unit (not smallest unit)
+      amount: sessionData.amount / 100,
+      currency: sessionData.currency,
+      customer: {
+        email: sessionData.customer_email ?? cart.email ?? "",
+        ...([cart.billing_address?.first_name, cart.billing_address?.last_name]
+          .filter(Boolean)
+          .join(" ")
+          ? {
+              name: [cart.billing_address?.first_name, cart.billing_address?.last_name]
+                .filter(Boolean)
+                .join(" "),
+            }
+          : {}),
+      },
+      meta: {
+        payment_session_id: paymentSession.id,
+        cart_id: cart.id,
+      },
+      customizations: {
+        title: "YourNextHair",
+        description: "Hair purchase",
+      },
+      callback: async (data) => {
+        if (data.status !== "successful") {
+          setErrorMessage("Payment was not successful. Please try again.")
+          setSubmitting(false)
           return
         }
 
-        if (
-          (paymentIntent && paymentIntent.status === "requires_capture") ||
-          paymentIntent.status === "succeeded"
-        ) {
-          return onPaymentCompleted()
+        try {
+          const result = await recordFlutterwaveTransaction(
+            paymentSession.id,
+            data.transaction_id,
+            data.tx_ref
+          )
+          if (!result?.success) {
+            setErrorMessage(result?.error ?? "Payment verification failed.")
+            setSubmitting(false)
+            return
+          }
+        } catch {
+          setErrorMessage("Could not verify payment. Please contact support.")
+          setSubmitting(false)
+          return
         }
 
-        return
-      })
+        completeOrder(setSubmitting, setErrorMessage)
+      },
+      onclose: () => {
+        // User dismissed the popup without paying
+        setSubmitting(false)
+      },
+    })
   }
 
   return (
     <>
       <Button
-        isDisabled={disabled || notReady}
+        isDisabled={notReady || submitting}
         onPress={handlePayment}
         isLoading={submitting}
         className="w-full"
+        data-testid="submit-order-button"
       >
         Place order
       </Button>
@@ -169,7 +204,11 @@ const StripePaymentButton = ({
   )
 }
 
-const PayPalPaymentButton = ({
+// --------------------------------------------------------------------------
+// Paystack inline popup
+// --------------------------------------------------------------------------
+
+const PaystackPaymentButton = ({
   cart,
   notReady,
 }: {
@@ -178,83 +217,76 @@ const PayPalPaymentButton = ({
 }) => {
   const [submitting, setSubmitting] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const completeOrder = useCompleteOrder()
 
-  const router = useRouter()
-
-  const placeOrder = usePlaceOrder()
-
-  const onPaymentCompleted = () => {
-    placeOrder.mutate(null, {
-      onSuccess: (data) => {
-        if (data?.type === "order") {
-          const countryCode =
-            data.order.shipping_address?.country_code?.toLowerCase()
-          router.push(`/${countryCode}/order/confirmed/${data.order.id}`)
-        } else if (data?.error) {
-          setErrorMessage(data.error.message)
-        }
-        setSubmitting(false)
-      },
-      onError: (error) => {
-        setErrorMessage(error.message)
-        setSubmitting(false)
-      },
-    })
-  }
-
-  const session = cart.payment_collection?.payment_sessions?.find(
-    (s) => s.status === "pending"
+  const paymentSession = getCheckoutPaymentSession(
+    cart.payment_collection?.payment_sessions,
+    "pp_paystack_paystack"
   )
 
-  const handlePayment = async (
-    _data: OnApproveData,
-    actions: OnApproveActions
-  ) => {
-    actions?.order
-      ?.authorize()
-      .then((authorization) => {
-        if (authorization.status !== "COMPLETED") {
-          setErrorMessage(`An error occurred, status: ${authorization.status}`)
-          return
-        }
-        onPaymentCompleted()
-      })
-      .catch(() => {
-        setErrorMessage(`An unknown error occurred, please try again.`)
-        setSubmitting(false)
-      })
-  }
+  const handlePayment = () => {
+    if (!paymentSession?.data?.paystackTxAccessCode) {
+      setErrorMessage("Payment session not initialised. Please try again.")
+      return
+    }
 
-  const [{ isPending, isResolved }] = usePayPalScriptReducer()
+    if (typeof window.PaystackPop !== "function") {
+      setErrorMessage("Payment provider failed to load. Please refresh and try again.")
+      return
+    }
 
-  if (isPending) {
-    return <Spinner />
-  }
+    setSubmitting(true)
 
-  if (isResolved) {
-    return (
-      <>
-        <PayPalButtons
-          style={{ layout: "horizontal" }}
-          createOrder={async () => session?.data.id as string}
-          onApprove={handlePayment}
-          disabled={notReady || submitting || isPending}
-        />
-        <ErrorMessage {...withDefinedProp("error", errorMessage)} />
-      </>
+    const popup = new window.PaystackPop()
+    popup.resumeTransaction(
+      paymentSession.data.paystackTxAccessCode as string,
+      {
+        onSuccess: () => {
+          // The reference is already stored in the session from initiation.
+          // authorizePayment() on cart.complete() verifies it server-side.
+          completeOrder(setSubmitting, setErrorMessage)
+        },
+        onCancel: () => {
+          setSubmitting(false)
+        },
+        onError: (error) => {
+          const message =
+            error instanceof Error
+              ? error.message
+              : "Payment provider failed to load. Please try again."
+          setErrorMessage(message)
+          setSubmitting(false)
+        },
+      }
     )
   }
 
-  return null
+  return (
+    <>
+      <Button
+        isDisabled={notReady || submitting}
+        onPress={handlePayment}
+        isLoading={submitting}
+        className="w-full"
+        data-testid="submit-order-button"
+      >
+        Place order
+      </Button>
+      <ErrorMessage {...withDefinedProp("error", errorMessage)} />
+    </>
+  )
 }
+
+// --------------------------------------------------------------------------
+// Manual test button (dev only)
+// --------------------------------------------------------------------------
 
 const ManualTestPaymentButton = ({ notReady }: { notReady: boolean }) => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const placeOrder = usePlaceOrder()
-
   const router = useRouter()
 
-  const onPaymentCompleted = () => {
+  const handlePayment = () => {
     placeOrder.mutate(null, {
       onSuccess: (data) => {
         if (data?.type === "order") {
@@ -265,14 +297,8 @@ const ManualTestPaymentButton = ({ notReady }: { notReady: boolean }) => {
           setErrorMessage(data.error.message)
         }
       },
-      onError: (error) => {
-        setErrorMessage(error.message)
-      },
+      onError: (error) => setErrorMessage(error.message),
     })
-  }
-
-  const handlePayment = () => {
-    onPaymentCompleted()
   }
 
   return (
@@ -282,6 +308,28 @@ const ManualTestPaymentButton = ({ notReady }: { notReady: boolean }) => {
         isLoading={placeOrder.isPending}
         onPress={handlePayment}
         className="w-full"
+        data-testid="submit-order-button"
+      >
+        Place order
+      </Button>
+      <ErrorMessage {...withDefinedProp("error", errorMessage)} />
+    </>
+  )
+}
+
+const AuthorizedPaymentButton = ({ notReady }: { notReady: boolean }) => {
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const completeOrder = useCompleteOrder()
+  const [submitting, setSubmitting] = useState(false)
+
+  return (
+    <>
+      <Button
+        isDisabled={notReady || submitting}
+        isLoading={submitting}
+        onPress={() => completeOrder(setSubmitting, setErrorMessage)}
+        className="w-full"
+        data-testid="submit-order-button"
       >
         Place order
       </Button>

@@ -49,7 +49,9 @@ export class CheckoutPage extends BasePage {
   deliveryOptionSummary: Locator
 
   paymentMethodSummary: Locator
+  paymentMethodSummaryRow: Locator
   paymentDetailsSummary: Locator
+  paymentDetailsSummaryRow: Locator
   paymentMethodErrorMessage: Locator
   stripePaymentErrorMessage: Locator
   paypalPaymentErrorMessage: Locator
@@ -187,9 +189,11 @@ export class CheckoutPage extends BasePage {
     this.paymentMethodSummary = this.container.getByTestId(
       "payment-method-summary"
     )
+    this.paymentMethodSummaryRow = this.paymentMethodSummary.locator("xpath=..")
     this.paymentDetailsSummary = this.container.getByTestId(
       "payment-details-summary"
     )
+    this.paymentDetailsSummaryRow = this.paymentDetailsSummary.locator("xpath=..")
     this.paymentMethodErrorMessage = this.container.getByTestId(
       "payment-method-error-message"
     )

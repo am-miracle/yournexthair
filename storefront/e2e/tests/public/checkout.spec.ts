@@ -62,6 +62,12 @@ test.describe("Checkout flow tests", async () => {
       await checkoutPage.selectDeliveryOption("FakeEx Standard")
       await checkoutPage.submitDeliveryOptionButton.click()
       await checkoutPage.submitPaymentButton.click()
+      await expect(checkoutPage.paymentMethodSummary).toContainText("Payment method")
+      await expect(checkoutPage.paymentMethodSummaryRow).toContainText("Manual Payment")
+      await expect(checkoutPage.paymentDetailsSummary).toContainText("Payment details")
+      await expect(checkoutPage.paymentDetailsSummaryRow).toContainText(
+        "Payment will be confirmed after you place the order."
+      )
       await checkoutPage.submitOrderButton.click()
       await orderPage.container.waitFor({ state: "visible" })
     })
@@ -150,6 +156,20 @@ test.describe("Checkout flow tests", async () => {
       await checkoutPage.selectDeliveryOption("FakeEx Standard")
       await checkoutPage.submitDeliveryOptionButton.click()
       await checkoutPage.submitPaymentButton.click()
+      await expect(checkoutPage.paymentMethodSummaryRow).toContainText("Manual Payment")
+      await expect(checkoutPage.paymentDetailsSummaryRow).toContainText(
+        "Payment will be confirmed after you place the order."
+      )
+    })
+
+    await test.step("Re-open the payment step and ensure the same payment selection is preserved", async () => {
+      await checkoutPage.editPaymentButton.click()
+      await expect(checkoutPage.submitPaymentButton).toBeVisible()
+      await checkoutPage.submitPaymentButton.click()
+      await expect(checkoutPage.paymentMethodSummaryRow).toContainText("Manual Payment")
+      await expect(checkoutPage.paymentDetailsSummaryRow).toContainText(
+        "Payment will be confirmed after you place the order."
+      )
     })
 
     await test.step("Edit the shipping info", async () => {
@@ -483,6 +503,10 @@ test.describe("Checkout flow tests", async () => {
 
     await test.step("Submit the payment info and navigate back and forth", async () => {
       await checkoutPage.submitPaymentButton.click()
+      await expect(checkoutPage.paymentMethodSummaryRow).toContainText("Manual Payment")
+      await expect(checkoutPage.paymentDetailsSummaryRow).toContainText(
+        "Payment will be confirmed after you place the order."
+      )
       await checkoutPage.submitOrderButton.waitFor({ state: "visible" })
       await checkoutPage.backToCartLink.click()
       await cartPage.checkoutButton.click()
