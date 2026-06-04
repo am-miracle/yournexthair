@@ -4,7 +4,6 @@ import ProductPreview from "@modules/products/components/product-preview"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import { Layout, LayoutColumn } from "@/components/Layout"
 import { NoResults } from "@modules/store/components/no-results.tsx"
-import { withReactQueryProvider } from "@lib/util/react-query"
 import * as React from "react"
 import SkeletonProductGrid from "@modules/skeletons/templates/skeleton-product-grid"
 import { useStoreProducts } from "@/hooks/store"
@@ -103,4 +102,4 @@ function PaginatedProducts({
   )
 }
 
-export default withReactQueryProvider(PaginatedProducts)
+export default PaginatedProducts

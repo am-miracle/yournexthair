@@ -33,52 +33,105 @@ export const HeaderWrapper: React.FC<{ children?: React.ReactNode }> = ({
     }
 
     const nextElement = headerElement.nextElementSibling
-    let triggerPosition = 0
-
-    const updateTriggerPosition = () => {
-      if (isPageWithHeroImage) {
-        triggerPosition = nextElement
-          ? Math.max(nextElement.clientHeight - headerElement.clientHeight, 1)
-          : 200
-      } else {
-        triggerPosition = nextElement
-          ? Math.max(
-              Number.parseInt(
-                window.getComputedStyle(nextElement).paddingTop,
-                10
-              ) - headerElement.clientHeight,
-              1
-            )
-          : 1
-      }
+    if (!(nextElement instanceof HTMLElement)) {
+      return
     }
 
-    const handleScroll = () => {
-      const position = window.scrollY
+    const sentinelElement = document.createElement("div")
+    const originalPositionStyle = nextElement.style.position
+    let currentStickyState: "true" | "false" | null = null
+    let intersectionObserver: IntersectionObserver | null = null
+    let resizeTimeout: ReturnType<typeof setTimeout> | null = null
 
-      headerElement.setAttribute(
-        "data-sticky",
-        position > triggerPosition ? "true" : "false"
+    sentinelElement.setAttribute("aria-hidden", "true")
+    sentinelElement.style.position = "absolute"
+    sentinelElement.style.left = "0"
+    sentinelElement.style.width = "1px"
+    sentinelElement.style.height = "1px"
+    sentinelElement.style.pointerEvents = "none"
+    sentinelElement.style.opacity = "0"
+
+    if (window.getComputedStyle(nextElement).position === "static") {
+      nextElement.style.position = "relative"
+    }
+
+    nextElement.prepend(sentinelElement)
+
+    const setStickyState = (isSticky: boolean) => {
+      const nextStickyState = isSticky ? "true" : "false"
+
+      if (currentStickyState === nextStickyState) {
+        return
+      }
+
+      currentStickyState = nextStickyState
+      headerElement.setAttribute("data-sticky", nextStickyState)
+    }
+
+    const getTriggerPosition = () => {
+      if (isPageWithHeroImage) {
+        return Math.max(nextElement.clientHeight - headerElement.clientHeight, 1)
+      }
+
+      return Math.max(
+        Number.parseInt(window.getComputedStyle(nextElement).paddingTop, 10) -
+          headerElement.clientHeight,
+        1
       )
     }
 
-    updateTriggerPosition()
-    handleScroll()
+    const syncStickyStateFromLayout = () => {
+      const sentinelTop = sentinelElement.offsetTop
+      setStickyState(window.scrollY > sentinelTop)
+    }
 
-    window.addEventListener("resize", updateTriggerPosition, {
-      passive: true,
-    })
-    window.addEventListener("orientationchange", updateTriggerPosition, {
-      passive: true,
-    })
-    window.addEventListener("scroll", handleScroll, {
+    const observeStickyThreshold = () => {
+      const triggerPosition = getTriggerPosition()
+
+      sentinelElement.style.top = `${triggerPosition}px`
+
+      intersectionObserver?.disconnect()
+      intersectionObserver = new IntersectionObserver((entries) => {
+        const entry = entries[0]
+
+        if (!entry) {
+          return
+        }
+
+        setStickyState(entry.boundingClientRect.top < 0 && !entry.isIntersecting)
+      })
+      intersectionObserver.observe(sentinelElement)
+      syncStickyStateFromLayout()
+    }
+
+    const handleViewportChange = () => {
+      if (resizeTimeout) {
+        clearTimeout(resizeTimeout)
+      }
+
+      resizeTimeout = setTimeout(() => {
+        observeStickyThreshold()
+      }, 50)
+    }
+
+    observeStickyThreshold()
+
+    window.addEventListener("resize", handleViewportChange, { passive: true })
+    window.addEventListener("orientationchange", handleViewportChange, {
       passive: true,
     })
 
     return () => {
-      window.removeEventListener("resize", updateTriggerPosition)
-      window.removeEventListener("orientationchange", updateTriggerPosition)
-      window.removeEventListener("scroll", handleScroll)
+      if (resizeTimeout) {
+        clearTimeout(resizeTimeout)
+      }
+
+      intersectionObserver?.disconnect()
+      sentinelElement.remove()
+      nextElement.style.position = originalPositionStyle
+
+      window.removeEventListener("resize", handleViewportChange)
+      window.removeEventListener("orientationchange", handleViewportChange)
     }
   }, [pathName, isPageWithHeroImage, isAlwaysSticky])
 

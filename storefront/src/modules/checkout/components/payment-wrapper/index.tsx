@@ -6,7 +6,6 @@ import StripeWrapper from "@modules/checkout/components/payment-wrapper/stripe-w
 import { PayPalScriptProvider } from "@paypal/react-paypal-js"
 import { createContext } from "react"
 import { isPaypal, isStripe } from "@lib/constants"
-import { withReactQueryProvider } from "@lib/util/react-query"
 import { StoreCart } from "@medusajs/types"
 
 type WrapperProps = {
@@ -67,4 +66,4 @@ const Wrapper: React.FC<WrapperProps> = ({ children, cart }) => {
   return <div>{children}</div>
 }
 
-export default withReactQueryProvider(Wrapper)
+export default Wrapper

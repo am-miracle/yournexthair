@@ -7,7 +7,6 @@ import { Form, InputField } from "@/components/Forms"
 import { codeFormSchema } from "@modules/cart/components/discount-code"
 import { SubmitButton } from "@modules/common/components/submit-button"
 import { useApplyPromotions } from "hooks/cart"
-import { withReactQueryProvider } from "@lib/util/react-query"
 
 type DiscountCodeProps = {
   cart: HttpTypes.StoreCart
@@ -46,4 +45,4 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
   )
 }
 
-export default withReactQueryProvider(DiscountCode)
+export default DiscountCode

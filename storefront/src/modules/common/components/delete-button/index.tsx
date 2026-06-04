@@ -1,6 +1,5 @@
 "use client"
 import { Icon } from "@/components/Icon"
-import { withReactQueryProvider } from "@lib/util/react-query"
 import { useDeleteLineItem } from "@/hooks/cart"
 
 const DeleteButton = ({ id }: { id: string }) => {
@@ -19,4 +18,4 @@ const DeleteButton = ({ id }: { id: string }) => {
   )
 }
 
-export default withReactQueryProvider(DeleteButton)
+export default DeleteButton

@@ -6,16 +6,8 @@ import { LocalizedLink } from "@/components/LocalizedLink"
 import { HeaderDrawer } from "@/components/HeaderDrawer"
 import { RegionSwitcher } from "@/components/RegionSwitcher"
 import { HeaderWrapper } from "@/components/HeaderWrapper"
-
-import dynamic from "next/dynamic"
-
-const LoginLink = dynamic(() => import("@modules/header/components/LoginLink"), {
-  loading: () => <></>,
-})
-
-const CartDrawer = dynamic(() => import("@/components/CartDrawer").then((mod) => mod.CartDrawer), {
-  loading: () => <></>,
-})
+import { CartDrawer } from "@/components/CartDrawer"
+import LoginLink from "@modules/header/components/LoginLink"
 
 type CountryOption = {
   country: string

@@ -1,6 +1,5 @@
 import "server-only"
 import { HttpTypes } from "@medusajs/types"
-import { omit } from "lodash"
 
 import { getProductsById } from "@lib/data/products"
 
@@ -32,12 +31,14 @@ export async function enrichLineItems<
       return item
     }
 
+    const { variants, ...productWithoutVariants } = product
+
     // If product and variant are found, enrich the item
     return {
       ...item,
       variant: {
         ...variant,
-        product: omit(product, "variants"),
+        product: productWithoutVariants,
       },
     }
   }) as T

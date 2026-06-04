@@ -4,9 +4,7 @@ import { SubmitButton } from "@modules/common/components/submit-button"
 import { Form, InputField } from "@/components/Forms"
 import { z } from "zod"
 import { signupFormSchema, useSignup } from "@/hooks/customer"
-import { withReactQueryProvider } from "@lib/util/react-query"
-
-export const SignUpForm = withReactQueryProvider(() => {
+export const SignUpForm = () => {
   const { mutateAsync, isPending, data } = useSignup()
 
   const onSubmit = async (values: z.infer<typeof signupFormSchema>) => {
@@ -76,4 +74,4 @@ export const SignUpForm = withReactQueryProvider(() => {
       }}
     </Form>
   )
-})
+}

@@ -6,7 +6,6 @@ import { CreditCard } from "@medusajs/icons"
 import { CardElement } from "@stripe/react-stripe-js"
 import { StripeCardElementOptions } from "@stripe/stripe-js"
 import { twJoin } from "tailwind-merge"
-import { capitalize } from "lodash"
 
 import { isStripe as isStripeFunc, paymentInfoMap } from "@lib/constants"
 import PaymentContainer from "@modules/checkout/components/payment-container"
@@ -23,6 +22,14 @@ import {
   useSetPaymentMethod,
 } from "hooks/cart"
 import { StoreCart, StorePaymentSession } from "@medusajs/types"
+
+const capitalizeWord = (value?: string | null) => {
+  if (!value) {
+    return null
+  }
+
+  return value.charAt(0).toUpperCase() + value.slice(1)
+}
 
 const Payment = ({ cart }: { cart: StoreCart }) => {
   const [isLoading, setIsLoading] = useState(false)
@@ -97,7 +104,7 @@ const Payment = ({ cart }: { cart: StoreCart }) => {
   if (prevPaymentMethod !== paymentMethod) {
     setPrevPaymentMethod(paymentMethod)
     if (paymentMethod) {
-      setCardBrand(capitalize(paymentMethod?.card?.brand))
+      setCardBrand(capitalizeWord(paymentMethod.card?.brand))
       setCardComplete(true)
     }
   }

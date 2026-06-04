@@ -42,7 +42,7 @@ const ProductTypesSection: React.FC = async () => {
                         width={1200}
                         height={900}
                         alt={productType.value}
-                        priority={index === 0}
+                        preload={index === 0}
                         loading={index === 0 ? "eager" : "lazy"}
                         className="h-64 w-full object-cover sm:h-72 md:h-80 lg:h-96"
                       />

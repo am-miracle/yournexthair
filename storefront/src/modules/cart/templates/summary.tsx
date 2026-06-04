@@ -8,7 +8,6 @@ import DiscountCode from "@modules/cart/components/discount-code"
 import { getCheckoutStep } from "@modules/cart/utils/getCheckoutStep"
 import { Icon } from "@/components/Icon"
 import { useCustomer } from "@/hooks/customer"
-import { withReactQueryProvider } from "@lib/util/react-query"
 
 type SummaryProps = {
   cart: HttpTypes.StoreCart
@@ -41,4 +40,4 @@ const Summary = ({ cart }: SummaryProps) => {
   )
 }
 
-export default withReactQueryProvider(Summary)
+export default Summary

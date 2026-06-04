@@ -9,7 +9,6 @@ import { withDefinedProp } from "@lib/util/optional-props"
 import { Button } from "@/components/Button"
 import { usePathname, useRouter } from "next/navigation"
 import { useInitiatePaymentSession, useSetPaymentMethod } from "hooks/cart"
-import { withReactQueryProvider } from "@lib/util/react-query"
 
 type PaymentButtonProps = {
   cart: HttpTypes.StoreCart
@@ -204,4 +203,4 @@ const PaymentMethodButton = ({
   )
 }
 
-export default withReactQueryProvider(PaymentCardButton)
+export default PaymentCardButton

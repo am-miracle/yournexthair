@@ -9,15 +9,15 @@ import { Form, InputField } from "@/components/Forms"
 import { withDefinedProp } from "@lib/util/optional-props"
 import { SubmitButton } from "@modules/common/components/submit-button"
 import { updateCustomerFormSchema, useUpdateCustomer } from "hooks/customer"
-import { withReactQueryProvider } from "@lib/util/react-query"
-
-export const PersonalInfoForm = withReactQueryProvider<{
+export const PersonalInfoForm = ({
+  defaultValues,
+}: {
   defaultValues?: {
     first_name: string
     last_name: string
     phone?: string | null
   }
-}>(({ defaultValues }) => {
+}) => {
   const { mutate, isPending, data } = useUpdateCustomer()
 
   const { close } = React.useContext(ReactAria.OverlayTriggerStateContext)!
@@ -81,4 +81,4 @@ export const PersonalInfoForm = withReactQueryProvider<{
       }}
     </Form>
   )
-})
+}

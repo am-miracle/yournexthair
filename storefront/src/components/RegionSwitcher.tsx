@@ -12,9 +12,12 @@ import {
 import { withDefinedProp } from "@lib/util/optional-props"
 import { useCountryCode } from "hooks/country-code"
 import { useUpdateRegion } from "hooks/cart"
-import { withReactQueryProvider } from "@lib/util/react-query"
-
-export const RegionSwitcher = withReactQueryProvider<{
+export const RegionSwitcher = ({
+  countryOptions,
+  className,
+  selectButtonClassName,
+  selectIconClassName,
+}: {
   countryOptions: {
     country: string
     region: string
@@ -23,7 +26,7 @@ export const RegionSwitcher = withReactQueryProvider<{
   className?: string
   selectButtonClassName?: string
   selectIconClassName?: string
-}>(({ countryOptions, className, selectButtonClassName, selectIconClassName }) => {
+}) => {
   const pathName = usePathname()
   const countryCode = useCountryCode(countryOptions)
   let currentPath = pathName
@@ -72,4 +75,4 @@ export const RegionSwitcher = withReactQueryProvider<{
       </ReactAria.Popover>
     </ReactAria.Select>
   )
-})
+}

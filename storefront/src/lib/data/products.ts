@@ -1,7 +1,12 @@
 "use server"
 
+import { cache } from "react"
 import { sdk } from "@lib/config"
 import { HttpTypes } from "@medusajs/types"
+import {
+  PRODUCTS_CACHE_TAG,
+  PRODUCTS_REVALIDATE_SECONDS,
+} from "@lib/data/cache"
 import { getRegion } from "@lib/data/regions"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import { sortProducts } from "@lib/util/sort-products"
@@ -21,16 +26,16 @@ export const getProductsById = async function ({
         region_id: regionId,
         fields: "*variants.calculated_price,+variants.inventory_quantity",
       } satisfies HttpTypes.StoreProductListParams,
-      next: { tags: ["products"] },
+      next: {
+        tags: [PRODUCTS_CACHE_TAG],
+        revalidate: PRODUCTS_REVALIDATE_SECONDS,
+      },
       cache: "force-cache",
     })
     .then(({ products }) => products)
 }
 
-export const getProductByHandle = async function (
-  handle: string,
-  regionId: string
-) {
+export const getProductByHandle = cache(async (handle: string, regionId: string) => {
   return sdk.client
     .fetch<{ products: HttpTypes.StoreProduct[] }>(`/store/products`, {
       query: {
@@ -38,12 +43,15 @@ export const getProductByHandle = async function (
         region_id: regionId,
         fields: "*variants.calculated_price,+variants.inventory_quantity",
       } satisfies HttpTypes.StoreProductListParams,
-      next: { tags: ["products"] },
+      next: {
+        tags: [PRODUCTS_CACHE_TAG],
+        revalidate: PRODUCTS_REVALIDATE_SECONDS,
+      },
     })
     .then(({ products }) => products[0])
-}
+})
 
-export const getProductFashionDataByHandle = async function (handle: string) {
+export const getProductFashionDataByHandle = cache(async (handle: string) => {
   return sdk.client.fetch<{
     materials: {
       id: string
@@ -56,10 +64,13 @@ export const getProductFashionDataByHandle = async function (handle: string) {
     }[]
   }>(`/store/custom/fashion/${handle}`, {
     method: "GET",
-    next: { tags: ["products"] },
+    next: {
+      tags: [PRODUCTS_CACHE_TAG],
+      revalidate: PRODUCTS_REVALIDATE_SECONDS,
+    },
     cache: "force-cache",
   })
-}
+})
 
 export const getProductsList = async function ({
   pageParam = 1,
@@ -96,7 +107,10 @@ export const getProductsList = async function ({
           fields: "*variants.calculated_price",
           ...queryParams,
         } satisfies HttpTypes.StoreProductListParams,
-        next: { tags: ["products"] },
+        next: {
+          tags: [PRODUCTS_CACHE_TAG],
+          revalidate: PRODUCTS_REVALIDATE_SECONDS,
+        },
         cache: "force-cache",
       }
     )

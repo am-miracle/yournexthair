@@ -4,28 +4,13 @@ import * as React from "react"
 import * as ReactAria from "react-aria-components"
 import { twJoin } from "tailwind-merge"
 import { useAsyncList } from "react-stately"
-import { Hit } from "meilisearch"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useCountryCode } from "@/hooks/country-code"
-import { MeiliSearchProductHit, searchClient } from "@lib/search-client"
-import { getProductPrice } from "@lib/util/get-product-price"
-import { getProductsById } from "@lib/data/products"
+import type { SearchSuggestionItem } from "@lib/search-suggestions"
 import Thumbnail from "@modules/products/components/thumbnail"
 import { Button } from "@/components/Button"
 import { Input } from "@/components/Forms"
 import { Icon } from "@/components/Icon"
-
-interface ListItem extends Hit<MeiliSearchProductHit> {
-  price: {
-    calculated_price_number: number
-    calculated_price: string
-    original_price_number: number | null
-    original_price: string
-    currency_code: string | null
-    price_type: string | null | undefined
-    percentage_diff: string
-  } | null
-}
 
 export const SearchField: React.FC<{
   countryOptions: {
@@ -41,32 +26,42 @@ export const SearchField: React.FC<{
   const region = countryOptions.find((co) => co.country === countryCode)?.region
   const searchParams = useSearchParams()
   const searchQuery = searchParams.get("query")
+  const [inputValue, setInputValue] = React.useState(searchQuery ?? "")
 
-  const list = useAsyncList<ListItem>({
+  const list = useAsyncList<SearchSuggestionItem>({
     getKey(item) {
       return item.handle
     },
     load: async ({ filterText, signal }) => {
-      const results = await searchClient
-        .index("products")
-        .search<MeiliSearchProductHit>(filterText, undefined, {
-          signal,
-        })
-      const medusaProducts = await getProductsById({
-        ids: results.hits.map((h: MeiliSearchProductHit) => h.id),
-        regionId: region!,
+      const normalizedFilterText = filterText?.trim() ?? ""
+
+      if (!normalizedFilterText || !region) {
+        return {
+          items: [],
+          filterText: filterText ?? "",
+        }
+      }
+
+      const params = new URLSearchParams({
+        query: normalizedFilterText,
+        region,
       })
 
+      const response = await fetch(`/api/search-suggestions?${params.toString()}`, {
+        cache: "no-store",
+        signal,
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to load search suggestions")
+      }
+
+      const data = (await response.json()) as {
+        items: SearchSuggestionItem[]
+      }
+
       return {
-        items: results.hits.map((hit: MeiliSearchProductHit) => {
-          const product = medusaProducts.find((p) => p.id === hit.id)
-          return {
-            ...hit,
-            price: getProductPrice({
-              product: product!,
-            }).cheapestPrice,
-          }
-        }),
+        items: data.items,
         filterText: filterText ?? "",
       }
     },
@@ -76,34 +71,51 @@ export const SearchField: React.FC<{
   const buttonPressHandle = React.useCallback(() => {
     if (!isInputShown) {
       setIsInputShown(true)
-    } else if (list.filterText) {
-      router.push(`/${countryCode}/search?query=${list.filterText}`)
+    } else if (inputValue.trim()) {
+      router.push(`/${countryCode}/search?query=${inputValue.trim()}`)
       if (!isInputAlwaysShown) setIsInputShown(false)
     } else {
       if (!isInputAlwaysShown) setIsInputShown(false)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isInputShown, list.filterText, router, countryCode])
+  }, [countryCode, inputValue, isInputAlwaysShown, isInputShown, router])
 
   const handleKeyDown = React.useCallback(
     (e: React.KeyboardEvent) => {
       if (e.key === "Escape") {
         if (!isInputAlwaysShown) setIsInputShown(false)
-      } else if (e.key === "Enter" && list.filterText) {
-        router.push(`/${countryCode}/search?query=${list.filterText}`)
+      } else if (e.key === "Enter" && inputValue.trim()) {
+        router.push(`/${countryCode}/search?query=${inputValue.trim()}`)
         if (!isInputAlwaysShown) setIsInputShown(false)
       }
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [list.filterText, router, countryCode],
+    [countryCode, inputValue, isInputAlwaysShown, router],
   )
 
   React.useEffect(() => {
-    if (searchQuery && !list.filterText) {
-      list.setFilterText(searchQuery)
+    const normalizedSearchQuery = searchQuery ?? ""
+
+    // Sync the controlled input when navigation changes the query param.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setInputValue((currentValue) =>
+      currentValue === normalizedSearchQuery ? currentValue : normalizedSearchQuery
+    )
+
+    if (list.filterText !== normalizedSearchQuery) {
+      list.setFilterText(normalizedSearchQuery)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchQuery])
+  }, [list, searchQuery])
+
+  React.useEffect(() => {
+    if (inputValue === list.filterText) {
+      return
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      list.setFilterText(inputValue)
+    }, 300)
+
+    return () => window.clearTimeout(timeoutId)
+  }, [inputValue, list])
 
   return (
     <div className="flex">
@@ -114,7 +126,7 @@ export const SearchField: React.FC<{
         aria-label={
           !isInputShown
             ? "Open search"
-            : list.filterText
+            : inputValue.trim()
               ? "Search for products"
               : "Close search"
         }
@@ -126,8 +138,8 @@ export const SearchField: React.FC<{
         className="overflow-hidden"
         aria-label="Search"
         items={list.items}
-        inputValue={list.filterText}
-        onInputChange={list.setFilterText}
+        inputValue={inputValue}
+        onInputChange={setInputValue}
         onKeyDown={handleKeyDown}
         isDisabled={!isInputAlwaysShown && !isInputShown}
       >
@@ -140,6 +152,7 @@ export const SearchField: React.FC<{
           <Input
             aria-label="Search products"
             placeholder="Search products"
+            hasFloatingPlaceholder={false}
             className="px-0 disabled:bg-transparent py-0! h-7 md:h-6 max-md:border-0 border-black rounded-none border-t-0 border-x-0 group-data-[light=true]:md:border-white group-data-[sticky=true]:md:border-black ml-2 md:ml-1"
           />
         </div>
@@ -151,7 +164,7 @@ export const SearchField: React.FC<{
           className="max-w-90 md:max-w-95 lg:max-w-98 w-full bg-white rounded-xs border border-grayscale-200 overflow-y-scroll"
         >
           <ReactAria.ListBox className="outline-none">
-            {(item: ListItem) => (
+            {(item: SearchSuggestionItem) => (
               <ReactAria.ListBoxItem
                 className="relative after:absolute after:content-[''] after:h-px after:bg-grayscale-100 after:-bottom-px after:left-6 after:right-6 last:after:hidden mb-px flex gap-6 p-6 transition-colors hover:bg-grayscale-50"
                 key={item.handle}

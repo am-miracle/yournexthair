@@ -11,6 +11,7 @@ import { getProductTypesList } from "@lib/data/product-types"
 import { withDefinedProp } from "@lib/util/optional-props"
 import PaginatedProducts from "@modules/store/templates/paginated-products"
 import { getRegion } from "@lib/data/regions"
+import { HttpTypes } from "@medusajs/types"
 
 const StoreTemplate = async ({
   sortBy,
@@ -30,7 +31,7 @@ const StoreTemplate = async ({
   const pageNumber = page ? parseInt(page, 10) : 1
 
   const [collections, categories, types, region] = await Promise.all([
-    getCollectionsList(0, 100, ["id", "title", "handle"]),
+    getCollectionsList(0, 100, ["id", "title", "handle", "metadata"] as (keyof HttpTypes.StoreCollection)[]),
     getCategoriesList(0, 100, ["id", "name", "handle"]),
     getProductTypesList(0, 100, ["id", "value"]),
     getRegion(countryCode),
@@ -41,7 +42,7 @@ const StoreTemplate = async ({
       <div className="sr-only">
         <h1>Shop</h1>
       </div>
-      <CollectionsSlider />
+      <CollectionsSlider collections={collections.collections.slice(0, 20)} />
       <RefinementList
         collections={Object.fromEntries(
           collections.collections.map((c) => [c.handle, c.title])

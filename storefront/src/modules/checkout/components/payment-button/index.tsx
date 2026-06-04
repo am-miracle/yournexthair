@@ -13,7 +13,6 @@ import { withDefinedProp } from "@lib/util/optional-props"
 import { Button } from "@/components/Button"
 import ErrorMessage from "@modules/checkout/components/error-message"
 import { usePlaceOrder } from "hooks/cart"
-import { withReactQueryProvider } from "@lib/util/react-query"
 
 type PaymentButtonProps = {
   cart: HttpTypes.StoreCart
@@ -291,4 +290,4 @@ const ManualTestPaymentButton = ({ notReady }: { notReady: boolean }) => {
   )
 }
 
-export default withReactQueryProvider(PaymentButton)
+export default PaymentButton

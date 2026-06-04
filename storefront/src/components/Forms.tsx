@@ -158,6 +158,7 @@ export type InputOwnProps = {
   isSuccess?: boolean | undefined
   errorMessage?: string | undefined
   wrapperClassName?: string | undefined
+  hasFloatingPlaceholder?: boolean | undefined
 }
 
 export const Input = React.forwardRef<
@@ -173,6 +174,7 @@ export const Input = React.forwardRef<
       isSuccess,
       errorMessage,
       wrapperClassName,
+      hasFloatingPlaceholder = true,
       placeholder,
       className,
       ...rest
@@ -189,11 +191,14 @@ export const Input = React.forwardRef<
             isVisuallyDisabled,
             isSuccess,
           }),
+          !hasFloatingPlaceholder && "placeholder:visible",
           className,
         )}
         {...withDefinedProp("placeholder", placeholder)}
       />
-      {placeholder && <span className={getPlaceholderClassNames({ uiSize })}>{placeholder}</span>}
+      {hasFloatingPlaceholder && placeholder && (
+        <span className={getPlaceholderClassNames({ uiSize })}>{placeholder}</span>
+      )}
       {isSuccess && (
         <Icon
           name="check"

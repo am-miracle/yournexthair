@@ -10,7 +10,6 @@ import { LocalizedLink } from "@/components/LocalizedLink"
 import { withDefinedProp } from "@lib/util/optional-props"
 import { twMerge } from "tailwind-merge"
 import { useLineItemQuantityUpdater } from "hooks/cart"
-import { withReactQueryProvider } from "@lib/util/react-query"
 
 type ItemProps = {
   item: HttpTypes.StoreCartLineItem
@@ -79,4 +78,4 @@ const Item = ({ item, className }: ItemProps) => {
   )
 }
 
-export default withReactQueryProvider(Item)
+export default Item

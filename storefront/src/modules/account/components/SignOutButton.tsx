@@ -4,9 +4,7 @@ import { SubmitButton } from "@modules/common/components/submit-button"
 import { useCountryCode } from "hooks/country-code"
 import { ButtonProps } from "@/components/Button"
 import { useSignout } from "hooks/customer"
-import { withReactQueryProvider } from "@lib/util/react-query"
-
-export const SignOutButton = withReactQueryProvider<Omit<ButtonProps, "type">>((rest) => {
+export const SignOutButton = (rest: Omit<ButtonProps, "type">) => {
   const countryCode = useCountryCode()
   const { mutateAsync, isPending } = useSignout()
 
@@ -28,4 +26,4 @@ export const SignOutButton = withReactQueryProvider<Omit<ButtonProps, "type">>((
       </SubmitButton>
     </form>
   )
-})
+}

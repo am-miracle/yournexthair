@@ -2,7 +2,6 @@
 
 import { Icon } from "@/components/Icon"
 import { LocalizedButtonLink } from "@/components/LocalizedLink"
-import { withReactQueryProvider } from "@lib/util/react-query"
 import { useCustomer } from "@/hooks/customer"
 
 const LoginLink = ({ className }: { className: string }) => {
@@ -20,4 +19,4 @@ const LoginLink = ({ className }: { className: string }) => {
   )
 }
 
-export default withReactQueryProvider(LoginLink)
+export default LoginLink

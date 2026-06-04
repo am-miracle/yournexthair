@@ -8,7 +8,6 @@ import { twMerge } from "tailwind-merge"
 import { SubmitButton } from "@modules/common/components/submit-button"
 import { z } from "zod"
 import { useApplyPromotions } from "hooks/cart"
-import { withReactQueryProvider } from "@lib/util/react-query"
 
 type DiscountCodeProps = {
   cart: HttpTypes.StoreCart
@@ -50,4 +49,4 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart, className }) => {
   )
 }
 
-export default withReactQueryProvider(DiscountCode)
+export default DiscountCode

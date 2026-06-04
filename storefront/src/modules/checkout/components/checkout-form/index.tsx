@@ -1,5 +1,4 @@
 "use client"
-import { withReactQueryProvider } from "@lib/util/react-query"
 import React from "react"
 import { useRouter } from "next/navigation"
 
@@ -13,10 +12,13 @@ import { useCart } from "@/hooks/cart"
 import { getCheckoutStep } from "@modules/cart/utils/getCheckoutStep"
 import { Icon } from "@/components/Icon"
 
-export const CheckoutForm = withReactQueryProvider<{
+export const CheckoutForm = ({
+  countryCode,
+  step,
+}: {
   countryCode: string
   step: string | undefined
-}>(({ countryCode, step }) => {
+}) => {
   const { data: cart, isPending } = useCart({ enabled: true })
   const router = useRouter()
   React.useEffect(() => {
@@ -47,4 +49,4 @@ export const CheckoutForm = withReactQueryProvider<{
       <Review cart={cart} />
     </Wrapper>
   )
-})
+}

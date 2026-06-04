@@ -2,13 +2,15 @@
 
 import { UiConfirmButton } from "@/components/Dialog"
 import { useDeleteCustomerAddress } from "hooks/customer"
-import { withReactQueryProvider } from "@lib/util/react-query"
-
-export const DeleteAddressButton = withReactQueryProvider<{
+export const DeleteAddressButton = ({
+  addressId,
+  children,
+  ...rest
+}: {
   addressId: string
   className?: string
   children: React.ReactNode
-}>(({ addressId, children, ...rest }) => {
+}) => {
   const { mutateAsync, isPending } = useDeleteCustomerAddress()
 
   return (
@@ -24,4 +26,4 @@ export const DeleteAddressButton = withReactQueryProvider<{
       {children}
     </UiConfirmButton>
   )
-})
+}

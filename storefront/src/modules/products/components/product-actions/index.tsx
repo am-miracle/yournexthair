@@ -1,6 +1,5 @@
 "use client"
 
-import { isEqual } from "lodash"
 import { useMemo, useState } from "react"
 import { HttpTypes } from "@medusajs/types"
 import * as ReactAria from "react-aria-components"
@@ -18,7 +17,6 @@ import {
 import { useCountryCode } from "@/hooks/country-code"
 import ProductPrice from "@modules/products/components/product-price"
 import { UiRadioGroup } from "@/components/ui/Radio"
-import { withReactQueryProvider } from "@lib/util/react-query"
 import { useAddLineItem } from "@/hooks/cart"
 
 type ProductActionsProps = {
@@ -48,6 +46,24 @@ const optionsAsKeymap = (variantOptions: HttpTypes.StoreProductVariant["options"
 const priorityOptions = ["Material", "Color", "Size"]
 
 const normalizeOptionKey = (key: string) => key.trim().toLowerCase().replace(/\s+/g, "_")
+
+const areOptionMapsEqual = (
+  left: Record<string, string | undefined> | undefined,
+  right: Record<string, string | undefined> | undefined,
+) => {
+  if (!left || !right) {
+    return left === right
+  }
+
+  const leftKeys = Object.keys(left)
+  const rightKeys = Object.keys(right)
+
+  if (leftKeys.length !== rightKeys.length) {
+    return false
+  }
+
+  return leftKeys.every((key) => left[key] === right[key])
+}
 
 const getInitialOptions = (product: ProductActionsProps["product"]) => {
   if (product.variants?.length === 1) {
@@ -163,7 +179,7 @@ function ProductActions({ product, materials, disabled }: ProductActionsProps) {
 
     return product.variants.find((v) => {
       const variantOptions = optionsAsKeymap(v.options)
-      return isEqual(variantOptions, options)
+      return areOptionMapsEqual(variantOptions, options)
     })
   }, [product.variants, options])
 
@@ -361,4 +377,4 @@ function ProductActions({ product, materials, disabled }: ProductActionsProps) {
   )
 }
 
-export default withReactQueryProvider(ProductActions)
+export default ProductActions

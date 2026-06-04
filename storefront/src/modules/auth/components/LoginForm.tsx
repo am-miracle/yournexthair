@@ -5,7 +5,6 @@ import { LocalizedLink } from "@/components/LocalizedLink"
 import { twMerge } from "tailwind-merge"
 import { z } from "zod"
 import { useLogin } from "hooks/customer"
-import { withReactQueryProvider } from "@lib/util/react-query"
 import { useRouter } from "next/navigation"
 import { emailFormSchema } from "@modules/checkout/components/email"
 
@@ -14,11 +13,15 @@ const loginFormSchema = z.object({
   password: z.string().min(6),
 })
 
-export const LoginForm = withReactQueryProvider<{
+export const LoginForm = ({
+  className,
+  redirectUrl,
+  handleCheckout,
+}: {
   className?: string
   redirectUrl?: string
   handleCheckout?: (values: z.infer<typeof emailFormSchema>) => void
-}>(({ className, redirectUrl, handleCheckout }) => {
+}) => {
   const { isPending, data, mutate } = useLogin()
 
   const router = useRouter()
@@ -69,4 +72,4 @@ export const LoginForm = withReactQueryProvider<{
       </div>
     </Form>
   )
-})
+}

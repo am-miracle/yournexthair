@@ -1,3 +1,4 @@
+import { cache } from "react"
 import { sdk } from "@lib/config"
 import { getProductsList } from "@lib/data/products"
 import { HttpTypes } from "@medusajs/types"
@@ -31,10 +32,10 @@ export const getCollectionsList = async function (
     .then(({ collections }) => ({ collections, count: collections.length }))
 }
 
-export const getCollectionByHandle = async function (
+export const getCollectionByHandle = cache(async (
   handle: string,
   fields?: (keyof HttpTypes.StoreCollection)[]
-): Promise<HttpTypes.StoreCollection> {
+): Promise<HttpTypes.StoreCollection> => {
   return sdk.client
     .fetch<HttpTypes.StoreCollectionListResponse>(`/store/collections`, {
       query: {
@@ -54,7 +55,7 @@ export const getCollectionByHandle = async function (
 
       return collection
     })
-}
+})
 
 export const getCollectionsWithProducts = async (
   countryCode: string

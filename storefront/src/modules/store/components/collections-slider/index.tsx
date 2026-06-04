@@ -1,5 +1,6 @@
 import * as React from "react"
 import Image from "next/image"
+import { HttpTypes } from "@medusajs/types"
 
 import { getCollectionsList } from "@lib/data/collections"
 import { Carousel } from "@/components/Carousel"
@@ -9,8 +10,11 @@ import { twMerge } from "tailwind-merge"
 export const CollectionsSlider: React.FC<{
   heading?: React.ReactNode
   className?: string
-}> = async ({ heading = "Collections", className }) => {
-  const collections = await getCollectionsList(0, 20, ["id", "title", "handle", "metadata"])
+  collections?: HttpTypes.StoreCollection[]
+}> = async ({ heading = "Collections", className, collections: prefetchedCollections }) => {
+  const collections = prefetchedCollections
+    ? { collections: prefetchedCollections, count: prefetchedCollections.length }
+    : await getCollectionsList(0, 20, ["id", "title", "handle", "metadata"])
 
   if (!collections || !collections.collections.length) {
     return null

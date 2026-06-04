@@ -4,7 +4,6 @@ import ItemsTemplate from "@modules/cart/templates/items"
 import Summary from "@modules/cart/templates/summary"
 import { Layout, LayoutColumn } from "@/components/Layout"
 import { useCart } from "@/hooks/cart"
-import { withReactQueryProvider } from "@lib/util/react-query"
 import SkeletonCartPage from "@modules/skeletons/templates/skeleton-cart-page"
 
 // TODO: Ask customer if they want to sign in or continue as guest
@@ -37,4 +36,4 @@ const CartTemplate = () => {
   )
 }
 
-export default withReactQueryProvider(CartTemplate)
+export default CartTemplate

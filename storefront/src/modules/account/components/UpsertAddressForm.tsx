@@ -9,9 +9,11 @@ import { z } from "zod"
 import { withDefinedProp, withNonNullProp } from "@lib/util/optional-props"
 import { SubmitButton } from "@modules/common/components/submit-button"
 import { customerAddressSchema, useAddressMutation } from "hooks/customer"
-import { withReactQueryProvider } from "@lib/util/react-query"
-
-export const UpsertAddressForm = withReactQueryProvider<{
+export const UpsertAddressForm = ({
+  addressId,
+  region,
+  defaultValues,
+}: {
   addressId?: string
   region?: CountrySelectProps["region"]
   defaultValues?: {
@@ -26,7 +28,7 @@ export const UpsertAddressForm = withReactQueryProvider<{
     country_code?: string
     phone?: string
   }
-}>(({ addressId, region, defaultValues }) => {
+}) => {
   const { close } = React.useContext(ReactAria.OverlayTriggerStateContext)!
   const { mutate, isPending, data } = useAddressMutation(addressId)
 
@@ -177,4 +179,4 @@ export const UpsertAddressForm = withReactQueryProvider<{
       }}
     </Form>
   )
-})
+}

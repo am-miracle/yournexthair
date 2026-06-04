@@ -5,10 +5,10 @@ import {
   getCollectionByHandle,
   getCollectionsList,
 } from "@lib/data/collections"
-import { listRegions } from "@lib/data/regions"
+import { listStaticCountryCodes } from "@lib/data/regions"
 import { SITE_NAME, getCanonicalPath, getCanonicalUrl } from "@lib/util/seo"
 import { withDefinedProp } from "@lib/util/optional-props"
-import { StoreCollection, StoreRegion } from "@medusajs/types"
+import { StoreCollection } from "@medusajs/types"
 import CollectionTemplate from "@modules/collections/templates"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import { collectionMetadataCustomFieldsSchema } from "@lib/util/collections"
@@ -30,13 +30,7 @@ export async function generateStaticParams() {
     return []
   }
 
-  const countryCodes = await listRegions().then(
-    (regions: StoreRegion[]) =>
-      regions
-        ?.map((r) => r.countries?.map((c) => c.iso_2))
-        .flat()
-        .filter(Boolean) as string[]
-  )
+  const countryCodes = await listStaticCountryCodes()
 
   const collectionHandles = collections.map(
     (collection: StoreCollection) => collection.handle

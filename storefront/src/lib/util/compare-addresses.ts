@@ -1,5 +1,17 @@
 import { HttpTypes } from "@medusajs/types"
-import { isEqual, pick } from "lodash"
+
+const addressKeys = [
+  "first_name",
+  "last_name",
+  "address_1",
+  "address_2",
+  "company",
+  "postal_code",
+  "city",
+  "country_code",
+  "province",
+  "phone",
+] as const
 
 export default function compareAddresses(
   address1: Pick<
@@ -29,30 +41,5 @@ export default function compareAddresses(
     | "phone"
   >
 ) {
-  return isEqual(
-    pick(address1, [
-      "first_name",
-      "last_name",
-      "address_1",
-      "address_2",
-      "company",
-      "postal_code",
-      "city",
-      "country_code",
-      "province",
-      "phone",
-    ]),
-    pick(address2, [
-      "first_name",
-      "last_name",
-      "address_1",
-      "address_2",
-      "company",
-      "postal_code",
-      "city",
-      "country_code",
-      "province",
-      "phone",
-    ])
-  )
+  return addressKeys.every((key) => address1[key] === address2[key])
 }
