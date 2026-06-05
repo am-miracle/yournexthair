@@ -12,12 +12,14 @@ import {
   createTaxRegionsWorkflow,
   linkSalesChannelsToApiKeyWorkflow,
   linkSalesChannelsToStockLocationWorkflow,
+  updateProductsWorkflow,
   updateStoresWorkflow,
   uploadFilesWorkflow,
 } from "@medusajs/medusa/core-flows"
 import type {
   ExecArgs,
   IFulfillmentModuleService,
+  IRegionModuleService,
   ISalesChannelModuleService,
   IStoreModuleService,
 } from "@medusajs/framework/types"
@@ -115,10 +117,12 @@ export default async function seedDemoData({ container }: ExecArgs) {
   const logger = container.resolve(ContainerRegistrationKeys.LOGGER)
   const remoteLink = container.resolve(ContainerRegistrationKeys.LINK)
   const fulfillmentModuleService: IFulfillmentModuleService = container.resolve(Modules.FULFILLMENT)
+  const regionModuleService: IRegionModuleService = container.resolve(Modules.REGION)
   const salesChannelModuleService: ISalesChannelModuleService = container.resolve(
     Modules.SALES_CHANNEL,
   )
   const storeModuleService: IStoreModuleService = container.resolve(Modules.STORE)
+  const pgConnection = container.resolve(ContainerRegistrationKeys.PG_CONNECTION)
   const fashionModuleService: FashionModuleService = container.resolve("fashionModuleService")
 
   const nigeriaCountries = ["ng"]
@@ -189,36 +193,48 @@ export default async function seedDemoData({ container }: ExecArgs) {
     ? [FLUTTERWAVE_PAYMENT_PROVIDER_ID]
     : [MANUAL_PAYMENT_PROVIDER_ID]
 
-  const { result: regionResult } = await createRegionsWorkflow(container).run({
-    input: {
-      regions: [
-        {
-          name: "Nigeria",
-          currency_code: "ngn",
-          countries: nigeriaCountries,
-          payment_providers:
-            nigeriaPaymentProviders.length > 0
-              ? nigeriaPaymentProviders
-              : [MANUAL_PAYMENT_PROVIDER_ID],
-        },
-        {
-          name: "International",
-          currency_code: "usd",
-          countries: usdCountries,
-          payment_providers: internationalPaymentProviders,
-        },
-        {
-          name: "Europe",
-          currency_code: "eur",
-          countries: eurCountries,
-          payment_providers: europePaymentProviders,
-        },
-      ],
+  const desiredRegions = [
+    {
+      name: "Nigeria",
+      currency_code: "ngn",
+      countries: nigeriaCountries,
+      payment_providers:
+        nigeriaPaymentProviders.length > 0
+          ? nigeriaPaymentProviders
+          : [MANUAL_PAYMENT_PROVIDER_ID],
     },
-  })
-  const nigeriaRegion = requireFound(regionResult, (region) => region.name === "Nigeria", 'Expected "Nigeria" region to be created while seeding demo data.')
-  requireFound(regionResult, (region) => region.name === "International", 'Expected "International" region to be created while seeding demo data.')
-  requireFound(regionResult, (region) => region.name === "Europe", 'Expected "Europe" region to be created while seeding demo data.')
+    {
+      name: "International",
+      currency_code: "usd",
+      countries: usdCountries,
+      payment_providers: internationalPaymentProviders,
+    },
+    {
+      name: "Europe",
+      currency_code: "eur",
+      countries: eurCountries,
+      payment_providers: europePaymentProviders,
+    },
+  ]
+
+  const existingRegions = await regionModuleService.listRegions({}, { take: 100 })
+  const existingRegionNames = new Set(existingRegions.map((region) => region.name))
+  const missingRegions = desiredRegions.filter((region) => !existingRegionNames.has(region.name))
+
+  const createdRegions = missingRegions.length
+    ? (
+        await createRegionsWorkflow(container).run({
+          input: {
+            regions: missingRegions,
+          },
+        })
+      ).result
+    : []
+
+  const regionResult = [...existingRegions, ...createdRegions]
+  const nigeriaRegion = requireFound(regionResult, (region) => region.name === "Nigeria", 'Expected "Nigeria" region to exist while seeding demo data.')
+  requireFound(regionResult, (region) => region.name === "International", 'Expected "International" region to exist while seeding demo data.')
+  requireFound(regionResult, (region) => region.name === "Europe", 'Expected "Europe" region to exist while seeding demo data.')
   logger.info("Finished seeding regions.")
 
   await updateStoresWorkflow(container).run({
@@ -357,7 +373,7 @@ export default async function seedDemoData({ container }: ExecArgs) {
         rules: [
           {
             attribute: "enabled_in_store",
-            value: '"true"',
+            value: "true",
             operator: "eq",
           },
           {
@@ -399,7 +415,7 @@ export default async function seedDemoData({ container }: ExecArgs) {
         rules: [
           {
             attribute: "enabled_in_store",
-            value: '"true"',
+            value: "true",
             operator: "eq",
           },
           {
@@ -475,7 +491,7 @@ export default async function seedDemoData({ container }: ExecArgs) {
         rules: [
           {
             attribute: "enabled_in_store",
-            value: '"true"',
+            value: "true",
             operator: "eq",
           },
           {
@@ -2760,4 +2776,28 @@ Perfect for clients who want bold, full-bodied hair that lasts.`,
   })
 
   logger.info("Finished seeding product data.")
+
+  logger.info("Ensuring all products are linked to the default shipping profile...")
+  const productsMissingShippingProfile: Array<{ id: string }> = await pgConnection("product as p")
+    .leftJoin("product_shipping_profile as psp", "psp.product_id", "p.id")
+    .whereNull("psp.product_id")
+    .whereNull("p.deleted_at")
+    .select("p.id")
+
+  if (productsMissingShippingProfile.length) {
+    await updateProductsWorkflow(container).run({
+      input: {
+        products: productsMissingShippingProfile.map((product) => ({
+          id: product.id,
+          shipping_profile_id: shippingProfile.id,
+        })),
+      },
+    })
+
+    logger.info(
+      `Linked ${productsMissingShippingProfile.length} product(s) to shipping profile ${shippingProfile.id}.`,
+    )
+  } else {
+    logger.info("All products already have a shipping profile.")
+  }
 }

@@ -1,4 +1,6 @@
-import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime"
+import { useRouter } from "next/navigation"
+
+type AppRouterInstance = ReturnType<typeof useRouter>
 
 export interface WebMCPClient {
   requestUserInteraction: <T>(callback: () => Promise<T> | T) => Promise<T>
@@ -7,6 +9,7 @@ export interface WebMCPClient {
 export interface WebMCPToolContext {
   router?: AppRouterInstance
   client?: WebMCPClient
+  countryCode?: string
 }
 
 export type WebMCPToolResult<TData> =

@@ -8,12 +8,8 @@ export const listCartShippingMethods = async function (cartId: string) {
       `/store/shipping-options`,
       {
         query: { cart_id: cartId },
-        next: { tags: ["shipping"] },
-        cache: "force-cache",
+        cache: "no-store",
       }
     )
     .then(({ shipping_options }) => shipping_options)
-    .catch(() => {
-      return null
-    })
 }

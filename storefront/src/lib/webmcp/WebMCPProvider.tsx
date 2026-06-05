@@ -2,15 +2,18 @@
 
 import React from "react"
 import { registerWebMCPTools } from "./register-tools"
-import { useRouter } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
 
 export const WebMCPProvider = () => {
   const router = useRouter()
+  const params = useParams<{ countryCode?: string }>()
+  const countryCode =
+    typeof params.countryCode === "string" ? params.countryCode : undefined
 
   React.useEffect(() => {
-    const cleanup = registerWebMCPTools(router)
+    const cleanup = registerWebMCPTools(router, countryCode)
     return cleanup
-  }, [router])
+  }, [countryCode, router])
 
   return null
 }

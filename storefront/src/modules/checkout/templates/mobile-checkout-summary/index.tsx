@@ -38,13 +38,13 @@ const MobileCheckoutSummary = ({ cart }: { cart: HttpTypes.StoreCart }) => {
     <>
       <button
         type="button"
-        className="h-18 flex justify-between items-center w-full group"
+        className="group flex min-h-16 w-full items-center justify-between gap-4 py-3 text-left"
         onClick={onClickHandler}
         data-open="no"
       >
-        <p>Order summary</p>
-        <div className="flex items-center gap-4">
-          <span>{convertToLocale({ amount: total ?? 0, currency_code })}</span>
+        <p className="font-medium">Order summary</p>
+        <div className="flex shrink-0 items-center gap-3">
+          <span className="font-medium">{convertToLocale({ amount: total ?? 0, currency_code })}</span>
           <Icon
             name="chevron-down"
             className="w-6 group-data-[open=yes]:rotate-180 transition-transform"
@@ -58,7 +58,7 @@ const MobileCheckoutSummary = ({ cart }: { cart: HttpTypes.StoreCart }) => {
           height: "0px",
         }}
       >
-        <div className="py-8">
+        <div className="border-t border-grayscale-200 py-6">
           <CheckoutSummary cart={cart} />
         </div>
       </div>

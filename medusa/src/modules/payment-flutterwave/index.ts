@@ -1,8 +1,6 @@
-import { Module } from "@medusajs/framework/utils"
+import { ModuleProvider, Modules } from "@medusajs/framework/utils"
 import FlutterwavePaymentService from "./service"
 
-export const FLUTTERWAVE_MODULE = "flutterwave"
-
-export default Module(FLUTTERWAVE_MODULE, {
-  service: FlutterwavePaymentService,
+export default ModuleProvider(Modules.PAYMENT, {
+  services: [FlutterwavePaymentService],
 })

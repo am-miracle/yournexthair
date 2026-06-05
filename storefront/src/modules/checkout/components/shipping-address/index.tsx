@@ -313,21 +313,21 @@ const ShippingAddress = ({
           </UiDialogTrigger>
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-4 mb-8">
+        <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-2">
           <InputField
-            placeholder="First name"
+            placeholder="First name *"
             name="shipping_address.first_name"
             inputProps={{ autoComplete: "given-name", "aria-label": "Shipping first name" }}
             data-testid="shipping-first-name-input"
           />
           <InputField
-            placeholder="Last name"
+            placeholder="Last name *"
             name="shipping_address.last_name"
             inputProps={{ autoComplete: "family-name", "aria-label": "Shipping last name" }}
             data-testid="shipping-last-name-input"
           />
           <InputField
-            placeholder="Address"
+            placeholder="Address *"
             name="shipping_address.address_1"
             inputProps={{ autoComplete: "address-line1", "aria-label": "Shipping address line 1" }}
             data-testid="shipping-address-input"
@@ -339,13 +339,13 @@ const ShippingAddress = ({
             data-testid="shipping-company-input"
           />
           <InputField
-            placeholder="Postal code"
+            placeholder="Postal code *"
             name="shipping_address.postal_code"
             inputProps={{ autoComplete: "postal-code", "aria-label": "Shipping postal code" }}
             data-testid="shipping-postal-code-input"
           />
           <InputField
-            placeholder="City"
+            placeholder="City *"
             name="shipping_address.city"
             inputProps={{ autoComplete: "address-level2", "aria-label": "Shipping city" }}
             data-testid="shipping-city-input"

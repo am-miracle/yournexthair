@@ -286,9 +286,9 @@ const BillingAddress = ({
           </UiDialogTrigger>
         </div>
       ) : (
-        <div className={twMerge("grid grid-cols-2 gap-4 mt-8")}>
+        <div className={twMerge("mt-8 grid grid-cols-1 gap-4 md:grid-cols-2")}>
           <InputField
-            placeholder="First name"
+            placeholder="First name *"
             name="billing_address.first_name"
             inputProps={{
               autoComplete: "given-name",
@@ -297,7 +297,7 @@ const BillingAddress = ({
             data-testid="billing-first-name-input"
           />
           <InputField
-            placeholder="Last name"
+            placeholder="Last name *"
             name="billing_address.last_name"
             inputProps={{
               autoComplete: "family-name",
@@ -306,7 +306,7 @@ const BillingAddress = ({
             data-testid="billing-last-name-input"
           />
           <InputField
-            placeholder="Address"
+            placeholder="Address *"
             name="billing_address.address_1"
             inputProps={{
               autoComplete: "address-line1",
@@ -324,7 +324,7 @@ const BillingAddress = ({
             data-testid="billing-company-input"
           />
           <InputField
-            placeholder="Postal code"
+            placeholder="Postal code *"
             name="billing_address.postal_code"
             inputProps={{
               autoComplete: "postal-code",
@@ -333,7 +333,7 @@ const BillingAddress = ({
             data-testid="billing-postal-input"
           />
           <InputField
-            placeholder="City"
+            placeholder="City *"
             name="billing_address.city"
             inputProps={{
               autoComplete: "address-level2",

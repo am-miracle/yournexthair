@@ -1,7 +1,7 @@
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
 import { getCartId } from "@lib/data/cookies"
-import { CheckoutForm } from "@modules/checkout/components/checkout-form"
+import { CheckoutFormClientWrapper } from "@modules/checkout/components/checkout-form/client-wrapper"
 
 export const metadata: Metadata = {
   title: "Checkout",
@@ -26,5 +26,5 @@ export default async function Checkout({
   const { countryCode } = await params
   const { step } = await searchParams
 
-  return <CheckoutForm countryCode={countryCode} step={step} />
+  return <CheckoutFormClientWrapper countryCode={countryCode} step={step} />
 }

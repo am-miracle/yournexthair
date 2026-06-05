@@ -47,11 +47,12 @@ export const useCartQuantity = () => {
 
 export const useCartShippingMethods = (cartId: string) => {
   return useQuery({
-    queryKey: [cartId],
+    queryKey: ["cart", cartId, "shipping-methods"],
     queryFn: async () => {
       const res = await listCartShippingMethods(cartId)
       return res
     },
+    enabled: Boolean(cartId),
   })
 }
 
@@ -408,6 +409,9 @@ export const useSetShippingMethod = (
         exact: false,
         queryKey: ["cart"],
       })
+      await queryClient.invalidateQueries({
+        queryKey: ["cart", cartId, "shipping-methods"],
+      })
 
       await options?.onSuccess?.(...args)
     },
@@ -623,6 +627,10 @@ export const useUpdateRegion = (
       await queryClient.invalidateQueries({
         exact: false,
         queryKey: ["cart"],
+      })
+      await queryClient.invalidateQueries({
+        predicate: (query) =>
+          Array.isArray(query.queryKey) && query.queryKey.includes("shipping-methods"),
       })
       await queryClient.invalidateQueries({
         exact: false,

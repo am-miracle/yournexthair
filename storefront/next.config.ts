@@ -10,6 +10,7 @@ const nextConfig: NextConfig = {
     staticGenerationRetryCount: 3,
   },
   images: {
+    qualities: [50, 75, 90],
     remotePatterns: [
       {
         protocol: "http",

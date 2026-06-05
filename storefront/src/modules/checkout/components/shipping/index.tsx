@@ -30,7 +30,10 @@ const Shipping = ({ cart }: { cart: StoreCart }) => {
     setError(null)
   }
 
-  const { data: availableShippingMethods } = useCartShippingMethods(cart.id)
+  const {
+    data: availableShippingMethods,
+    error: shippingMethodsError,
+  } = useCartShippingMethods(cart.id)
 
   const { mutate, isPending } = useSetShippingMethod({ cartId: cart.id })
   const selectedShippingMethod = availableShippingMethods?.find(
@@ -78,7 +81,13 @@ const Shipping = ({ cart }: { cart: StoreCart }) => {
           )}
       </div>
       {isOpen ? (
-        shippingMethodOptions.length === 0 ? (
+        shippingMethodsError ? (
+          <div role="status" aria-live="polite">
+            <p className="text-red-900">
+              We couldn&apos;t load shipping methods right now. Please try again.
+            </p>
+          </div>
+        ) : shippingMethodOptions.length === 0 ? (
           <div role="status" aria-live="polite">
             <p className="text-red-900">
               There are no shipping methods available for your location. Please
@@ -126,7 +135,7 @@ const Shipping = ({ cart }: { cart: StoreCart }) => {
       ) : cart &&
         (cart.shipping_methods?.length ?? 0) > 0 &&
         selectedShippingMethod ? (
-        <ul className="flex max-sm:flex-col flex-wrap gap-y-2 gap-x-28">
+        <ul className="grid gap-2 md:grid-cols-[minmax(0,10rem)_1fr] md:gap-4">
           <li className="text-grayscale-500">Shipping</li>
           <li className="text-grayscale-600">{selectedShippingMethod.name}</li>
         </ul>

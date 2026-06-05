@@ -47,8 +47,8 @@ const Email = ({ countryCode, cart }: { countryCode: string; cart: StoreCart }) 
 
   return (
     <>
-      <div className="flex justify-between mb-6 md:mb-8">
-        <div className="flex justify-between flex-wrap gap-5 flex-1">
+      <div className="mb-6 flex justify-between gap-4 md:mb-8">
+        <div className="flex flex-1 flex-wrap justify-between gap-4 md:gap-5">
           <div>
             <p
               className={twJoin("transition-[font-weight] duration-75", isOpen && "font-semibold")}
@@ -123,7 +123,7 @@ const Email = ({ countryCode, cart }: { countryCode: string; cart: StoreCart }) 
           }}
         </Form>
       ) : cart?.email ? (
-        <ul className="flex max-sm:flex-col flex-wrap gap-y-2 gap-x-34">
+        <ul className="grid gap-2 md:grid-cols-[minmax(0,9rem)_1fr] md:gap-4">
           <li className="text-grayscale-500">Email</li>
           <li className="text-grayscale-600 break-all">{cart.email}</li>
         </ul>

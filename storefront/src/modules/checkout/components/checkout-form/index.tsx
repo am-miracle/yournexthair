@@ -30,7 +30,7 @@ export const CheckoutForm = ({
   }, [step, countryCode, cart])
   if (isPending) {
     return (
-      <div className="absolute left-0 top-20 md:top-40 lg:top-0 w-screen lg:max-w-[calc(100vw-((50vw-50%)+448px))] xl:max-w-[calc(100vw-((50vw-50%)+540px))] -ml-[calc(50vw-50%)] h-screen lg:w-full flex items-center justify-center">
+      <div className="flex min-h-[50vh] w-full items-center justify-center rounded-4xl border border-grayscale-200 bg-white">
         <Icon name="loader" className="w-10 md:w-20 animate-spin" />
       </div>
     )

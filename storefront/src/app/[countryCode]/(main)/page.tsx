@@ -6,6 +6,7 @@ import { SITE_DESCRIPTION, getCanonicalPath } from "@lib/util/seo"
 import { Layout, LayoutColumn } from "@/components/Layout"
 import { LocalizedLink } from "@/components/LocalizedLink"
 import { CollectionsSection } from "@/components/CollectionsSection"
+import { Icon } from "@/components/Icon"
 
 export const metadata: Metadata = {
   title: "Raw & Virgin Hair Extensions and Wigs",
@@ -31,12 +32,15 @@ const ProductTypesSection: React.FC = async () => {
         <div className="flex items-start gap-x-3 gap-y-8 md:gap-x-10 md:gap-y-12">
           {productTypes.productTypes.map((productType, index) => (
             <div key={productType.id} className="w-full">
-              <LocalizedLink href={`/store?type=${productType.value}`}>
+              <LocalizedLink
+                href={`/store?type=${productType.value}`}
+                className="group block"
+              >
                 {typeof productType.metadata?.image === "object" &&
                   productType.metadata.image &&
                   "url" in productType.metadata.image &&
                   typeof productType.metadata.image.url === "string" && (
-                    <div className="mb-4 md:mb-6 overflow-hidden">
+                    <div className="relative mb-4 overflow-hidden bg-grayscale-100 md:mb-6">
                       <Image
                         src={productType.metadata.image.url}
                         width={1200}
@@ -44,11 +48,25 @@ const ProductTypesSection: React.FC = async () => {
                         alt={productType.value}
                         preload={index === 0}
                         loading={index === 0 ? "eager" : "lazy"}
-                        className="h-64 w-full object-cover sm:h-72 md:h-80 lg:h-96"
+                        className="h-64 w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03] sm:h-72 md:h-80 lg:h-96"
                       />
+                      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-linear-to-t from-black/45 via-black/10 to-transparent" />
+                      <div className="absolute left-4 top-4 inline-flex items-center gap-2 rounded-full bg-white/92 px-3 py-1.5 text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-black shadow-[0_10px_30px_rgba(0,0,0,0.08)] transition-transform duration-300 group-hover:translate-y-1 md:left-5 md:top-5">
+                        <span>Shop category</span>
+                        <Icon name="arrow-up-right" className="w-3.5" />
+                      </div>
                     </div>
                   )}
-                <p className="text-xs md:text-md">{productType.value}</p>
+                <div className="flex items-center justify-between gap-3 border-b border-grayscale-200 pb-3 transition-colors duration-300 group-hover:border-black md:pb-4">
+                  <p className="text-xs md:text-md">{productType.value}</p>
+                  <span className="inline-flex items-center gap-2 text-[0.65rem] font-semibold uppercase tracking-[0.22em] text-grayscale-500 transition-colors duration-300 group-hover:text-black">
+                    Explore
+                    <Icon
+                      name="arrow-right"
+                      className="w-4 transition-transform duration-300 group-hover:translate-x-1"
+                    />
+                  </span>
+                </div>
               </LocalizedLink>
             </div>
           ))}

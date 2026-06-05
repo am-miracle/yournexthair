@@ -159,7 +159,7 @@ const Addresses = ({ cart }: { cart: StoreCart }) => {
         </Form>
       ) : cart?.shipping_address ? (
         <div className="flex flex-col gap-4">
-          <div className="flex max-sm:flex-col flex-wrap gap-y-2 gap-x-12">
+          <div className="grid gap-2 md:grid-cols-[minmax(0,10rem)_1fr] md:gap-4">
             <div className="text-grayscale-500">Shipping address</div>
             <div className="text-grayscale-600">
               {[
@@ -186,7 +186,7 @@ const Addresses = ({ cart }: { cart: StoreCart }) => {
             </div>
           </div>
           {sameAsBilling || cart.billing_address ? (
-            <div className="flex max-sm:flex-col flex-wrap gap-y-2 gap-x-17">
+            <div className="grid gap-2 md:grid-cols-[minmax(0,10rem)_1fr] md:gap-4">
               <div className="text-grayscale-500">Billing address</div>
               <div className="text-grayscale-600">
                 {sameAsBilling ? (

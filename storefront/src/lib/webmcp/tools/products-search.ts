@@ -1,18 +1,23 @@
+import { z } from "zod"
 import { getProductsListWithSort } from "@lib/data/products"
 import { MeiliSearchProductHit, searchClient } from "@lib/search-client"
 import { getProductPrice } from "@lib/util/get-product-price"
 import { withDefinedProp, withNonNullProp } from "@lib/util/optional-props"
 import { HttpTypes } from "@medusajs/types"
-import { WebMCPTool, WebMCPToolResult } from "../types"
+import { WebMCPTool, WebMCPToolContext, WebMCPToolResult } from "../types"
 
-export interface ProductSearchInput {
-  query?: string
-  collection_ids?: string[]
-  category_ids?: string[]
-  type_ids?: string[]
-  sort?: "latest_arrivals" | "lowest_price" | "highest_price"
-  limit?: number
-}
+const productSearchSchema = z.object({
+  query: z.string().optional(),
+  collection_ids: z.array(z.string()).optional(),
+  category_ids: z.array(z.string()).optional(),
+  type_ids: z.array(z.string()).optional(),
+  sort: z
+    .enum(["latest_arrivals", "lowest_price", "highest_price"])
+    .optional(),
+  limit: z.number().int().min(1).max(36).optional(),
+})
+
+export type ProductSearchInput = z.infer<typeof productSearchSchema>
 
 interface ProductSearchData {
   products: Array<{
@@ -44,17 +49,30 @@ interface ProductSearchData {
 type ProductSearchItem = ProductSearchData["products"][number]
 
 export const productsSearch = async (
-  params: ProductSearchInput
+  rawInput: unknown,
+  context?: WebMCPToolContext
 ): Promise<WebMCPToolResult<ProductSearchData>> => {
-  const pathNameParts = window.location.pathname.replace(/^\//, "").split("/")
-  const countryCode = pathNameParts[0]
+  const parsed = productSearchSchema.safeParse(rawInput)
+  if (!parsed.success) {
+    return {
+      ok: false,
+      error: {
+        code: "INVALID_INPUT",
+        message: parsed.error.issues.map((i) => i.message).join("; "),
+      },
+    }
+  }
+
+  const params = parsed.data
+  const countryCode = context?.countryCode ?? ""
 
   if (!countryCode) {
     return {
       ok: false,
       error: {
         code: "INVALID_COUNTRY_CODE",
-        message: "Your country code is invalid.",
+        message:
+          "User must be on a localised page (e.g. /ng/store) to search products.",
       },
     }
   }
@@ -67,7 +85,7 @@ export const productsSearch = async (
       : null
 
     const queryParams: HttpTypes.StoreProductListParams = {
-      limit: Math.min(36, params.limit || 12),
+      limit: Math.min(36, Math.max(1, Math.floor(params.limit ?? 12))),
     }
 
     if (params.collection_ids && params.collection_ids.length) {
@@ -105,9 +123,7 @@ export const productsSearch = async (
       ok: true,
       data: {
         products: medusaProducts.response.products.map((product): ProductSearchItem => {
-          const { cheapestPrice } = getProductPrice({
-            product,
-          })
+          const { cheapestPrice } = getProductPrice({ product })
 
           return {
             id: product.id,
@@ -133,7 +149,7 @@ export const productsSearch = async (
                     ...withNonNullProp("title", variant.title),
                     ...withDefinedProp(
                       "inventory_quantity",
-                      variant.inventory_quantity,
+                      variant.inventory_quantity
                     ),
                   })),
                 }
@@ -158,9 +174,7 @@ export const productsSearch = async (
           }
         }),
       },
-      meta: {
-        tool: "products.search",
-      },
+      meta: { tool: "products.search" },
     }
   } catch (error: unknown) {
     const message =
@@ -168,10 +182,7 @@ export const productsSearch = async (
 
     return {
       ok: false,
-      error: {
-        code: "SEARCH_FAILED",
-        message,
-      },
+      error: { code: "SEARCH_FAILED", message },
     }
   }
 }

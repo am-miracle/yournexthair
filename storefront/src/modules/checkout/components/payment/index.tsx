@@ -134,7 +134,7 @@ const Payment = ({ cart }: { cart: StoreCart }) => {
       <div className={isOpen ? "hidden" : "block"}>
         {cart && paymentReady && activeSession ? (
           <div className="flex flex-col gap-4">
-            <div className="flex max-sm:flex-col flex-wrap gap-y-2 gap-x-12">
+            <div className="grid gap-2 md:grid-cols-[minmax(0,10rem)_1fr] md:gap-4">
               <div
                 className="text-grayscale-500"
                 data-testid="payment-method-summary"
@@ -146,7 +146,7 @@ const Payment = ({ cart }: { cart: StoreCart }) => {
                   activeSession.provider_id}
               </div>
             </div>
-            <div className="flex max-sm:flex-col flex-wrap gap-y-2 gap-x-12">
+            <div className="grid gap-2 md:grid-cols-[minmax(0,10rem)_1fr] md:gap-4">
               <div
                 className="text-grayscale-500"
                 data-testid="payment-details-summary"

@@ -1,5 +1,5 @@
 import { retrieveCart } from "@lib/data/cart"
-import { WebMCPTool, WebMCPToolResult } from "../types"
+import { WebMCPTool, WebMCPToolContext, WebMCPToolResult } from "../types"
 
 export interface NavigateToProductInput {
   handle: string
@@ -13,13 +13,12 @@ type NavigateToResult = {
 const normalizeOptionKey = (key: string) =>
   key.trim().toLowerCase().replace(/\s+/g, "_")
 
+const getCountryCode = (context?: WebMCPToolContext): string =>
+  context?.countryCode ?? ""
+
 export const navigateToProduct = async (
   input: NavigateToProductInput,
-  context?: {
-    router?: {
-      push: (href: string) => void
-    }
-  }
+  context?: WebMCPToolContext
 ): Promise<WebMCPToolResult<NavigateToResult>> => {
   const normalizedOptionKeys = new Set(
     Object.keys(input.options ?? {}).map((key) => normalizeOptionKey(key))
@@ -39,6 +38,18 @@ export const navigateToProduct = async (
     }
   }
 
+  const countryCode = getCountryCode(context)
+  if (!countryCode) {
+    return {
+      ok: false,
+      error: {
+        code: "INVALID_COUNTRY_CODE",
+        message:
+          "User must be on a localised page (e.g. /ng/store) before navigating to a product.",
+      },
+    }
+  }
+
   const queryParams = new URLSearchParams()
 
   Object.entries(input.options ?? {}).forEach(([key, value]) => {
@@ -50,7 +61,7 @@ export const navigateToProduct = async (
     queryParams.set(`mcp_opt_${normalizedKey}`, value)
   })
 
-  const path = `/products/${input.handle}${
+  const path = `/${countryCode}/products/${input.handle}${
     queryParams.toString() ? `?${queryParams.toString()}` : ""
   }`
 
@@ -59,12 +70,8 @@ export const navigateToProduct = async (
 
     return {
       ok: true,
-      data: {
-        path,
-      },
-      meta: {
-        tool: "navigation.toProduct",
-      },
+      data: { path },
+      meta: { tool: "navigation.toProduct" },
     }
   } catch (error) {
     console.error(error)
@@ -80,25 +87,29 @@ export const navigateToProduct = async (
 
 export const navigateToCart = async (
   _input: Record<string, never>,
-  context?: {
-    router?: {
-      push: (href: string) => void
+  context?: WebMCPToolContext
+): Promise<WebMCPToolResult<NavigateToResult>> => {
+  const countryCode = getCountryCode(context)
+  if (!countryCode) {
+    return {
+      ok: false,
+      error: {
+        code: "INVALID_COUNTRY_CODE",
+        message:
+          "User must be on a localised page (e.g. /ng/store) before navigating to the cart.",
+      },
     }
   }
-): Promise<WebMCPToolResult<NavigateToResult>> => {
-  const path = "/cart"
+
+  const path = `/${countryCode}/cart`
 
   try {
     context?.router?.push(path)
 
     return {
       ok: true,
-      data: {
-        path,
-      },
-      meta: {
-        tool: "navigation.toCart",
-      },
+      data: { path },
+      meta: { tool: "navigation.toCart" },
     }
   } catch (error) {
     console.error(error)
@@ -114,13 +125,21 @@ export const navigateToCart = async (
 
 export const checkoutPrepare = async (
   _input: Record<string, never>,
-  context?: {
-    router?: {
-      push: (href: string) => void
+  context?: WebMCPToolContext
+): Promise<WebMCPToolResult<NavigateToResult>> => {
+  const countryCode = getCountryCode(context)
+  if (!countryCode) {
+    return {
+      ok: false,
+      error: {
+        code: "INVALID_COUNTRY_CODE",
+        message:
+          "User must be on a localised page (e.g. /ng/store) before proceeding to checkout.",
+      },
     }
   }
-): Promise<WebMCPToolResult<NavigateToResult>> => {
-  const path = "/checkout"
+
+  const path = `/${countryCode}/checkout`
 
   try {
     const cart = await retrieveCart()

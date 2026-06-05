@@ -37,8 +37,8 @@ const CheckoutSummary = ({ cart }: { cart: HttpTypes.StoreCart }) => {
   const numOfItems = items.length
 
   return (
-    <>
-      <div className="flex justify-between items-center mb-8 lg:mb-16">
+    <div className="space-y-6 md:space-y-8">
+      <div className="flex items-center justify-between gap-4">
         <div>
           <p>
             Order — {numOfItems} item{numOfItems > 1 ? "s" : ""}
@@ -54,30 +54,31 @@ const CheckoutSummary = ({ cart }: { cart: HttpTypes.StoreCart }) => {
             return (a.created_at ?? "") > (b.created_at ?? "") ? -1 : 1
           })
           .map((item) => (
-            <div key={item.id} className="flex gap-4 lg:gap-6 mb-8">
+            <div key={item.id} className="flex gap-4 md:gap-5">
               <LocalizedLink
                 href={`/products/${item.variant?.product?.handle}`}
+                className="shrink-0"
               >
                 <Thumbnail
                   thumbnail={item.variant?.product?.thumbnail}
                   images={item.variant?.product?.images}
                   size="3/4"
-                  className="w-25 lg:w-33"
+                  className="w-20 md:w-24 lg:w-28"
                 />
               </LocalizedLink>
-              <div className="flex flex-col flex-1 justify-between">
-                <div className="flex flex-wrap gap-x-4 gap-y-1 justify-between">
-                  <div>
+              <div className="flex min-w-0 flex-1 flex-col justify-between gap-3">
+                <div className="flex flex-wrap justify-between gap-x-4 gap-y-1">
+                  <div className="min-w-0 pr-2">
                     <LocalizedLink
                       href={`/products/${item.variant?.product?.handle}`}
-                      className="font-semibold"
+                      className="line-clamp-2 font-semibold"
                     >
                       {item.product_title}
                     </LocalizedLink>
                   </div>
                   <ItemPrice item={item} />
                 </div>
-                <div className="flex flex-col gap-1.5 max-lg:text-xs">
+                <div className="flex flex-col gap-1.5 text-xs md:text-sm">
                   {item.variant?.title && (
                     <p>
                       Variant:{" "}
@@ -93,7 +94,7 @@ const CheckoutSummary = ({ cart }: { cart: HttpTypes.StoreCart }) => {
           ))}
       <DiscountCode cart={cart} />
       <CartTotals cart={cart} />
-    </>
+    </div>
   )
 }
 

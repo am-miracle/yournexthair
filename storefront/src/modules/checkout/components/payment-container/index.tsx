@@ -1,8 +1,6 @@
 import * as React from "react"
 
-import { isManual } from "@lib/constants"
 import { UiRadio, UiRadioBox, UiRadioLabel } from "@/components/ui/Radio"
-import PaymentTest from "@modules/checkout/components/payment-test"
 
 type PaymentContainerProps = {
   paymentProviderId: string
@@ -15,8 +13,6 @@ const PaymentContainer: React.FC<PaymentContainerProps> = ({
   paymentInfoMap,
   disabled = false,
 }) => {
-  const isDevelopment = process.env.NODE_ENV === "development"
-
   return (
     <UiRadio
       key={paymentProviderId}
@@ -28,8 +24,6 @@ const PaymentContainer: React.FC<PaymentContainerProps> = ({
       <UiRadioBox />
       <UiRadioLabel>
         {paymentInfoMap[paymentProviderId]?.title || paymentProviderId}
-
-        {isManual(paymentProviderId) && isDevelopment && <PaymentTest />}
       </UiRadioLabel>
       <span className="ml-auto group-data-[selected=true]:font-normal">
         {paymentInfoMap[paymentProviderId]?.icon}

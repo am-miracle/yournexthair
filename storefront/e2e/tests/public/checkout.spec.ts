@@ -6,6 +6,7 @@ test.describe("Checkout flow tests", async () => {
     cartPage,
     checkoutPage,
     orderPage,
+    page,
     productPage,
     storePage,
   }) => {
@@ -23,8 +24,10 @@ test.describe("Checkout flow tests", async () => {
       await productPage.cartDropdown.navCartLink.click()
       await productPage.cartDropdown.goToCartButton.click()
       await cartPage.container.waitFor({ state: "visible" })
+      await expect(page).toHaveURL(/\/[a-z]{2}\/cart$/)
       await cartPage.checkoutButton.click()
       await checkoutPage.container.waitFor({ state: "visible" })
+      await expect(page).toHaveURL(/\/[a-z]{2}\/checkout(?:\?.*)?$/)
     })
 
     await test.step("Enter in the first step of the checkout process", async () => {
@@ -55,6 +58,9 @@ test.describe("Checkout flow tests", async () => {
         await checkoutPage.billingProvinceInput.fill("Colorado")
         await checkoutPage.billingCountrySelect.selectOption("United States")
         await checkoutPage.submitAddressButton.click()
+        await checkoutPage.deliveryOptionRadio
+          .first()
+          .waitFor({ state: "visible" })
       })
     })
 
@@ -100,6 +106,7 @@ test.describe("Checkout flow tests", async () => {
   test("Editing checkout steps works as expected", async ({
     cartPage,
     checkoutPage,
+    page,
     productPage,
     storePage,
   }) => {
@@ -117,8 +124,10 @@ test.describe("Checkout flow tests", async () => {
       await productPage.cartDropdown.navCartLink.click()
       await productPage.cartDropdown.goToCartButton.click()
       await cartPage.container.waitFor({ state: "visible" })
+      await expect(page).toHaveURL(/\/[a-z]{2}\/cart$/)
       await cartPage.checkoutButton.click()
       await checkoutPage.container.waitFor({ state: "visible" })
+      await expect(page).toHaveURL(/\/[a-z]{2}\/checkout(?:\?.*)?$/)
     })
 
     await test.step("Enter in the first step of the checkout process", async () => {

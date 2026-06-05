@@ -55,7 +55,7 @@ export default function RootLayout(props: { children: React.ReactNode }) {
             {props.children}
           </main>
           <SpeedInsights />
-          <WebMCPProvider />
+          {process.env.NEXT_PUBLIC_ENABLE_WEBMCP === "true" && <WebMCPProvider />}
         </Providers>
       </body>
     </html>
