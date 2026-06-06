@@ -5,6 +5,16 @@ import type { MeilisearchPluginOptions } from "./src/modules/meilisearch/types"
 
 loadEnv(process.env.NODE_ENV ?? "development", process.cwd())
 
+const requireSecret = (name: string): string => {
+  const value = process.env[name]
+
+  if (!value) {
+    throw new Error(`Missing required environment variable: ${name}`)
+  }
+
+  return value
+}
+
 const meiliSearchOptions: MeilisearchPluginOptions = {
   config: {
     host: process.env.MEILISEARCH_HOST ?? "https://fashion-starter-search.agilo.agency",
@@ -83,8 +93,8 @@ module.exports = defineConfig({
       storeCors: process.env.STORE_CORS ?? "http://localhost:8000",
       adminCors: process.env.ADMIN_CORS ?? "http://localhost:5173,http://localhost:9000",
       authCors: process.env.AUTH_CORS ?? "http://localhost:8000,http://localhost:5173,http://localhost:9000",
-      jwtSecret: process.env.JWT_SECRET || "supersecret",
-      cookieSecret: process.env.COOKIE_SECRET || "supersecret",
+      jwtSecret: requireSecret("JWT_SECRET"),
+      cookieSecret: requireSecret("COOKIE_SECRET"),
       jwtExpiresIn: process.env.JWT_EXPIRES_IN || "24h",
     },
   },
@@ -98,7 +108,7 @@ module.exports = defineConfig({
             ? [
                 {
                   id: "flutterwave",
-                  resolve: "./src/modules/payment-flutterwave",
+                  resolve: "./src/modules/payment",
                   options: {
                     secret_key: process.env.FLW_SECRET_KEY,
                     public_key: process.env.FLW_PUBLIC_KEY,

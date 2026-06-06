@@ -8,15 +8,7 @@ export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
 
   const { id, colorId } = req.params as { id: string; colorId: string };
 
-  await fashionModuleService.retrieveMaterial(id, {
-    withDeleted: true,
-  });
-
-  await fashionModuleService.restoreColors(colorId);
-
-  const color = await fashionModuleService.retrieveColor(colorId, {
-    withDeleted: true,
-  });
+  const color = await fashionModuleService.restoreColorForMaterial(id, colorId);
 
   res.status(200).json(color);
 };

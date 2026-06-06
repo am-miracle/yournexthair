@@ -7,12 +7,9 @@ export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
 
   const fashionModuleService: FashionModuleService = req.scope.resolve(FASHION_MODULE)
 
-  await fashionModuleService.restoreMaterials(id)
+  await fashionModuleService.restoreMaterial(id)
 
-  const material = await fashionModuleService.retrieveMaterial(id, {
-    relations: ["colors"],
-    withDeleted: true,
-  })
+  const material = await fashionModuleService.getMaterialDetails(id)
 
   res.status(200).json(material)
 }

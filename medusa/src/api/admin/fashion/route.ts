@@ -14,19 +14,7 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
   const fashionModuleService: FashionModuleService =
     req.scope.resolve(FASHION_MODULE);
 
-  const [materials, count] = await fashionModuleService.listAndCountMaterials(
-    deleted
-      ? {
-          deleted_at: { $lte: new Date() },
-        }
-      : undefined,
-    {
-      skip: 20 * (page - 1),
-      take: 20,
-      withDeleted: deleted,
-      relations: ['colors'],
-    },
-  );
+  const [materials, count] = await fashionModuleService.listMaterialsPage(page, deleted);
 
   const last_page = Math.ceil(count / 20);
 
@@ -44,7 +32,7 @@ export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
   const body: unknown = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
   const validatedData = createMaterialBodySchema.parse(body);
 
-  const material = await fashionModuleService.createMaterials(validatedData);
+  const material = await fashionModuleService.createMaterial(validatedData.name);
 
   res.status(201).json(material);
 };

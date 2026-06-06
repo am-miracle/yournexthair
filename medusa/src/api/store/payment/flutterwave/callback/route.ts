@@ -1,27 +1,16 @@
 import type { MedusaResponse, MedusaStoreRequest } from "@medusajs/framework"
 import type { IPaymentModuleService } from "@medusajs/framework/types"
-import { Modules } from "@medusajs/framework/utils"
+import { MedusaError, Modules } from "@medusajs/framework/utils"
+import {
+  assertSuccessfulVerification,
+  verifyFlutterwaveTransaction,
+} from "../../../../../modules/payment/verification"
 
 type CallbackBody = {
   session_id: string
   transaction_id: number
   tx_ref: string
 }
-
-type FlwVerifyResponse = {
-  status: string
-  data: {
-    id: number
-    tx_ref: string
-    status: string
-    amount: number
-    charged_amount: number
-    currency: string
-  }
-}
-
-const getVerifiedMainUnitAmount = (data: FlwVerifyResponse["data"]) =>
-  Number(data.charged_amount ?? data.amount)
 
 export const POST = async (
   req: MedusaStoreRequest<CallbackBody>,
@@ -59,41 +48,27 @@ export const POST = async (
     return res.status(200).json({ success: true })
   }
 
-  // Verify with Flutterwave API before storing anything
-  const verifyRes = await fetch(
-    `https://api.flutterwave.com/v3/transactions/${transaction_id}/verify`,
-    {
-      headers: {
-        Authorization: `Bearer ${secretKey}`,
-        "Content-Type": "application/json",
-      },
-    }
+  const expectedCurrency = session.currency_code?.toUpperCase()
+  const expectedAmount = Number(
+    typeof session.data?.amount === "number" ? session.data.amount : session.amount,
   )
 
-  if (!verifyRes.ok) {
-    return res.status(502).json({ error: "Failed to verify transaction with Flutterwave" })
-  }
+  let verification
+  try {
+    verification = await verifyFlutterwaveTransaction(transaction_id, secretKey)
+    assertSuccessfulVerification(verification, {
+      tx_ref,
+      amount: expectedAmount,
+      currency: expectedCurrency ?? "",
+    })
+  } catch (error) {
+    if (error instanceof MedusaError && error.type === MedusaError.Types.UNEXPECTED_STATE) {
+      return res.status(502).json({ error: "Failed to verify transaction with Flutterwave" })
+    }
 
-  const verification = (await verifyRes.json()) as FlwVerifyResponse
-
-  if (verification.status !== "success" || verification.data.status !== "successful") {
-    return res.status(400).json({ error: "Payment was not successful" })
-  }
-
-  if (verification.data.tx_ref !== tx_ref) {
-    return res.status(400).json({ error: "Transaction reference mismatch from Flutterwave" })
-  }
-
-  const expectedCurrency = session.currency_code?.toUpperCase()
-  if (!expectedCurrency || verification.data.currency !== expectedCurrency) {
-    return res.status(400).json({ error: "Currency mismatch" })
-  }
-
-  const expectedAmount =
-    typeof session.data?.amount === "number" ? session.data.amount : session.amount
-  const expectedMainUnit = Number(expectedAmount) / 100
-  if (getVerifiedMainUnitAmount(verification.data) < expectedMainUnit) {
-    return res.status(400).json({ error: "Paid amount is lower than expected" })
+    return res.status(400).json({
+      error: error instanceof Error ? error.message : "Payment verification failed",
+    })
   }
 
   await paymentService.updatePaymentSession({

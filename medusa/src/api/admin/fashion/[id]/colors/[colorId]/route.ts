@@ -8,13 +8,7 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
 
   const { id, colorId } = req.params as { id: string; colorId: string }
 
-  await fashionModuleService.retrieveMaterial(id, {
-    withDeleted: true,
-  })
-
-  const color = await fashionModuleService.retrieveColor(colorId, {
-    withDeleted: true,
-  })
+  const color = await fashionModuleService.getColorForMaterial(id, colorId)
 
   res.status(200).json(color)
 }
@@ -34,12 +28,10 @@ export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
   const fashionModuleService: FashionModuleService = req.scope.resolve(FASHION_MODULE)
   const { id, colorId } = req.params as { id: string; colorId: string }
 
-  await fashionModuleService.retrieveMaterial(id, { withDeleted: true })
-
   const body: unknown = typeof req.body === "string" ? JSON.parse(req.body) : req.body
   const validatedData = colorsUpdateBodySchema.parse(body)
 
-  const color = await fashionModuleService.updateColors({ ...validatedData, id: colorId })
+  const color = await fashionModuleService.updateColorForMaterial(id, colorId, validatedData)
 
   res.status(200).json(color)
 }
@@ -48,10 +40,7 @@ export const DELETE = async (req: MedusaRequest, res: MedusaResponse) => {
   const fashionModuleService: FashionModuleService = req.scope.resolve(FASHION_MODULE)
   const { id, colorId } = req.params as { id: string; colorId: string }
 
-  await fashionModuleService.retrieveMaterial(id, { withDeleted: true })
-  await fashionModuleService.softDeleteColors(colorId)
-
-  const color = await fashionModuleService.retrieveColor(colorId, { withDeleted: true })
+  const color = await fashionModuleService.deleteColorForMaterial(id, colorId)
 
   res.status(200).json(color)
 }

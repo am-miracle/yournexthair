@@ -14,3 +14,23 @@ export const refetchProductType = async (
 
   return productType!
 }
+
+export const listProductTypes = async (
+  scope: MedusaContainer,
+  filters: Record<string, unknown>,
+  fields: string[],
+  pagination: Record<string, unknown>,
+) => {
+  const query = scope.resolve("query")
+  const { data: productTypes, metadata } = await query.graph({
+    entity: "product_types",
+    filters,
+    fields,
+    pagination,
+  })
+
+  return {
+    productTypes,
+    metadata,
+  }
+}

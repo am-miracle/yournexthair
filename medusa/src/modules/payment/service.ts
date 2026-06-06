@@ -23,6 +23,11 @@ import type {
   WebhookActionResult,
   PaymentSessionStatus,
 } from "@medusajs/types"
+import {
+  assertSuccessfulVerification,
+  type FlutterwaveSessionData,
+  verifyFlutterwaveTransaction,
+} from "./verification"
 
 type FlutterwaveOptions = {
   secret_key: string
@@ -30,30 +35,9 @@ type FlutterwaveOptions = {
   webhook_secret: string
 }
 
-type FlwTransactionData = {
-  id: number
-  tx_ref: string
-  status: string
-  amount: number
-  charged_amount: number
-  currency: string
-  customer: { email: string }
-  meta?: Record<string, unknown> | string | null
-}
-
-type FlwVerifyResponse = {
-  status: string
-  message: string
-  data: FlwTransactionData
-}
-
-type SessionData = {
-  tx_ref: string
-  amount: number
-  currency: string
+type SessionData = FlutterwaveSessionData & {
   customer_email: string | null
   transaction_id?: number
-  [key: string]: unknown
 }
 
 type FlutterwaveWebhookEvent = {
@@ -93,9 +77,6 @@ const parseMeta = (
   return isRecord(meta) ? meta : {}
 }
 
-const getVerifiedMainUnitAmount = (data: FlwTransactionData) =>
-  Number(data.charged_amount ?? data.amount)
-
 export class FlutterwavePaymentService extends AbstractPaymentProvider<FlutterwaveOptions> {
   static identifier = "flutterwave"
 
@@ -105,26 +86,6 @@ export class FlutterwavePaymentService extends AbstractPaymentProvider<Flutterwa
 
   private get secretKey(): string {
     return this.config.secret_key
-  }
-
-  private async verifyTransaction(transactionId: number): Promise<FlwVerifyResponse> {
-    const res = await fetch(
-      `https://api.flutterwave.com/v3/transactions/${transactionId}/verify`,
-      {
-        headers: {
-          Authorization: `Bearer ${this.secretKey}`,
-          "Content-Type": "application/json",
-        },
-      }
-    )
-    if (!res.ok) {
-      throw new MedusaError(
-        MedusaError.Types.UNEXPECTED_STATE,
-        `Flutterwave verification failed: HTTP ${res.status}`
-      )
-    }
-    const body: unknown = await res.json()
-    return body as FlwVerifyResponse
   }
 
   initiatePayment(input: InitiatePaymentInput): Promise<InitiatePaymentOutput> {
@@ -152,40 +113,15 @@ export class FlutterwavePaymentService extends AbstractPaymentProvider<Flutterwa
     }
 
     try {
-      const verification = await this.verifyTransaction(sessionData.transaction_id)
-
-      if (verification.status !== "success" || verification.data.status !== "successful") {
-        return {
-          status: "error" as PaymentSessionStatus,
-          data: { ...sessionData, error: "Payment not successful" },
-        }
-      }
-
-      if (verification.data.tx_ref !== sessionData.tx_ref) {
-        return {
-          status: "error" as PaymentSessionStatus,
-          data: { ...sessionData, error: "Transaction reference mismatch" },
-        }
-      }
-
-      if (verification.data.currency !== sessionData.currency) {
-        return {
-          status: "error" as PaymentSessionStatus,
-          data: { ...sessionData, error: "Currency mismatch" },
-        }
-      }
-
-      const expectedMainUnit = sessionData.amount / 100
-      if (getVerifiedMainUnitAmount(verification.data) < expectedMainUnit) {
-        return {
-          status: "error" as PaymentSessionStatus,
-          data: { ...sessionData, error: "Paid amount is lower than expected" },
-        }
-      }
+      const verification = await verifyFlutterwaveTransaction(
+        sessionData.transaction_id,
+        this.secretKey,
+      )
+      const verifiedTransaction = assertSuccessfulVerification(verification, sessionData)
 
       return {
         status: "authorized" as PaymentSessionStatus,
-        data: { ...sessionData, flw_transaction: verification.data },
+        data: { ...sessionData, flw_transaction: verifiedTransaction },
       }
     } catch (e) {
       return {
@@ -261,7 +197,10 @@ export class FlutterwavePaymentService extends AbstractPaymentProvider<Flutterwa
       return { data: sessionData }
     }
     try {
-      const verification = await this.verifyTransaction(sessionData.transaction_id)
+      const verification = await verifyFlutterwaveTransaction(
+        sessionData.transaction_id,
+        this.secretKey,
+      )
       return { data: { ...sessionData, flw_transaction: verification.data } }
     } catch {
       return { data: sessionData }
@@ -303,7 +242,10 @@ export class FlutterwavePaymentService extends AbstractPaymentProvider<Flutterwa
     }
 
     try {
-      const verification = await this.verifyTransaction(sessionData.transaction_id)
+      const verification = await verifyFlutterwaveTransaction(
+        sessionData.transaction_id,
+        this.secretKey,
+      )
       if (verification.data.status === "successful") {
         return { status: "authorized" as PaymentSessionStatus }
       }

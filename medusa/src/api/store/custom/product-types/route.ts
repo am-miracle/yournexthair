@@ -3,18 +3,18 @@ import type {
   AuthenticatedMedusaRequest,
   MedusaResponse,
 } from '@medusajs/framework';
+import { listProductTypes } from './helpers';
 
 export const GET = async (
   req: AuthenticatedMedusaRequest<HttpTypes.AdminProductTypeListParams>,
   res: MedusaResponse,
 ) => {
-  const query = req.scope.resolve("query")
-  const { data: productTypes, metadata } = await query.graph({
-    entity: "product_types",
-    filters: req.filterableFields,
-    fields: req.queryConfig.fields,
-    pagination: req.queryConfig.pagination
-  })
+  const { productTypes, metadata } = await listProductTypes(
+    req.scope,
+    req.filterableFields,
+    req.queryConfig.fields,
+    req.queryConfig.pagination,
+  )
 
   res.json({
     product_types: productTypes,
