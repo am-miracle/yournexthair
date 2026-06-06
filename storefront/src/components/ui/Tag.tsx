@@ -22,7 +22,7 @@ export const UiTag: React.FC<
     {...rest}
     className={twMerge(
       "inline-flex justify-center items-center gap-2 rounded-md px-4 py-1.5 max-h-6 text-xs bg-grayscale-50",
-      isActive && "bg-black text-white",
+      isActive && "bg-red-primary text-white",
       iconPosition === "end" && "flex-row-reverse",
       className
     )}

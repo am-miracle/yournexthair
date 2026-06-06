@@ -17,6 +17,8 @@ type CountryOption = {
 
 export const Header: React.FC = async () => {
   const regions = await listRegions()
+  const navLinkClass =
+    "rounded-full px-3 py-2 text-sm font-medium transition-colors hover:bg-black/5 hover:text-black group-data-[light=true]:md:text-white group-data-[light=true]:md:hover:bg-white/15 group-data-[light=true]:md:hover:text-white group-data-[sticky=true]:md:!text-black group-data-[sticky=true]:md:hover:bg-black/5 group-data-[sticky=true]:md:hover:!text-black"
 
   const countryOptions: CountryOption[] = regions
     .flatMap((region) =>
@@ -39,47 +41,44 @@ export const Header: React.FC = async () => {
       <header>
         <Layout>
           <LayoutColumn>
-            <div className="flex justify-between items-center h-18 md:h-21">
-              <p className="font-medium text-md">
-                <LocalizedLink href="/" className="cursor-pointer">
+            <div className="flex h-16 items-center justify-between gap-4 md:h-20">
+              <p className="shrink-0 text-sm font-semibold uppercase md:text-base">
+                <LocalizedLink href="/" className="cursor-pointer rounded-full py-2">
                   YourNextHair
                 </LocalizedLink>
               </p>
-              <nav aria-label="Primary" className="flex items-center gap-8 max-md:hidden">
-                <LocalizedLink
-                  href="/about"
-                  className="hover:text-purple-600 hover:underline underline-offset-4 decoration-purple-600 transition-colors"
-                >
+              <nav
+                aria-label="Primary"
+                className="hidden items-center rounded-full border border-transparent bg-white/0 p-1 transition-colors md:flex group-data-[light=true]:md:border-white/25 group-data-[light=true]:md:bg-white/10 group-data-[sticky=true]:md:border-grayscale-200 group-data-[sticky=true]:md:bg-grayscale-50"
+              >
+                <LocalizedLink href="/about" className={navLinkClass}>
                   About
                 </LocalizedLink>
-                <LocalizedLink
-                  href="/inspiration"
-                  className="hover:text-purple-600 hover:underline underline-offset-4 decoration-purple-600 transition-colors"
-                >
+                <LocalizedLink href="/inspiration" className={navLinkClass}>
                   Hair Guide
                 </LocalizedLink>
-                <LocalizedLink
-                  href="/store"
-                  className="hover:text-purple-600 hover:underline underline-offset-4 decoration-purple-600 transition-colors"
-                >
+                <LocalizedLink href="/services" className={navLinkClass}>
+                  Services
+                </LocalizedLink>
+                <LocalizedLink href="/store" className={navLinkClass}>
                   Shop
                 </LocalizedLink>
               </nav>
-              <div className="flex items-center gap-3 lg:gap-6 max-md:hidden">
+              <div className="hidden items-center gap-2 md:flex lg:gap-3">
                 <RegionSwitcher
                   countryOptions={countryOptions}
-                  className="w-16 cursor-pointer"
-                  selectButtonClassName="h-auto !gap-0 !p-1 transition-none cursor-pointer"
+                  className="w-auto cursor-pointer"
+                  selectButtonClassName="h-10 min-w-18 rounded-full !gap-1 !px-3 !py-0 transition-colors cursor-pointer hover:bg-black/5 group-data-[light=true]:md:text-white group-data-[light=true]:md:hover:bg-white/15 group-data-[sticky=true]:md:!text-black group-data-[sticky=true]:md:hover:bg-black/5"
                   selectIconClassName="text-current"
                 />
                 <React.Suspense>
                   <SearchField countryOptions={countryOptions} />
                 </React.Suspense>
-                <LoginLink className="p-1 cursor-pointer group-data-[light=true]:md:text-white group-data-[sticky=true]:md:text-black" />
+                <LoginLink className="h-10 w-10 rounded-full p-0 cursor-pointer transition-colors hover:bg-black/5 group-data-[light=true]:md:text-white group-data-[light=true]:md:hover:bg-white/15 group-data-[sticky=true]:md:!text-black group-data-[sticky=true]:md:hover:bg-black/5" />
                 <CartDrawer />
               </div>
-              <div className="flex items-center gap-4 md:hidden">
-                <LoginLink className="p-1 cursor-pointer group-data-[light=true]:md:text-white" />
+              <div className="flex items-center gap-2 md:hidden">
+                <LoginLink className="h-10 w-10 rounded-full p-0 cursor-pointer" />
                 <CartDrawer />
                 <React.Suspense>
                   <HeaderDrawer countryOptions={countryOptions} />

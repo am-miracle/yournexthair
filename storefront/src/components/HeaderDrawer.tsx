@@ -27,7 +27,7 @@ export const HeaderDrawer: React.FC<{
     <>
       <Button
         variant="ghost"
-        className="p-1 group-data-[light=true]:md:text-white"
+        className="h-10 w-10 rounded-full p-0"
         onPress={() => setIsMenuOpen(true)}
         aria-label="Open menu"
       >
@@ -37,34 +37,59 @@ export const HeaderDrawer: React.FC<{
         animateFrom="left"
         isOpen={isMenuOpen}
         onOpenChange={setIsMenuOpen}
-        className="rounded-none p-0!"
+        colorScheme="light"
+        className="w-[min(100vw,24rem)] max-w-none rounded-none p-0!"
       >
         {({ close }) => (
           <>
-            <div className="flex flex-col text-white h-full">
-              <div className="flex items-center justify-between pb-6 mb-8 pt-5 w-full border-b border-white px-8">
+            <div className="flex h-full flex-col text-black">
+              <div className="flex w-full items-center justify-between gap-4 border-b border-grayscale-200 px-6 py-5">
                 <SearchField countryOptions={countryOptions} isInputAlwaysShown />
-                <button onClick={close} aria-label="Close menu">
+                <button
+                  onClick={close}
+                  aria-label="Close menu"
+                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-grayscale-100"
+                >
                   <Icon name="close" className="w-6" />
                 </button>
               </div>
-              <div className="text-lg flex flex-col gap-8 font-medium px-8">
-                <LocalizedLink href="/about" onClick={() => setIsMenuOpen(false)}>
-                  About
-                </LocalizedLink>
-                <LocalizedLink href="/inspiration" onClick={() => setIsMenuOpen(false)}>
-                  Hair Guide
-                </LocalizedLink>
-                <LocalizedLink href="/store" onClick={() => setIsMenuOpen(false)}>
+              <div className="flex flex-col px-6 py-6 text-xl font-medium">
+                <LocalizedLink
+                  href="/store"
+                  className="border-b border-grayscale-200 py-5"
+                  onClick={() => setIsMenuOpen(false)}
+                >
                   Shop
                 </LocalizedLink>
+                <LocalizedLink
+                  href="/inspiration"
+                  className="border-b border-grayscale-200 py-5"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Hair Guide
+                </LocalizedLink>
+                <LocalizedLink
+                  href="/services"
+                  className="border-b border-grayscale-200 py-5"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Services
+                </LocalizedLink>
+                <LocalizedLink
+                  href="/about"
+                  className="border-b border-grayscale-200 py-5"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  About
+                </LocalizedLink>
               </div>
-              <RegionSwitcher
-                countryOptions={countryOptions}
-                className="mt-auto ml-8 mb-8"
-                selectButtonClassName="max-md:text-base gap-2 p-1 w-auto"
-                selectIconClassName="text-current w-6 h-6"
-              />
+              <div className="mt-auto border-t border-grayscale-200 px-6 py-5">
+                <RegionSwitcher
+                  countryOptions={countryOptions}
+                  selectButtonClassName="w-full justify-between rounded-full border border-grayscale-200 px-4 py-3 text-base"
+                  selectIconClassName="text-current w-6 h-6"
+                />
+              </div>
             </div>
           </>
         )}

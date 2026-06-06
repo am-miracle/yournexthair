@@ -37,7 +37,7 @@ export const CollectionsSection: React.FC<{ className?: string }> = async ({ cla
               collection.metadata.image &&
               "url" in collection.metadata.image &&
               typeof collection.metadata.image.url === "string" && (
-                <div className="relative mb-4 w-full aspect-3/4 overflow-hidden bg-grayscale-100 md:mb-10">
+                <div className="relative mb-4 w-full aspect-square overflow-hidden bg-grayscale-100 md:mb-10">
                   <Image
                     src={collection.metadata.image.url}
                     alt={collection.title}
@@ -52,9 +52,9 @@ export const CollectionsSection: React.FC<{ className?: string }> = async ({ cla
                   </div>
                 </div>
               )}
-            <div className="mb-2 flex items-center justify-between gap-3 border-b border-grayscale-200 pb-3 transition-colors duration-300 group-hover:border-black md:mb-4 md:pb-4">
+            <div className="mb-2 flex items-center justify-between gap-3 border-b border-grayscale-200 pb-3 transition-colors duration-300 group-hover:border-red-primary md:mb-4 md:pb-4">
               <h3 className="md:text-lg">{collection.title}</h3>
-              <span className="inline-flex items-center gap-2 text-[0.65rem] font-semibold uppercase tracking-[0.22em] text-grayscale-500 transition-colors duration-300 group-hover:text-black">
+              <span className="inline-flex items-center gap-2 text-[0.65rem] font-semibold uppercase tracking-[0.22em] text-grayscale-500 transition-colors duration-300 group-hover:text-red-primary">
                 Open
                 <Icon
                   name="arrow-right"

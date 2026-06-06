@@ -118,11 +118,16 @@ export const SearchField: React.FC<{
   }, [inputValue, list])
 
   return (
-    <div className="flex">
+    <div className={twJoin("flex", isInputAlwaysShown && "w-full")}>
       <Button
         onPress={buttonPressHandle}
         variant="ghost"
-        className="p-1 max-md:text-white group-data-[light=true]:md:text-white group-data-[sticky=true]:md:text-black"
+        className={twJoin(
+          "h-10 w-10 shrink-0 rounded-full p-0 transition-colors hover:bg-black/5",
+          isInputAlwaysShown
+            ? "text-black"
+            : "group-data-[light=true]:md:text-white group-data-[light=true]:md:hover:bg-white/15 group-data-[sticky=true]:md:!text-black group-data-[sticky=true]:md:hover:bg-black/5",
+        )}
         aria-label={
           !isInputShown
             ? "Open search"
@@ -145,7 +150,8 @@ export const SearchField: React.FC<{
       >
         <div
           className={twJoin(
-            "overflow-hidden transition-[width] duration-500 h-full max-w-40 md:max-w-30",
+            "h-full overflow-hidden transition-[width] duration-500",
+            isInputAlwaysShown ? "max-w-none" : "max-w-40 md:max-w-30",
             isInputShown ? "w-full md:w-30" : "md:w-0",
           )}
         >
@@ -153,7 +159,12 @@ export const SearchField: React.FC<{
             aria-label="Search products"
             placeholder="Search products"
             hasFloatingPlaceholder={false}
-            className="px-0 disabled:bg-transparent py-0! h-7 md:h-6 max-md:border-0 border-black rounded-none border-t-0 border-x-0 group-data-[light=true]:md:border-white group-data-[sticky=true]:md:border-black ml-2 md:ml-1"
+            className={twJoin(
+              "h-7 rounded-none border-x-0 border-t-0 border-black px-0 py-0! disabled:bg-transparent md:h-6",
+              isInputAlwaysShown
+                ? "ml-2 w-full"
+                : "ml-2 max-md:border-0 md:ml-1 group-data-[light=true]:md:border-white group-data-[sticky=true]:md:!border-black",
+            )}
           />
         </div>
         <ReactAria.Popover

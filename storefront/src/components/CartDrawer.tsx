@@ -25,7 +25,7 @@ export const CartDrawer = () => {
       <Button
         onPress={() => setIsCartDrawerOpen(true)}
         variant="ghost"
-        className="p-1 group-data-[light=true]:md:text-white group-data-[sticky=true]:md:text-black"
+        className="h-10 w-10 rounded-full p-0 transition-colors hover:bg-black/5 group-data-[light=true]:md:text-white group-data-[light=true]:md:hover:bg-white/15 group-data-[sticky=true]:md:!text-black group-data-[sticky=true]:md:hover:bg-black/5"
         aria-label="Open cart"
       >
         {pendingQuantity ? (

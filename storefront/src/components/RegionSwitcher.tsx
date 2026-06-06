@@ -37,6 +37,8 @@ export const RegionSwitcher = ({
     currentPath = pathName.split(`/${countryCode}`)[1] ?? "/"
   }
 
+  const selectedCountryCode = countryCode?.toUpperCase() ?? ""
+
   return (
     <ReactAria.Select
       value={countryCode ?? null}
@@ -52,15 +54,19 @@ export const RegionSwitcher = ({
         variant="ghost"
         {...withDefinedProp("className", selectButtonClassName)}
       >
-        <UiSelectValue>
-          {(item) =>
-            typeof item.selectedItems[0] === "object" &&
+        <UiSelectValue className="min-w-[2ch] overflow-visible text-center">
+          {(item) => {
+            if (selectedCountryCode) {
+              return selectedCountryCode
+            }
+
+            return typeof item.selectedItems[0] === "object" &&
             item.selectedItems[0] !== null &&
             "country" in item.selectedItems[0] &&
             typeof item.selectedItems[0].country === "string"
               ? item.selectedItems[0].country.toUpperCase()
               : item.defaultChildren
-          }
+          }}
         </UiSelectValue>
         <UiSelectIcon className={selectIconClassName} />
       </UiSelectButton>
