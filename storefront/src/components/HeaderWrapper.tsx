@@ -4,14 +4,10 @@ import * as React from "react"
 import { usePathname } from "next/navigation"
 import { useCountryCode } from "@/hooks/country-code"
 
-export const HeaderWrapper: React.FC<{ children?: React.ReactNode }> = ({
-  children,
-}) => {
+export const HeaderWrapper: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
   const pathName = usePathname()
   const countryCode = useCountryCode()
-  const currentPath = countryCode
-    ? pathName.split(`/${countryCode}`)[1] ?? "/"
-    : pathName
+  const currentPath = countryCode ? (pathName.split(`/${countryCode}`)[1] ?? "/") : pathName
   const isPageWithHeroImage =
     !currentPath ||
     currentPath === "/" ||
@@ -19,8 +15,7 @@ export const HeaderWrapper: React.FC<{ children?: React.ReactNode }> = ({
     currentPath === "/inspiration" ||
     currentPath === "/services" ||
     currentPath.startsWith("/collections")
-  const isAlwaysSticky =
-    currentPath.startsWith("/auth") || currentPath.startsWith("/account")
+  const isAlwaysSticky = currentPath.startsWith("/auth") || currentPath.startsWith("/account")
 
   React.useEffect(() => {
     if (isAlwaysSticky) {
@@ -77,7 +72,7 @@ export const HeaderWrapper: React.FC<{ children?: React.ReactNode }> = ({
       return Math.max(
         Number.parseInt(window.getComputedStyle(nextElement).paddingTop, 10) -
           headerElement.clientHeight,
-        1
+        1,
       )
     }
 
@@ -139,7 +134,7 @@ export const HeaderWrapper: React.FC<{ children?: React.ReactNode }> = ({
   return (
     <div
       id="site-header"
-      className="fixed top-0 left-0 z-40 w-full border-b border-transparent bg-white/95 text-black backdrop-blur-md transition-[background-color,border-color,box-shadow,color] duration-300 md:bg-transparent md:backdrop-blur-none data-[light=true]:md:text-white data-[sticky=true]:border-grayscale-200 data-[sticky=true]:bg-white/95 data-[sticky=true]:text-black data-[sticky=true]:md:!text-black data-[sticky=true]:shadow-[0_8px_30px_rgba(0,0,0,0.06)] data-[sticky=true]:backdrop-blur-md group"
+      className="fixed top-0 left-0 z-40 w-full border-b border-transparent bg-white/95 text-black backdrop-blur-md transition-[background-color,border-color,box-shadow,color] duration-300 md:bg-transparent md:backdrop-blur-none data-[light=true]:md:text-white data-[sticky=true]:border-grayscale-200 data-[sticky=true]:bg-white/95 data-[sticky=true]:text-black data-[sticky=true]:md:text-black! data-[sticky=true]:shadow-[0_8px_30px_rgba(0,0,0,0.06)] data-[sticky=true]:backdrop-blur-md group"
       data-light={isPageWithHeroImage}
       data-sticky={isAlwaysSticky}
     >

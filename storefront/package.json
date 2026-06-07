@@ -14,6 +14,7 @@
     "lint": "eslint src next.config.ts next-sitemap.config.ts playwright.config.ts check-env-variables.ts postcss.config.mjs eslint.config.cjs",
     "lint:fix": "eslint src next.config.ts next-sitemap.config.ts playwright.config.ts check-env-variables.ts postcss.config.mjs eslint.config.cjs --fix",
     "analyze": "ANALYZE=true next build",
+    "test": "vitest run",
     "test-e2e": "playwright test e2e"
   },
   "dependencies": {
@@ -59,6 +60,8 @@
     "prettier": "^3.8.3",
     "tailwindcss": "^4.3.0",
     "typescript": "^6.0.3",
+    "vite": "^8.0.16",
+    "vitest": "^4.1.8",
     "webpack": "^5.107.2"
   },
   "packageManager": "pnpm@10.15.1"

@@ -74,7 +74,7 @@ export const Header: React.FC = async () => {
                 <React.Suspense>
                   <SearchField countryOptions={countryOptions} />
                 </React.Suspense>
-                <LoginLink className="h-10 w-10 rounded-full p-0 cursor-pointer transition-colors hover:bg-black/5 group-data-[light=true]:md:text-white group-data-[light=true]:md:hover:bg-white/15 group-data-[sticky=true]:md:!text-black group-data-[sticky=true]:md:hover:bg-black/5" />
+                <LoginLink className="h-10 w-10 rounded-full p-0 cursor-pointer transition-colors hover:bg-black/5 group-data-[light=true]:md:text-white group-data-[light=true]:md:hover:bg-white/15 group-data-[sticky=true]:md:text-black! group-data-[sticky=true]:md:hover:bg-black/5" />
                 <CartDrawer />
               </div>
               <div className="flex items-center gap-2 md:hidden">

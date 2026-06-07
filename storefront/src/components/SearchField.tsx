@@ -97,7 +97,7 @@ export const SearchField: React.FC<{
     // Sync the controlled input when navigation changes the query param.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setInputValue((currentValue) =>
-      currentValue === normalizedSearchQuery ? currentValue : normalizedSearchQuery
+      currentValue === normalizedSearchQuery ? currentValue : normalizedSearchQuery,
     )
 
     if (list.filterText !== normalizedSearchQuery) {
@@ -126,14 +126,10 @@ export const SearchField: React.FC<{
           "h-10 w-10 shrink-0 rounded-full p-0 transition-colors hover:bg-black/5",
           isInputAlwaysShown
             ? "text-black"
-            : "group-data-[light=true]:md:text-white group-data-[light=true]:md:hover:bg-white/15 group-data-[sticky=true]:md:!text-black group-data-[sticky=true]:md:hover:bg-black/5",
+            : "group-data-[light=true]:md:text-white group-data-[light=true]:md:hover:bg-white/15 group-data-[sticky=true]:md:text-black! group-data-[sticky=true]:md:hover:bg-black/5",
         )}
         aria-label={
-          !isInputShown
-            ? "Open search"
-            : inputValue.trim()
-              ? "Search for products"
-              : "Close search"
+          !isInputShown ? "Open search" : inputValue.trim() ? "Search for products" : "Close search"
         }
       >
         <Icon name="search" className="w-5 h-5" />
@@ -163,7 +159,7 @@ export const SearchField: React.FC<{
               "h-7 rounded-none border-x-0 border-t-0 border-black px-0 py-0! disabled:bg-transparent md:h-6",
               isInputAlwaysShown
                 ? "ml-2 w-full"
-                : "ml-2 max-md:border-0 md:ml-1 group-data-[light=true]:md:border-white group-data-[sticky=true]:md:!border-black",
+                : "ml-2 max-md:border-0 md:ml-1 group-data-[light=true]:md:border-white group-data-[sticky=true]:md:border-black!",
             )}
           />
         </div>

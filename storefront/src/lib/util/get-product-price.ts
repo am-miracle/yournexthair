@@ -38,46 +38,40 @@ export function getProductPrice({
     throw new Error("No product provided")
   }
 
-  const cheapestPrice = () => {
-    if (!product || !product.variants?.length) {
-      return null
+  const pricedVariants = product?.variants?.filter((v) => !!v.calculated_price) ?? []
+
+  // Single O(N) scan to find cheapest and most expensive — avoids two separate sorts
+  let minVariant: HttpTypes.StoreProductVariant | undefined
+  let maxVariant: HttpTypes.StoreProductVariant | undefined
+  for (const v of pricedVariants) {
+    const amount = v.calculated_price?.calculated_amount ?? 0
+    if (minVariant === undefined || amount < (minVariant.calculated_price?.calculated_amount ?? 0)) {
+      minVariant = v
     }
-
-    const cheapestVariant = product.variants
-      .filter((v) => !!v.calculated_price)
-      .sort((a, b) => {
-        return (
-          (a.calculated_price?.calculated_amount ?? 0) -
-          (b.calculated_price?.calculated_amount ?? 0)
-        )
-      })[0]
-
-    if (!cheapestVariant) {
-      return null
+    if (maxVariant === undefined || amount > (maxVariant.calculated_price?.calculated_amount ?? 0)) {
+      maxVariant = v
     }
-
-    return getPricesForVariant(cheapestVariant)
   }
 
-  const variantPrice = () => {
-    if (!product || !variantId) {
-      return null
-    }
+  const cheapestPrice = minVariant ? getPricesForVariant(minVariant) : null
 
-    const variant = product.variants?.find(
-      (v) => v.id === variantId || v.sku === variantId
-    )
+  const mostExpensivePrice = (() => {
+    if (pricedVariants.length < 2 || !maxVariant) return null
+    const price = getPricesForVariant(maxVariant)
+    if (!price || !cheapestPrice) return null
+    return price.calculated_price_number !== cheapestPrice.calculated_price_number ? price : null
+  })()
 
-    if (!variant) {
-      return null
-    }
-
-    return getPricesForVariant(variant)
-  }
+  const variantPrice = (() => {
+    if (!variantId) return null
+    const variant = product.variants?.find((v) => v.id === variantId || v.sku === variantId)
+    return variant ? getPricesForVariant(variant) : null
+  })()
 
   return {
     product,
-    cheapestPrice: cheapestPrice(),
-    variantPrice: variantPrice(),
+    cheapestPrice,
+    mostExpensivePrice,
+    variantPrice,
   }
 }

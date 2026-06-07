@@ -9,7 +9,7 @@ export default function ProductPrice({
   product: HttpTypes.StoreProduct
   variant?: HttpTypes.StoreProductVariant
 }) {
-  const { cheapestPrice, variantPrice } = getProductPrice({
+  const { cheapestPrice, mostExpensivePrice, variantPrice } = getProductPrice({
     product,
     ...withDefinedProp("variantId", variant?.id),
   })
@@ -38,11 +38,10 @@ export default function ProductPrice({
   }
 
   return (
-    <>
-      <p className="text-md mb-8">
-        {!variant && "From "}
-        {selectedPrice.calculated_price}
-      </p>
-    </>
+    <p className="text-md mb-8">
+      {!variant && mostExpensivePrice
+        ? `${selectedPrice.calculated_price} – ${mostExpensivePrice.calculated_price}`
+        : selectedPrice.calculated_price}
+    </p>
   )
 }
