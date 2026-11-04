@@ -9,6 +9,7 @@ export type OrderPlacedEmailProps = {
     HttpTypes.AdminOrder,
     "currency_code" | "email" | "shipping_total" | "subtotal" | "total" | "tax_total"
   > & {
+    display_id?: string | number | null
     shipping_address:
       | (Pick<
           HttpTypes.AdminOrderAddress,
@@ -64,11 +65,11 @@ export default function OrderPlacedEmail({ order, ...emailLayoutProps }: OrderPl
       <Heading className="text-2xl font-medium mt-0 mb-10">Order confirmation</Heading>
       <Text className="text-md mb-6!">
         We are pleased to confirm that your order has been successfully placed and will be processed
-        shortly. Your order number is #100002.
+        shortly.{order.display_id !== null && order.display_id !== undefined && <> Your order number is #{order.display_id}.</>}
       </Text>
       <Text className="text-md mb-6!">
         You&apos;ll receive another update once your order is shipped. For any questions, feel free
-        to contact us at info@sofasociety.com.
+        to contact us at yournexthair@gmail.com.
       </Text>
       <Text className="text-md mb-20!">Thank you for shopping with us!</Text>
       <Section className="mb-6">
@@ -223,6 +224,7 @@ export default function OrderPlacedEmail({ order, ...emailLayoutProps }: OrderPl
 
 OrderPlacedEmail.PreviewProps = {
   order: {
+    display_id: 100002,
     currency_code: "EUR",
     email: "example@medusa.local",
     shipping_address: {

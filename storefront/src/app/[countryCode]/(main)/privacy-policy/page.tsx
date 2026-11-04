@@ -172,7 +172,7 @@ export default function PrivacyPolicyPage() {
           contact us at:
         </p>
         <address className="not-italic">
-          <p>Email: <a href="mailto:judemiraco0@gmail.com">judemiraco0@gmail.com</a></p>
+          <p>Email: <a href="mailto:yournexthair@gmail.com">yournexthair@gmail.com</a></p>
           <p>
             WhatsApp:{" "}
             <a

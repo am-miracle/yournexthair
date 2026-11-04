@@ -15,6 +15,9 @@ const requireSecret = (name: string): string => {
   return value
 }
 
+const workerMode = (value: string | undefined): "shared" | "worker" | "server" =>
+  value === "worker" || value === "server" ? value : "shared"
+
 const meiliSearchOptions: MeilisearchPluginOptions = {
   config: {
     host: process.env.MEILISEARCH_HOST ?? "https://fashion-starter-search.agilo.agency",
@@ -82,13 +85,14 @@ const meiliSearchOptions: MeilisearchPluginOptions = {
 
 module.exports = defineConfig({
   admin: {
-    backendUrl: process.env.BACKEND_URL ?? "https://sofa-society-starter.medusajs.app",
+    backendUrl: process.env.BACKEND_URL ?? "http://localhost:9000",
     ...(process.env.STOREFRONT_URL ? { storefrontUrl: process.env.STOREFRONT_URL } : {}),
     maxUploadFileSize: 10 * 1024 * 1024, // 10MB
   },
   projectConfig: {
     ...(process.env.DATABASE_URL ? { databaseUrl: process.env.DATABASE_URL } : {}),
     ...(process.env.REDIS_URL ? { redisUrl: process.env.REDIS_URL } : {}),
+    workerMode: workerMode(process.env.MEDUSA_WORKER_MODE),
     http: {
       storeCors: process.env.STORE_CORS ?? "http://localhost:8000",
       adminCors: process.env.ADMIN_CORS ?? "http://localhost:5173,http://localhost:9000",
@@ -103,29 +107,16 @@ module.exports = defineConfig({
       resolve: "@medusajs/medusa/payment",
       options: {
         providers: [
-          // Primary — handles all currencies (NGN, USD, EUR)
-          ...(process.env.FLW_SECRET_KEY
+          ...(process.env.BACHS_SECRET_KEY
             ? [
                 {
-                  id: "flutterwave",
-                  resolve: "./src/modules/payment",
+                  id: "bachs",
+                  resolve: "./src/modules/bachs",
                   options: {
-                    secret_key: process.env.FLW_SECRET_KEY,
-                    public_key: process.env.FLW_PUBLIC_KEY,
-                    webhook_secret: process.env.FLW_WEBHOOK_SECRET,
-                  },
-                },
-              ]
-            : []),
-          // Secondary — NGN only, preferred by domestic Nigerian buyers
-          ...(process.env.PAYSTACK_SECRET_KEY
-            ? [
-                {
-                  id: "paystack",
-                  resolve: "medusa-payment-paystack",
-                  options: {
-                    secret_key: process.env.PAYSTACK_SECRET_KEY,
-                    webhook_secret: process.env.PAYSTACK_WEBHOOK_SECRET,
+                    api_key: process.env.BACHS_SECRET_KEY,
+                    webhook_secret: requireSecret("BACHS_WEBHOOK_SECRET"),
+                    storefront_url: requireSecret("STOREFRONT_URL"),
+                    ...(process.env.BACHS_API_URL ? { base_url: process.env.BACHS_API_URL } : {}),
                   },
                 },
               ]
@@ -169,8 +160,8 @@ module.exports = defineConfig({
               channels: ["email"],
               api_key: process.env.RESEND_API_KEY,
               from: process.env.RESEND_FROM,
-              siteTitle: "SofaSocietyCo.",
-              companyName: "Sofa Society",
+              siteTitle: "YourNextHair.",
+              companyName: "YourNextHair",
               footerLinks: [
                 {
                   url: "https://agilo.com",

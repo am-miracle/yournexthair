@@ -8,7 +8,7 @@ import WelcomeEmail from './welcome';
 export const subjects = {
   'auth-password-reset': 'Reset your password',
   'order-placed': 'Your order has been placed',
-  'customer-welcome': 'Welcome to Sofa Society!',
+  'customer-welcome': 'Welcome to YourNextHair!',
   'auth-forgot-password': 'Reset your password',
 } as const;
 

@@ -27,3 +27,5 @@ build
 
 .medusa
 /static
+.env.production
+.env.*.local

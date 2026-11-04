@@ -1,6 +1,5 @@
 import * as React from "react"
 import { Metadata } from "next"
-import Script from "next/script"
 import { Layout, LayoutColumn } from "@/components/Layout"
 import { LocalizedLink } from "@/components/LocalizedLink"
 import dynamic from "next/dynamic"
@@ -24,8 +23,6 @@ const MobileCheckoutSummaryWrapper = dynamic(
 export default function CheckoutLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
-      <Script src="https://checkout.flutterwave.com/v3.js" strategy="lazyOnload" />
-      <Script src="https://js.paystack.co/v2/inline.js" strategy="lazyOnload" />
       <Layout className="border-b border-grayscale-200 bg-white lg:hidden">
         <LayoutColumn>
           <div className="flex min-h-18 items-center justify-between gap-4 py-4">

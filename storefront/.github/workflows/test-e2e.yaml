@@ -38,7 +38,7 @@ env:
   NEXT_PUBLIC_INDEX_NAME: products
   NEXT_PUBLIC_SEARCH_ENDPOINT: http://127.0.0.1:7700
   NEXT_PUBLIC_SEARCH_API_KEY: meili_api_key
-  REVALIDATE_SECRET: supersecret
+  STOREFRONT_REVALIDATE_SECRET: supersecret
 
 jobs:
   e2e-test-runner:

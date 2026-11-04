@@ -1,16 +1,21 @@
 "use client"
 
 import React, { useState } from "react"
+import * as Sentry from "@sentry/nextjs"
 import { HttpTypes } from "@medusajs/types"
 import { useRouter } from "next/navigation"
 
-import { isFlutterwave, isManual, isPaystack } from "@lib/constants"
+import { isBachs, isManual } from "@lib/constants"
 import { getCheckoutPaymentSession, getReviewPaymentSession } from "@lib/util/payment-session"
 import { withDefinedProp } from "@lib/util/optional-props"
 import { Button } from "@/components/Button"
 import ErrorMessage from "@modules/checkout/components/error-message"
-import { recordFlutterwaveTransaction } from "@lib/data/cart"
-import { usePlaceOrder } from "hooks/cart"
+import { useInitiatePaymentSession, usePlaceOrder } from "hooks/cart"
+
+const BACHS_PROVIDER_ID = "pp_bachs_bachs"
+
+const isExpired = (expiresAt: unknown) =>
+  typeof expiresAt === "string" && Date.parse(expiresAt) <= Date.now()
 
 type PaymentButtonProps = {
   cart: HttpTypes.StoreCart
@@ -37,14 +42,8 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
   }
 
   switch (true) {
-    case isFlutterwave(paymentSession?.provider_id):
-      return (
-        <FlutterwavePaymentButton notReady={notReady} cart={cart} />
-      )
-    case isPaystack(paymentSession?.provider_id):
-      return (
-        <PaystackPaymentButton notReady={notReady} cart={cart} />
-      )
+    case isBachs(paymentSession?.provider_id):
+      return <BachsPaymentButton notReady={notReady} cart={cart} />
     case isManual(paymentSession?.provider_id):
       return <ManualTestPaymentButton notReady={notReady} />
     default:
@@ -89,11 +88,7 @@ function useCompleteOrder() {
   return complete
 }
 
-// --------------------------------------------------------------------------
-// Flutterwave inline popup
-// --------------------------------------------------------------------------
-
-const FlutterwavePaymentButton = ({
+const BachsPaymentButton = ({
   cart,
   notReady,
 }: {
@@ -102,175 +97,61 @@ const FlutterwavePaymentButton = ({
 }) => {
   const [submitting, setSubmitting] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
-  const completeOrder = useCompleteOrder()
+  const initiatePaymentSession = useInitiatePaymentSession()
 
   const paymentSession = getCheckoutPaymentSession(
     cart.payment_collection?.payment_sessions,
-    "pp_flutterwave_flutterwave"
+    BACHS_PROVIDER_ID
   )
 
-  const handlePayment = () => {
-    if (!paymentSession?.data?.tx_ref) {
-      setErrorMessage("Payment session not initialised. Please try again.")
-      return
+  const getCheckoutUrl = async () => {
+    if (paymentSession && !isExpired(paymentSession.data?.expires_at)) {
+      return paymentSession.data?.checkout_url
     }
 
-    if (typeof window.FlutterwaveCheckout !== "function") {
-      setErrorMessage("Payment provider failed to load. Please refresh and try again.")
-      return
-    }
-
-    const sessionData = paymentSession.data as {
-      tx_ref: string
-      amount: number
-      currency: string
-      customer_email: string | null
-    }
-
-    setSubmitting(true)
-
-    window.FlutterwaveCheckout({
-      public_key: process.env.NEXT_PUBLIC_FLW_PUBLIC_KEY!,
-      tx_ref: sessionData.tx_ref,
-      // Flutterwave expects main currency unit (not smallest unit)
-      amount: sessionData.amount / 100,
-      currency: sessionData.currency,
-      customer: {
-        email: sessionData.customer_email ?? cart.email ?? "",
-        ...([cart.billing_address?.first_name, cart.billing_address?.last_name]
-          .filter(Boolean)
-          .join(" ")
-          ? {
-              name: [cart.billing_address?.first_name, cart.billing_address?.last_name]
-                .filter(Boolean)
-                .join(" "),
-            }
-          : {}),
-      },
-      meta: {
-        payment_session_id: paymentSession.id,
-        cart_id: cart.id,
-      },
-      customizations: {
-        title: "YourNextHair",
-        description: "Hair purchase",
-      },
-      callback: async (data) => {
-        if (data.status !== "successful") {
-          setErrorMessage("Payment was not successful. Please try again.")
-          setSubmitting(false)
-          return
-        }
-
-        try {
-          const result = await recordFlutterwaveTransaction(
-            paymentSession.id,
-            data.transaction_id,
-            data.tx_ref
-          )
-          if (!result?.success) {
-            setErrorMessage(result?.error ?? "Payment verification failed.")
-            setSubmitting(false)
-            return
-          }
-        } catch {
-          setErrorMessage("Could not verify payment. Please contact support.")
-          setSubmitting(false)
-          return
-        }
-
-        completeOrder(setSubmitting, setErrorMessage)
-      },
-      onclose: () => {
-        // User dismissed the popup without paying
-        setSubmitting(false)
-      },
+    const { payment_collection } = await initiatePaymentSession.mutateAsync({
+      providerId: BACHS_PROVIDER_ID,
     })
+
+    return getCheckoutPaymentSession(
+      payment_collection?.payment_sessions,
+      BACHS_PROVIDER_ID
+    )?.data?.checkout_url
   }
 
-  return (
-    <>
-      <Button
-        isDisabled={notReady || submitting}
-        onPress={handlePayment}
-        isLoading={submitting}
-        className="w-full"
-        data-testid="submit-order-button"
-      >
-        Place order
-      </Button>
-      <ErrorMessage {...withDefinedProp("error", errorMessage)} />
-    </>
-  )
-}
-
-// --------------------------------------------------------------------------
-// Paystack inline popup
-// --------------------------------------------------------------------------
-
-const PaystackPaymentButton = ({
-  cart,
-  notReady,
-}: {
-  cart: HttpTypes.StoreCart
-  notReady: boolean
-}) => {
-  const [submitting, setSubmitting] = useState(false)
-  const [errorMessage, setErrorMessage] = useState<string | null>(null)
-  const completeOrder = useCompleteOrder()
-
-  const paymentSession = getCheckoutPaymentSession(
-    cart.payment_collection?.payment_sessions,
-    "pp_paystack_paystack"
-  )
-
-  const handlePayment = () => {
-    if (!paymentSession?.data?.paystackTxAccessCode) {
-      setErrorMessage("Payment session not initialised. Please try again.")
-      return
-    }
-
-    if (typeof window.PaystackPop !== "function") {
-      setErrorMessage("Payment provider failed to load. Please refresh and try again.")
-      return
-    }
-
+  const handlePayment = async () => {
     setSubmitting(true)
+    setErrorMessage(null)
 
-    const popup = new window.PaystackPop()
-    popup.resumeTransaction(
-      paymentSession.data.paystackTxAccessCode as string,
-      {
-        onSuccess: () => {
-          // The reference is already stored in the session from initiation.
-          // authorizePayment() on cart.complete() verifies it server-side.
-          completeOrder(setSubmitting, setErrorMessage)
-        },
-        onCancel: () => {
-          setSubmitting(false)
-        },
-        onError: (error) => {
-          const message =
-            error instanceof Error
-              ? error.message
-              : "Payment provider failed to load. Please try again."
-          setErrorMessage(message)
-          setSubmitting(false)
-        },
+    try {
+      const checkoutUrl = await getCheckoutUrl()
+
+      if (typeof checkoutUrl !== "string" || !checkoutUrl.startsWith("https://")) {
+        setErrorMessage("Payment session not initialised. Please try again.")
+        setSubmitting(false)
+        return
       }
-    )
+
+      window.location.assign(checkoutUrl)
+    } catch (error) {
+      Sentry.captureException(error, { tags: { provider: "bachs", stage: "start_payment" } })
+      setErrorMessage(
+        error instanceof Error ? error.message : "Could not start payment. Please try again."
+      )
+      setSubmitting(false)
+    }
   }
 
   return (
     <>
       <Button
         isDisabled={notReady || submitting}
-        onPress={handlePayment}
+        onPress={() => void handlePayment()}
         isLoading={submitting}
         className="w-full"
         data-testid="submit-order-button"
       >
-        Place order
+        Pay and place order
       </Button>
       <ErrorMessage {...withDefinedProp("error", errorMessage)} />
     </>
