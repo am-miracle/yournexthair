@@ -1,3 +1,5 @@
+import { randomUUID } from "node:crypto"
+
 import { expect, test } from "@playwright/test"
 
 import { addFirstProductToCart, COUNTRY } from "./helpers"
@@ -56,7 +58,7 @@ test("guest can buy a product with manual payment", async ({ page }) => {
 
 test("customer can register and log back in", async ({ page }) => {
   const email = `customer+${Date.now()}@example.com`
-  const password = "Sup3r-secret-pass"
+  const password = `Pw-${randomUUID()}`
 
   await page.goto(`/${COUNTRY}/auth/register`)
   const form = page

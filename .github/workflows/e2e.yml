@@ -15,16 +15,13 @@ env:
   NODE_VERSION: "22"
   PNPM_VERSION: "10.15.1"
 
-  DATABASE_URL: postgres://postgres:postgres@localhost:5432/medusa
+  DATABASE_URL: postgres://postgres@localhost:5432/medusa
   REDIS_URL: redis://localhost:6379
-  JWT_SECRET: ci-jwt-secret
-  COOKIE_SECRET: ci-cookie-secret
   BACKEND_URL: http://localhost:9000
   STOREFRONT_URL: http://localhost:8000
   STORE_CORS: http://localhost:8000
   ADMIN_CORS: http://localhost:9000
   AUTH_CORS: http://localhost:8000,http://localhost:9000
-  STOREFRONT_REVALIDATE_SECRET: ci-revalidate-secret
   # Uploads (the seed's product and collection images) go to disk and are served from /static.
   MEDUSA_FILE_STORAGE: local
 
@@ -43,7 +40,7 @@ jobs:
         image: postgres:16
         env:
           POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
+          POSTGRES_HOST_AUTH_METHOD: trust
           POSTGRES_DB: medusa
         ports:
           - 5432:5432
@@ -63,6 +60,14 @@ jobs:
           --health-retries 10
 
     steps:
+      - name: Generate test secrets
+        run: |
+          for name in JWT_SECRET COOKIE_SECRET STOREFRONT_REVALIDATE_SECRET; do
+            value=$(openssl rand -hex 32)
+            echo "::add-mask::$value"
+            echo "$name=$value" >> "$GITHUB_ENV"
+          done
+
       - uses: actions/checkout@v4
 
       - uses: pnpm/action-setup@v4
@@ -108,7 +113,7 @@ jobs:
 
       - name: Read publishable key
         run: |
-          key=$(PGPASSWORD=postgres psql -h localhost -U postgres -d medusa -tAc \
+          key=$(psql -h localhost -U postgres -d medusa -tAc \
             "select token from api_key where type = 'publishable' and revoked_at is null order by created_at limit 1")
           test -n "$key"
           echo "NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=$key" >> "$GITHUB_ENV"
