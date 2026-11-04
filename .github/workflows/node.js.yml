@@ -4,10 +4,10 @@
 name: PR test
 
 on:
-  pull_request_target:
+  pull_request:
     types: [assigned, opened, synchronize, reopened]
     branches: [master]
-    paths: ["storefront/**"]
+    paths: ["storefront/**", ".github/workflows/node.js.yml"]
 
 jobs:
   lint-storefront:
@@ -20,22 +20,26 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.1
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          cache: "yarn"
-          cache-dependency-path: "storefront/yarn.lock"
-      - run: yarn install --frozen-lockfile
+          cache: "pnpm"
+          cache-dependency-path: "storefront/pnpm-lock.yaml"
+      - run: pnpm install --frozen-lockfile
         working-directory: storefront
-      - run: yarn lint
+      - run: pnpm lint
         working-directory: storefront
         env:
           NODE_ENV: production
           NEXT_PUBLIC_MEDUSA_BACKEND_URL: ${{ secrets.NEXT_PUBLIC_MEDUSA_BACKEND_URL }}
           NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY }}
           NEXT_PUBLIC_STRIPE_KEY: ${{ secrets.NEXT_PUBLIC_STRIPE_KEY }}
-          REVALIDATE_SECRET: ${{ secrets.REVALIDATE_SECRET }}
+          STOREFRONT_REVALIDATE_SECRET: ${{ secrets.REVALIDATE_SECRET }}
           DISALLOW_ROBOTS: true
           NEXT_PUBLIC_DEFAULT_REGION: ng
           NEXT_PUBLIC_FEATURE_SEARCH_ENABLED: false
