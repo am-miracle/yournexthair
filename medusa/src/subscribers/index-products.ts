@@ -6,6 +6,10 @@ export default async function indexProductHandler({
   event: { data, name },
   container,
 }: SubscriberArgs<{ id: string }>) {
+  if (!container.hasRegistration("meilisearchService")) {
+    return
+  }
+
   const productId = data.id
 
   const logger = container.resolve("logger")

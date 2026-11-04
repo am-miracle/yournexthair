@@ -76,6 +76,7 @@ export default async function sendOrderConfirmationHandler({
     entity: 'order',
     fields: [
       'id',
+      'display_id',
       'currency_code',
       'total',
       'subtotal',
@@ -108,6 +109,7 @@ export default async function sendOrderConfirmationHandler({
     filters: { id: data.id },
   })) as QueryGraphResult<{
     id: string;
+    display_id: string | null;
     currency_code: string;
     total: MathBNInput | null;
     subtotal: MathBNInput | null;

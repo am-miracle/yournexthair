@@ -1,21 +1,14 @@
-// Uncomment this file to enable instrumentation and observability using OpenTelemetry
-// Refer to the docs for installation instructions: https://docs.medusajs.com/v2/debugging-and-testing/instrumentation
+import * as Sentry from "@sentry/node"
 
-// import { registerOtel } from "@medusajs/medusa"
-// import { ZipkinExporter } from "@opentelemetry/exporter-zipkin"
+// Better Stack ingests Sentry SDK events; SENTRY_DSN is the Better Stack application DSN.
+export function register() {
+  if (!process.env.SENTRY_DSN) {
+    return
+  }
 
-// const exporter = new ZipkinExporter({
-//   serviceName: "my-medusa-project",
-// })
-
-// export function register() {
-//   registerOtel({
-//     serviceName: "medusajs",
-//     exporter,
-//     instrument: {
-//       http: true,
-//       workflows: true,
-//       remoteQuery: true,
-//     },
-//   })
-// }
+  Sentry.init({
+    dsn: process.env.SENTRY_DSN,
+    environment: process.env.NODE_ENV ?? "development",
+    tracesSampleRate: 0,
+  })
+}

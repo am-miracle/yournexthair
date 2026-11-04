@@ -15,6 +15,7 @@
   "scripts": {
     "build": "medusa build",
     "seed": "medusa exec ./src/scripts/seed.ts",
+    "seed:catalog": "medusa exec ./src/scripts/seed-catalog.ts",
     "start": "medusa start",
     "dev": "medusa develop",
     "lint": "eslint src medusa-config.ts jest.config.ts instrumentation.ts eslint.config.mjs",
@@ -34,8 +35,8 @@
     "@medusajs/types": "2.15.5",
     "@medusajs/ui": "4.1.15",
     "@react-email/components": "^1.0.12",
+    "@sentry/node": "^11.10.0",
     "@tanstack/react-query": "5.100.14",
-    "medusa-payment-paystack": "^2.1.0",
     "meilisearch": "0.58.0",
     "posthog-node": "^5.35.6",
     "react-dropzone": "^15.0.0",

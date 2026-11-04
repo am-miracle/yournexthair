@@ -18,7 +18,7 @@ export default function AuthPasswordResetEmail({
     <EmailLayout {...emailLayoutProps}>
       <Heading className="text-2xl mt-0 mb-10 font-medium">Reset your password</Heading>
       <Text className="text-md mb-10!">
-        We received a request to reset your Sofa Society account password. Click below to set a new
+        We received a request to reset your YourNextHair account password. Click below to set a new
         password:
       </Text>
       <Button

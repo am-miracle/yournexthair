@@ -33,6 +33,9 @@ const Shipping = ({ cart }: { cart: StoreCart }) => {
   const {
     data: availableShippingMethods,
     error: shippingMethodsError,
+    isPending: shippingMethodsPending,
+    isFetching: shippingMethodsFetching,
+    refetch: refetchShippingMethods,
   } = useCartShippingMethods(cart.id)
 
   const { mutate, isPending } = useSetShippingMethod({ cartId: cart.id })
@@ -81,11 +84,14 @@ const Shipping = ({ cart }: { cart: StoreCart }) => {
           )}
       </div>
       {isOpen ? (
-        shippingMethodsError ? (
+        shippingMethodsPending ? (
+          <p role="status" aria-live="polite">Getting delivery options…</p>
+        ) : shippingMethodsError ? (
           <div role="status" aria-live="polite">
             <p className="text-red-900">
               We couldn&apos;t load shipping methods right now. Please try again.
             </p>
+            <Button variant="link" onPress={() => { void refetchShippingMethods() }} isLoading={shippingMethodsFetching}>Try again</Button>
           </div>
         ) : shippingMethodOptions.length === 0 ? (
           <div role="status" aria-live="polite">
@@ -126,7 +132,7 @@ const Shipping = ({ cart }: { cart: StoreCart }) => {
             <Button
               onPress={handleSubmit}
               isLoading={isPending}
-              isDisabled={!cart.shipping_methods?.[0]}
+              isDisabled={!selectedShippingMethod || shippingMethodsFetching || isPending}
             >
               Next
             </Button>

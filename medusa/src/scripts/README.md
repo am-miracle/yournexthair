@@ -62,3 +62,19 @@ Then, pass the arguments in the `exec` command after the file path:
 ```bash
 npx medusa exec ./src/scripts/my-script.ts arg1 arg2
 ```
+## Seed the local storefront catalog
+
+From `medusa`, run `pnpm seed:catalog`. This ensures regions, categories,
+collections, product types, a default shipping profile and sales channel, then
+creates five published demo products with two length variants and NGN/USD prices.
+Existing products with the same handles are preserved. Existing publishable keys
+are linked to the default sales channel so the storefront can see the catalog.
+
+Images reference `storefront/public/images/content` through `STOREFRONT_URL`
+(default `http://localhost:8000`); keep the storefront running to serve them.
+Collection images use stable public-asset identifiers rather than uploaded files.
+All prices and hair specifications are illustrative and should be reviewed in
+Admin before using this catalog for real orders. Inventory tracking is disabled
+for these demo variants. This seed does not create shipping rates or stock locations.
+
+Run `pnpm exec medusa exec ./src/scripts/index-products.ts` to refresh search.

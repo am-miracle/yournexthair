@@ -6,12 +6,8 @@ export const paymentInfoMap: Record<
   string,
   { title: string; icon: React.JSX.Element }
 > = {
-  pp_flutterwave_flutterwave: {
+  pp_bachs_bachs: {
     title: "Card / Bank Transfer / Mobile Money",
-    icon: <CreditCard />,
-  },
-  pp_paystack_paystack: {
-    title: "Paystack (Cards, Bank, USSD)",
     icon: <CreditCard />,
   },
   pp_system_default: {
@@ -20,11 +16,8 @@ export const paymentInfoMap: Record<
   },
 }
 
-export const isFlutterwave = (providerId?: string) =>
-  providerId?.startsWith("pp_flutterwave")
-
-export const isPaystack = (providerId?: string) =>
-  providerId?.startsWith("pp_paystack")
+export const isBachs = (providerId?: string) =>
+  providerId?.startsWith("pp_bachs")
 
 export const isManual = (providerId?: string) =>
   providerId?.startsWith("pp_system_default")

@@ -63,8 +63,7 @@ async function getImageUrlContent(url: string) {
 
 const NGN_PER_USD = 1600
 const MANUAL_PAYMENT_PROVIDER_ID = "pp_system_default"
-const FLUTTERWAVE_PAYMENT_PROVIDER_ID = "pp_flutterwave_flutterwave"
-const PAYSTACK_PAYMENT_PROVIDER_ID = "pp_paystack_paystack"
+const BACHS_PAYMENT_PROVIDER_ID = "pp_bachs_bachs"
 
 type SeedPrice = {
   amount: number
@@ -151,9 +150,26 @@ export default async function seedDemoData({ container }: ExecArgs) {
     "sa",
     "qa",
     "nz",
+    "de",
+    "fr",
+    "es",
+    "it",
+    "nl",
+    "be",
+    "se",
+    "no",
+    "dk",
+    "fi",
+    "ie",
+    "pt",
+    "ch",
+    "at",
+    "pl",
+    "cz",
+    "hu",
+    "hr",
   ]
-  const eurCountries = ["de", "fr", "es", "it", "nl", "be", "se", "no", "dk", "fi", "ie", "pt", "ch", "at", "pl", "cz", "hu", "hr"]
-  const countries = [...nigeriaCountries, ...usdCountries, ...eurCountries]
+  const countries = [...nigeriaCountries, ...usdCountries]
 
   logger.info("Seeding store data...")
   const store = requireFirst(
@@ -182,15 +198,8 @@ export default async function seedDemoData({ container }: ExecArgs) {
   ).id
 
   logger.info("Seeding region data...")
-  const nigeriaPaymentProviders = [
-    ...(process.env.FLW_SECRET_KEY ? [FLUTTERWAVE_PAYMENT_PROVIDER_ID] : []),
-    ...(process.env.PAYSTACK_SECRET_KEY ? [PAYSTACK_PAYMENT_PROVIDER_ID] : []),
-  ]
-  const internationalPaymentProviders = process.env.FLW_SECRET_KEY
-    ? [FLUTTERWAVE_PAYMENT_PROVIDER_ID]
-    : [MANUAL_PAYMENT_PROVIDER_ID]
-  const europePaymentProviders = process.env.FLW_SECRET_KEY
-    ? [FLUTTERWAVE_PAYMENT_PROVIDER_ID]
+  const paymentProviders = process.env.BACHS_SECRET_KEY
+    ? [BACHS_PAYMENT_PROVIDER_ID]
     : [MANUAL_PAYMENT_PROVIDER_ID]
 
   const desiredRegions = [
@@ -198,22 +207,13 @@ export default async function seedDemoData({ container }: ExecArgs) {
       name: "Nigeria",
       currency_code: "ngn",
       countries: nigeriaCountries,
-      payment_providers:
-        nigeriaPaymentProviders.length > 0
-          ? nigeriaPaymentProviders
-          : [MANUAL_PAYMENT_PROVIDER_ID],
+      payment_providers: paymentProviders,
     },
     {
       name: "International",
       currency_code: "usd",
       countries: usdCountries,
-      payment_providers: internationalPaymentProviders,
-    },
-    {
-      name: "Europe",
-      currency_code: "eur",
-      countries: eurCountries,
-      payment_providers: europePaymentProviders,
+      payment_providers: paymentProviders,
     },
   ]
 
@@ -234,7 +234,6 @@ export default async function seedDemoData({ container }: ExecArgs) {
   const regionResult = [...existingRegions, ...createdRegions]
   const nigeriaRegion = requireFound(regionResult, (region) => region.name === "Nigeria", 'Expected "Nigeria" region to exist while seeding demo data.')
   requireFound(regionResult, (region) => region.name === "International", 'Expected "International" region to exist while seeding demo data.')
-  requireFound(regionResult, (region) => region.name === "Europe", 'Expected "Europe" region to exist while seeding demo data.')
   logger.info("Finished seeding regions.")
 
   await updateStoresWorkflow(container).run({
@@ -263,6 +262,7 @@ export default async function seedDemoData({ container }: ExecArgs) {
   await createTaxRegionsWorkflow(container).run({
     input: countries.map((country_code) => ({
       country_code,
+      provider_id: "tp_system",
     })),
   })
   logger.info("Finished seeding tax regions.")

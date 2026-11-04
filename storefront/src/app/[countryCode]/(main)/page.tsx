@@ -2,6 +2,8 @@ import { Metadata } from "next"
 import Image from "next/image"
 import { getRegion } from "@lib/data/regions"
 import { getProductTypesList } from "@lib/data/product-types"
+import { getProductsList } from "@lib/data/products"
+import ProductPreview from "@modules/products/components/product-preview"
 import { SITE_DESCRIPTION, getCanonicalPath } from "@lib/util/seo"
 import { Layout, LayoutColumn } from "@/components/Layout"
 import { LocalizedLink } from "@/components/LocalizedLink"
@@ -29,9 +31,9 @@ const ProductTypesSection: React.FC = async () => {
         <h3 className="text-md md:text-2xl mb-8 md:mb-15">Shop by category</h3>
       </LayoutColumn>
       <LayoutColumn className="col-span-full">
-        <div className="flex items-start gap-x-3 gap-y-8 md:gap-x-10 md:gap-y-12">
+        <div className="grid grid-cols-1 items-start gap-x-3 gap-y-8 sm:grid-cols-2 md:gap-x-10 md:gap-y-12 lg:grid-cols-4">
           {productTypes.productTypes.map((productType, index) => (
-            <div key={productType.id} className="w-full">
+            <div key={productType.id} className="min-w-0">
               <LocalizedLink
                 href={`/store?type=${productType.value}`}
                 className="group block"
@@ -57,7 +59,7 @@ const ProductTypesSection: React.FC = async () => {
                       </div>
                     </div>
                   )}
-                <div className="flex items-center justify-between gap-3 border-b border-grayscale-200 pb-3 transition-colors duration-300 group-hover:border-black md:pb-4">
+                <div className="flex flex-wrap items-center justify-between gap-3 border-b border-grayscale-200 pb-3 transition-colors duration-300 group-hover:border-black md:pb-4">
                   <p className="text-xs md:text-md">{productType.value}</p>
                   <span className="inline-flex items-center gap-2 text-[0.65rem] font-semibold uppercase tracking-[0.22em] text-grayscale-500 transition-colors duration-300 group-hover:text-black">
                     Explore
@@ -72,6 +74,31 @@ const ProductTypesSection: React.FC = async () => {
           ))}
         </div>
       </LayoutColumn>
+    </Layout>
+  )
+}
+
+async function ProductsSection({ countryCode }: { countryCode: string }) {
+  const { response: { products } } = await getProductsList({
+    countryCode,
+    queryParams: { limit: 6 },
+  })
+
+  if (!products.length) return null
+
+  return (
+    <Layout className="mb-26 gap-y-8 md:mb-36 md:gap-y-12">
+      <LayoutColumn className="col-span-full">
+        <div className="flex items-center justify-between gap-4">
+          <h2 className="text-md md:text-2xl">Shop our hair</h2>
+          <LocalizedLink href="/store" variant="underline">View all</LocalizedLink>
+        </div>
+      </LayoutColumn>
+      {products.map((product) => (
+        <LayoutColumn key={product.id} className="col-span-6! md:col-span-4!">
+          <ProductPreview product={product} />
+        </LayoutColumn>
+      ))}
     </Layout>
   )
 }
@@ -134,6 +161,7 @@ export default async function Home({ params }: { params: Promise<{ countryCode: 
           </LayoutColumn>
         </Layout>
         <ProductTypesSection />
+        <ProductsSection countryCode={countryCode} />
         <CollectionsSection className="mb-22 md:mb-36" />
         <Layout>
           <LayoutColumn className="col-span-full">

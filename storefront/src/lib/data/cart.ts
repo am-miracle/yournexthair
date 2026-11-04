@@ -235,23 +235,6 @@ export async function setShippingMethod({
     .catch(medusaError)
 }
 
-export async function recordFlutterwaveTransaction(
-  sessionId: string,
-  transactionId: number,
-  txRef: string
-): Promise<{ success: boolean; error?: string }> {
-  return sdk.client
-    .fetch<{ success: boolean; error?: string }>(
-      "/store/payment/flutterwave/callback",
-      {
-        method: "POST",
-        body: { session_id: sessionId, transaction_id: transactionId, tx_ref: txRef },
-        headers: { ...(await getAuthHeaders()) },
-      }
-    )
-    .catch(medusaError) as Promise<{ success: boolean; error?: string }>
-}
-
 export async function initiatePaymentSession(provider_id: unknown) {
   const cart = await retrieveCart()
 
@@ -263,6 +246,11 @@ export async function initiatePaymentSession(provider_id: unknown) {
     throw new Error("Invalid payment provider")
   }
 
+  const address = cart.billing_address ?? cart.shipping_address
+  const customerName = [address?.first_name, address?.last_name]
+    .filter(Boolean)
+    .join(" ")
+
   return sdk.store.payment
     .initiatePaymentSession(
       cart,
@@ -270,6 +258,8 @@ export async function initiatePaymentSession(provider_id: unknown) {
         provider_id,
         data: {
           email: cart.email,
+          country_code: cart.shipping_address?.country_code,
+          ...(customerName ? { customer_name: customerName } : {}),
         },
       },
       {},
@@ -388,6 +378,12 @@ export async function placeOrder() {
 
   if (cartRes?.type === "order") {
     await removeCartId()
+    const countryCode =
+      cartRes.order.shipping_address?.country_code?.toLowerCase() ??
+      process.env.NEXT_PUBLIC_DEFAULT_REGION ??
+      "ng"
+    // Redirect here: clearing the cart cookie re-renders the checkout page, which 404s without a cart.
+    redirect(`/${countryCode}/order/confirmed/${cartRes.order.id}`)
   }
 
   return cartRes

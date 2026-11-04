@@ -77,6 +77,12 @@ async function getCountryCode(
 export async function proxy(request: NextRequest) {
   const regionMap = await getRegionMap()
   const countryCode = regionMap && (await getCountryCode(request, regionMap))
+  if (!countryCode) {
+    return new NextResponse(
+      "Store unavailable: configure a region with at least one country in Medusa Admin, then reload this page.",
+      { status: 503, headers: { "Content-Type": "text/plain; charset=utf-8" } },
+    )
+  }
   const firstPathSegment = request.nextUrl.pathname.split("/")[1]
 
   const urlHasCountryCode = !!countryCode && !!firstPathSegment?.includes(countryCode)

@@ -35,8 +35,7 @@ export default function OrderUpdateEmail({
         Order details
       </Button>
       <Text className="text-md m-0">
-        Thank you for choosing Sofa Society. We&apos;re excited for your new sofa to find its home
-        with you!
+        Thank you for choosing YourNextHair. We&apos;re excited for you to enjoy your new hair!
       </Text>
     </EmailLayout>
   )
