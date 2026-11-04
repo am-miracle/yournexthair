@@ -104,6 +104,19 @@ module.exports = defineConfig({
   },
   modules: [
     {
+      resolve: "@medusajs/medusa/fulfillment",
+      options: {
+        providers: [
+          { resolve: "@medusajs/medusa/fulfillment-manual", id: "manual" },
+          ...(process.env.TERMINAL_SECRET_KEY ? [{
+            resolve: "./src/modules/terminal-shipping",
+            id: "terminal",
+            options: { api_key: process.env.TERMINAL_SECRET_KEY },
+          }] : []),
+        ],
+      },
+    },
+    {
       resolve: "@medusajs/medusa/payment",
       options: {
         providers: [
