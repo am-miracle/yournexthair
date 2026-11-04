@@ -153,31 +153,37 @@ module.exports = defineConfig({
       resolve: "@medusajs/medusa/notification",
       options: {
         providers: [
-          {
-            resolve: "./src/modules/resend",
-            id: "resend",
-            options: {
-              channels: ["email"],
-              api_key: process.env.RESEND_API_KEY,
-              from: process.env.RESEND_FROM,
-              siteTitle: "YourNextHair.",
-              companyName: "YourNextHair",
-              footerLinks: [
-                {
-                  url: "https://agilo.com",
-                  label: "Agilo",
+          process.env.RESEND_API_KEY
+            ? {
+                resolve: "./src/modules/resend",
+                id: "resend",
+                options: {
+                  channels: ["email"],
+                  api_key: process.env.RESEND_API_KEY,
+                  from: process.env.RESEND_FROM,
+                  siteTitle: "YourNextHair.",
+                  companyName: "YourNextHair",
+                  footerLinks: [
+                    {
+                      url: "https://agilo.com",
+                      label: "Agilo",
+                    },
+                    {
+                      url: "https://www.instagram.com/agiloltd/",
+                      label: "Instagram",
+                    },
+                    {
+                      url: "https://www.linkedin.com/company/agilo/",
+                      label: "LinkedIn",
+                    },
+                  ],
                 },
-                {
-                  url: "https://www.instagram.com/agiloltd/",
-                  label: "Instagram",
-                },
-                {
-                  url: "https://www.linkedin.com/company/agilo/",
-                  label: "LinkedIn",
-                },
-              ],
-            },
-          },
+              }
+            : {
+                resolve: "@medusajs/medusa/notification-local",
+                id: "local",
+                options: { channels: ["email"] },
+              },
         ],
       },
     },
