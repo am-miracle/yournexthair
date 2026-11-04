@@ -15,6 +15,7 @@
   "scripts": {
     "build": "medusa build",
     "seed": "medusa exec ./src/scripts/seed.ts",
+    "seed:catalog": "medusa exec ./src/scripts/seed-catalog.ts",
     "start": "medusa start",
     "dev": "medusa develop",
     "lint": "eslint src medusa-config.ts jest.config.ts instrumentation.ts eslint.config.mjs",

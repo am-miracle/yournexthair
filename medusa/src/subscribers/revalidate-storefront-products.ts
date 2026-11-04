@@ -7,6 +7,15 @@ const PRODUCT_REVALIDATION_EVENTS = [
   "product-variant.created",
   "product-variant.updated",
   "product-variant.deleted",
+  "product-collection.created",
+  "product-collection.updated",
+  "product-collection.deleted",
+  "product-type.created",
+  "product-type.updated",
+  "product-type.deleted",
+  "product-category.created",
+  "product-category.updated",
+  "product-category.deleted",
 ] as const
 
 export default async function revalidateStorefrontProductsHandler({
@@ -31,7 +40,7 @@ export default async function revalidateStorefrontProductsHandler({
       authorization: `Bearer ${revalidateSecret}`,
     },
     body: JSON.stringify({
-      tags: ["products"],
+      tags: ["products", "collections", "product-types", "product-categories"],
       event: event.name,
     }),
   }).catch((error) => {

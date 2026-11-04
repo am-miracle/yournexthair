@@ -12,6 +12,8 @@ const nextConfig: NextConfig = {
     staticGenerationRetryCount: 3,
   },
   images: {
+    // Local seed images and local object storage resolve to private addresses.
+    dangerouslyAllowLocalIP: process.env.NODE_ENV === "development",
     qualities: [50, 75, 90],
     remotePatterns: [
       {

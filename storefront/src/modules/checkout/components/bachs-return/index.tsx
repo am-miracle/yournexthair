@@ -32,7 +32,12 @@ const BachsReturn = ({ countryCode }: { countryCode: string }) => {
       try {
         const result = await placeOrder(null)
 
-        if (result?.type === "order") {
+        // placeOrder redirects to the confirmation page once the order exists.
+        if (!result) {
+          return
+        }
+
+        if (result.type === "order") {
           const orderCountry =
             result.order.shipping_address?.country_code?.toLowerCase() ?? countryCode
           router.replace(`/${orderCountry}/order/confirmed/${result.order.id}`)

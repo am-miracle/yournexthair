@@ -378,6 +378,12 @@ export async function placeOrder() {
 
   if (cartRes?.type === "order") {
     await removeCartId()
+    const countryCode =
+      cartRes.order.shipping_address?.country_code?.toLowerCase() ??
+      process.env.NEXT_PUBLIC_DEFAULT_REGION ??
+      "ng"
+    // Redirect here: clearing the cart cookie re-renders the checkout page, which 404s without a cart.
+    redirect(`/${countryCode}/order/confirmed/${cartRes.order.id}`)
   }
 
   return cartRes
