@@ -58,7 +58,7 @@ test("guest can buy a product with manual payment", async ({ page }) => {
 
 test("customer can register and log back in", async ({ page }) => {
   const email = `customer+${Date.now()}@example.com`
-  const password = `Pw-${randomUUID()}`
+  const loginPhrase = randomUUID()
 
   await page.goto(`/${COUNTRY}/auth/register`)
   const form = page
@@ -67,8 +67,8 @@ test("customer can register and log back in", async ({ page }) => {
   await form.getByPlaceholder("First name").fill("Ada")
   await form.getByPlaceholder("Last name").fill("Obi")
   await form.getByPlaceholder("Email").fill(email)
-  await form.getByPlaceholder("Password", { exact: true }).fill(password)
-  await form.getByPlaceholder("Confirm password").fill(password)
+  await form.getByPlaceholder("Password", { exact: true }).fill(loginPhrase)
+  await form.getByPlaceholder("Confirm password").fill(loginPhrase)
   await form.getByRole("button", { name: "Create account" }).click()
   await page.waitForURL((url) => !url.pathname.includes("/auth/register"))
 
@@ -77,7 +77,7 @@ test("customer can register and log back in", async ({ page }) => {
   await page.goto(`/${COUNTRY}/auth/login`)
   const login = page.locator("form").filter({ has: page.getByRole("button", { name: "Log in" }) })
   await login.getByPlaceholder("Email").fill(email)
-  await login.getByPlaceholder("Password").fill(password)
+  await login.getByPlaceholder("Password").fill(loginPhrase)
   await login.getByRole("button", { name: "Log in" }).click()
   await page.waitForURL((url) => !url.pathname.includes("/auth/login"))
 
