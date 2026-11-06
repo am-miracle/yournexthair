@@ -91,12 +91,17 @@ module.exports = defineConfig({
   },
   projectConfig: {
     ...(process.env.DATABASE_URL ? { databaseUrl: process.env.DATABASE_URL } : {}),
+    ...(process.env.DATABASE_SSL_MODE === "disable"
+      ? { databaseDriverOptions: { connection: { ssl: false } } }
+      : {}),
     ...(process.env.REDIS_URL ? { redisUrl: process.env.REDIS_URL } : {}),
     workerMode: workerMode(process.env.MEDUSA_WORKER_MODE),
     http: {
-      storeCors: process.env.STORE_CORS ?? "http://localhost:8000",
-      adminCors: process.env.ADMIN_CORS ?? "http://localhost:5173,http://localhost:9000",
-      authCors: process.env.AUTH_CORS ?? "http://localhost:8000,http://localhost:5173,http://localhost:9000",
+      storeCors: process.env.STORE_CORS ?? process.env.STOREFRONT_URL ?? "http://localhost:8000",
+      adminCors: process.env.ADMIN_CORS ?? process.env.BACKEND_URL ?? "http://localhost:5173,http://localhost:9000",
+      authCors: process.env.AUTH_CORS ??
+        ([process.env.STOREFRONT_URL, process.env.BACKEND_URL].filter(Boolean).join(",") ||
+          "http://localhost:8000,http://localhost:5173,http://localhost:9000"),
       jwtSecret: requireSecret("JWT_SECRET"),
       cookieSecret: requireSecret("COOKIE_SECRET"),
       jwtExpiresIn: process.env.JWT_EXPIRES_IN || "24h",

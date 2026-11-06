@@ -5,7 +5,7 @@ import { TerminalClient } from "../client"
 jest.mock("@medusajs/framework/utils", () => ({
   AbstractFulfillmentProviderService: class {},
   MedusaError: class extends Error {
-    static Types = { INVALID_DATA: "invalid_data", UNEXPECTED_STATE: "unexpected_state", NOT_ALLOWED: "not_allowed" }
+    static Types: Record<string, string> = { INVALID_DATA: "invalid_data", UNEXPECTED_STATE: "unexpected_state", NOT_ALLOWED: "not_allowed" }
     constructor(_type: string, message: string) { super(message) }
   },
 }))

@@ -1,0 +1,83 @@
+# yaml-language-server: $schema=https://render.com/schema/render.yaml.json
+services:
+  - type: web
+    name: yournexthair-api-dev
+    runtime: node
+    branch: develop
+    region: frankfurt
+    plan: 1c-2g
+    rootDir: medusa
+    autoDeployTrigger: 'off'
+    buildCommand: >-
+      corepack enable && pnpm install --frozen-lockfile --prod=false && pnpm build && cp pnpm-lock.yaml .npmrc
+      .medusa/server/ && cd .medusa/server && pnpm install --frozen-lockfile --prod
+    preDeployCommand: 'cd .medusa/server && pnpm exec medusa db:migrate'
+    startCommand: cd .medusa/server && pnpm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_VERSION
+        value: 22.23.4
+      - key: NODE_ENV
+        value: production
+      - key: APP_ENV
+        value: development
+      - key: PORT
+        value: '9000'
+      - key: HOST
+        value: 0.0.0.0
+      - key: MEDUSA_WORKER_MODE
+        value: shared
+      - key: DATABASE_URL
+        fromDatabase:
+          name: yournexthair-db-dev
+          property: connectionString
+      - key: DATABASE_SSL_MODE
+        value: disable
+      - key: REDIS_URL
+        fromService:
+          type: keyvalue
+          name: yournexthair-redis-dev
+          property: connectionString
+      - key: BACKEND_URL
+        fromService:
+          type: web
+          name: yournexthair-api-dev
+          envVarKey: RENDER_EXTERNAL_URL
+      - key: STOREFRONT_URL
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: COOKIE_SECRET
+        generateValue: true
+      - key: STOREFRONT_REVALIDATE_SECRET
+        generateValue: true
+      - key: S3_FILE_URL
+        sync: false
+      - key: S3_ACCESS_KEY_ID
+        sync: false
+      - key: S3_SECRET_ACCESS_KEY
+        sync: false
+      - key: S3_REGION
+        sync: false
+      - key: S3_BUCKET
+        sync: false
+      - key: S3_ENDPOINT
+        sync: false
+      - key: S3_FORCE_PATH_STYLE
+        value: 'true'
+  - type: keyvalue
+    name: yournexthair-redis-dev
+    region: frankfurt
+    plan: 256mb
+    maxmemoryPolicy: noeviction
+    persistenceMode: journal-snapshot
+    ipAllowList: []
+databases:
+  - name: yournexthair-db-dev
+    region: frankfurt
+    plan: 0.1c-256mb
+    postgresMajorVersion: '16'
+    databaseName: yournexthair_dev
+    user: yournexthair_dev
+    diskSizeGB: 5
+    ipAllowList: []

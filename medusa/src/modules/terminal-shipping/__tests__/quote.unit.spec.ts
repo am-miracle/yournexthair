@@ -3,7 +3,7 @@ import { buildQuoteRequest, selectRate, type ShippingContext } from "../quote"
 // The quote logic only needs Medusa's error contract, not the application loader.
 jest.mock("@medusajs/framework/utils", () => ({
   MedusaError: class extends Error {
-    static Types = { INVALID_DATA: "invalid_data" }
+    static Types: Record<string, string> = { INVALID_DATA: "invalid_data" }
     constructor(_type: string, message: string) { super(message) }
   },
 }))
