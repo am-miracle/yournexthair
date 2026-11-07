@@ -63,5 +63,8 @@
     "vitest": "^4.1.8",
     "webpack": "^5.107.2"
   },
-  "packageManager": "pnpm@10.15.1"
+  "packageManager": "pnpm@10.15.1",
+  "engines": {
+    "node": "24.x"
+  }
 }

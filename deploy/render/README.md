@@ -17,6 +17,11 @@ Vercel project; cross-provider variables are not synchronized automatically.
 Hosted dev uses production builds too: `NODE_ENV=production`,
 `APP_ENV=development`. Neither application is a static export.
 
+Both apps target Node 24 LTS (`24.x`), matching the Render Blueprints, Docker
+image and CI. Vercel reads `storefront/package.json` for the Node major version.
+The major is constrained to 24 while patch updates are picked up on new builds.
+For local work, use `nvm install` and `nvm use` from the repository root.
+
 ## Start here: free development setup
 
 1. In Render → New → Blueprint, use the `develop` branch and
@@ -141,7 +146,7 @@ backend revalidation. In each, import `am-miracle/yournexthair` and set:
 | Root Directory | `storefront` | `storefront` |
 | Framework | Next.js | Next.js |
 | Production Branch | `master` | `develop` |
-| Node.js | 22.x | 22.x |
+| Node.js | 24.x | 24.x |
 | Install command | `pnpm install --frozen-lockfile` | same |
 | Build command | `pnpm build` | same |
 | Output Directory | Leave Next.js default | same |

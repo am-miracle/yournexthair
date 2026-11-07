@@ -1,4 +1,4 @@
-FROM node:22-slim AS build
+FROM node:24-slim AS build
 WORKDIR /app
 RUN corepack enable
 
@@ -17,7 +17,7 @@ RUN cp pnpm-lock.yaml .npmrc .medusa/server/ \
   && cd .medusa/server \
   && pnpm install --frozen-lockfile --prod
 
-FROM node:22-slim
+FROM node:24-slim
 WORKDIR /app
 ENV NODE_ENV=production
 COPY --from=build /app/.medusa/server ./

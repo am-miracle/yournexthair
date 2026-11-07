@@ -17,7 +17,7 @@ services:
     healthCheckPath: /health
     envVars:
       - key: NODE_VERSION
-        value: 22.23.4
+        value: 24.x
       - key: NODE_ENV
         value: production
       - key: APP_ENV
