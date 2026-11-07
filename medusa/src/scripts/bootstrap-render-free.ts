@@ -16,7 +16,9 @@ export default async function bootstrapRenderFree(args: ExecArgs) {
     const auth: IAuthModuleService = container.resolve(Modules.AUTH)
     const [existing] = await users.listUsers({ email })
     if (!existing) {
-      const { result } = await createUsersWorkflow(container).run({ input: { users: [{ email, roles: ["role_super_admin"] }] } })
+      // RBAC is optional and is not enabled in this application's configuration.
+      // Explicit role IDs would make the workflow resolve a missing RBAC module.
+      const { result } = await createUsersWorkflow(container).run({ input: { users: [{ email }] } })
       const user = result[0]
       if (!user) throw new Error("Could not create the initial Admin user.")
       try {
