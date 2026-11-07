@@ -5,14 +5,15 @@ services:
     runtime: node
     branch: develop
     region: frankfurt
-    plan: 1c-2g
+    plan: free
     rootDir: medusa
     autoDeployTrigger: 'off'
     buildCommand: >-
       corepack enable && pnpm install --frozen-lockfile --prod=false && pnpm build && cp pnpm-lock.yaml .npmrc
       .medusa/server/ && cd .medusa/server && pnpm install --frozen-lockfile --prod
-    preDeployCommand: 'cd .medusa/server && pnpm exec medusa db:migrate'
-    startCommand: cd .medusa/server && pnpm start
+    startCommand: >-
+      cd .medusa/server && pnpm exec medusa db:migrate && pnpm exec medusa exec
+      ./src/scripts/bootstrap-render-free.js && pnpm start
     healthCheckPath: /health
     envVars:
       - key: NODE_VERSION
@@ -28,11 +29,7 @@ services:
       - key: MEDUSA_WORKER_MODE
         value: shared
       - key: DATABASE_URL
-        fromDatabase:
-          name: yournexthair-db-dev
-          property: connectionString
-      - key: DATABASE_SSL_MODE
-        value: disable
+        sync: false
       - key: REDIS_URL
         fromService:
           type: keyvalue
@@ -65,19 +62,14 @@ services:
         sync: false
       - key: S3_FORCE_PATH_STYLE
         value: 'true'
+      - key: INITIAL_ADMIN_EMAIL
+        sync: false
+      - key: INITIAL_ADMIN_PASSWORD
+        sync: false
   - type: keyvalue
     name: yournexthair-redis-dev
     region: frankfurt
-    plan: 256mb
+    plan: free
     maxmemoryPolicy: noeviction
-    persistenceMode: journal-snapshot
-    ipAllowList: []
-databases:
-  - name: yournexthair-db-dev
-    region: frankfurt
-    plan: 0.1c-256mb
-    postgresMajorVersion: '16'
-    databaseName: yournexthair_dev
-    user: yournexthair_dev
-    diskSizeGB: 5
+    persistenceMode: 'off'
     ipAllowList: []

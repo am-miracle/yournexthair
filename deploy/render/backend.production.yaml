@@ -28,11 +28,7 @@ services:
       - key: MEDUSA_WORKER_MODE
         value: shared
       - key: DATABASE_URL
-        fromDatabase:
-          name: yournexthair-db-prod
-          property: connectionString
-      - key: DATABASE_SSL_MODE
-        value: disable
+        sync: false
       - key: REDIS_URL
         fromService:
           type: keyvalue
@@ -71,13 +67,4 @@ services:
     plan: 256mb
     maxmemoryPolicy: noeviction
     persistenceMode: journal-snapshot
-    ipAllowList: []
-databases:
-  - name: yournexthair-db-prod
-    region: frankfurt
-    plan: 0.5c-1g
-    postgresMajorVersion: '16'
-    databaseName: yournexthair_prod
-    user: yournexthair_prod
-    diskSizeGB: 5
     ipAllowList: []
