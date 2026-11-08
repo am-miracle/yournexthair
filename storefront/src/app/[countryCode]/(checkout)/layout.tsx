@@ -1,4 +1,5 @@
 import * as React from "react"
+import { BrandLogo } from "@/components/BrandLogo"
 import { Metadata } from "next"
 import { Layout, LayoutColumn } from "@/components/Layout"
 import { LocalizedLink } from "@/components/LocalizedLink"
@@ -27,7 +28,7 @@ export default function CheckoutLayout({ children }: { children: React.ReactNode
         <LayoutColumn>
           <div className="flex min-h-18 items-center justify-between gap-4 py-4">
             <LocalizedLink href="/" className="text-sm font-semibold tracking-[0.18em] uppercase">
-              YourNextHair
+              <BrandLogo />
             </LocalizedLink>
             <p className="text-sm font-semibold">Checkout</p>
           </div>
@@ -49,7 +50,7 @@ export default function CheckoutLayout({ children }: { children: React.ReactNode
               href="/"
               className="mb-10 hidden text-sm font-semibold uppercase tracking-[0.18em] lg:inline-block"
             >
-              YourNextHair
+              <BrandLogo />
             </LocalizedLink>
             {children}
           </div>

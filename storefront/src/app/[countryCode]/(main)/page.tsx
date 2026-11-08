@@ -145,13 +145,6 @@ export default async function Home({ params }: { params: Promise<{ countryCode: 
         </div>
       </div>
       <div className="pt-8 pb-26 md:pt-26 md:pb-36">
-        <Layout className="mb-26 md:mb-36">
-          <LayoutColumn>
-            <LocalizedLink href="/store" variant="underline" className="md:text-md">
-              Shop now
-            </LocalizedLink>
-          </LayoutColumn>
-        </Layout>
         <ProductTypesSection />
         <ProductsSection countryCode={countryCode} />
         <CollectionsSection className="mb-22 md:mb-36" />

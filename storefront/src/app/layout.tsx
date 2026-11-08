@@ -12,6 +12,13 @@ import { WebMCPProvider } from "@lib/webmcp/WebMCPProvider"
 export const metadata: Metadata = {
   metadataBase: new URL(getBaseURL()),
   applicationName: SITE_NAME,
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon.svg", type: "image/svg+xml" },
+    ],
+    apple: "/apple-touch-icon.png",
+  },
   title: {
     default: SITE_NAME,
     template: `%s | ${SITE_NAME}`,

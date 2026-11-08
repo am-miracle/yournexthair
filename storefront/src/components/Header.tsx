@@ -1,4 +1,5 @@
 import * as React from "react"
+import { BrandLogo } from "@/components/BrandLogo"
 import { listRegions } from "@lib/data/regions"
 import { SearchField } from "@/components/SearchField"
 import { Layout, LayoutColumn } from "@/components/Layout"
@@ -43,8 +44,8 @@ export const Header: React.FC = async () => {
           <LayoutColumn>
             <div className="flex h-16 items-center justify-between gap-4 md:h-20">
               <p className="shrink-0 text-sm font-semibold uppercase md:text-base">
-                <LocalizedLink href="/" className="cursor-pointer rounded-full py-2">
-                  YourNextHair
+                <LocalizedLink href="/" className="block cursor-pointer rounded-sm">
+                  <BrandLogo className="h-12 w-auto md:h-16" />
                 </LocalizedLink>
               </p>
               <nav
