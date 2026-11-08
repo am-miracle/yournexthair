@@ -5,7 +5,7 @@ import { getCanonicalPath } from "@lib/util/seo"
 
 export const metadata: Metadata = {
   title: "Refund Policy",
-  description: "Return eligibility and non-returnable items at Your Next Hair.",
+  description: "Return eligibility and non-returnable items at YourNextHair.",
   alternates: { canonical: getCanonicalPath("/refund-policy") },
 }
 
@@ -17,7 +17,7 @@ export default function RefundPolicyPage() {
   return (
     <Layout className="pt-30 pb-20 md:pt-47 md:pb-32">
       <LayoutColumn start={{ base: 1, lg: 2, xl: 3 }} end={{ base: 13, lg: 11, xl: 10 }}>
-        <h1 className="text-lg md:text-2xl mb-16 md:mb-25">Refund Policy for Your Next Hair</h1>
+        <h1 className="text-lg md:text-2xl mb-16 md:mb-25">Refund Policy for YourNextHair</h1>
       </LayoutColumn>
       <LayoutColumn start={{ base: 1, lg: 2, xl: 3 }} end={{ base: 13, lg: 10, xl: 9 }} className="article">
         <h2>1. Eligibility for Returns</h2>

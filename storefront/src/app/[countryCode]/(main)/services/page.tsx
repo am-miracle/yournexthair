@@ -29,7 +29,7 @@ export default function ServicesPage() {
           src="/images/content/wigstore.jpg"
           width={2880}
           height={1500}
-          alt="Your Next Hair professional services"
+          alt="YourNextHair professional services"
           className="h-128 w-full object-cover sm:h-144 md:h-screen"
         />
         <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent" />
@@ -53,7 +53,7 @@ export default function ServicesPage() {
           <LayoutColumn start={{ base: 1, lg: 8 }} end={13}>
             <div className="md:text-md lg:mt-18">
               <p className="mb-5 lg:mb-9">
-                At Your Next Hair, we do not just sell premium hair — we also offer a full range of
+                At YourNextHair, we do not just sell premium hair — we also offer a full range of
                 professional hair services right here in Port Harcourt. Whether you need a fresh
                 install, a bone straight press, or a complete revamp of an existing unit, our team
                 handles it with care and precision.
@@ -70,7 +70,7 @@ export default function ServicesPage() {
           src="/images/content/units.jpg"
           width={2880}
           height={1618}
-          alt="Your Next Hair services"
+          alt="YourNextHair services"
           className="w-full aspect-video object-cover mt-26 md:mt-36 mb-8 md:mb-26"
         />
 
@@ -140,7 +140,7 @@ export default function ServicesPage() {
           src="/images/content/wigs&unit.jpg"
           width={2880}
           height={1618}
-          alt="Your Next Hair wigs and units"
+          alt="YourNextHair wigs and units"
           className="w-full aspect-video object-cover mt-26 md:mt-36 mb-8 md:mb-26"
         />
 
@@ -239,7 +239,7 @@ export default function ServicesPage() {
             src="/images/content/ourclient.jpg"
             width={2880}
             height={1618}
-            alt="Book a hair service at Your Next Hair"
+            alt="Book a hair service at YourNextHair"
             className="w-full aspect-video object-cover"
           />
           <div className="absolute inset-0 bg-black/50" />

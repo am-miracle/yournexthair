@@ -10,7 +10,7 @@ export default function RegisterLoadingPage() {
         src="/images/content/short-wig.jpg"
         width={1440}
         height={1632}
-        alt="Your Next Hair"
+        alt="YourNextHair"
         className="max-lg:hidden lg:w-1/2 shrink-0 object-cover"
       />
       <div
@@ -18,7 +18,7 @@ export default function RegisterLoadingPage() {
         aria-busy="true"
         aria-live="polite"
       >
-        <h1 className="text-xl md:text-2xl mb-10 md:mb-16">Create your Your Next Hair account</h1>
+        <h1 className="text-xl md:text-2xl mb-10 md:mb-16">Create your YourNextHair account</h1>
         <p className="sr-only">Loading registration form</p>
         <form className="flex flex-col gap-6 md:gap-8 mb-8 md:mb-16">
           <div className="flex gap-4 md:gap-6">

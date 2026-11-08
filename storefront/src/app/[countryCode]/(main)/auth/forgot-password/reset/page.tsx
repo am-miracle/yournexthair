@@ -6,7 +6,7 @@ import { Layout, LayoutColumn } from "@/components/Layout"
 
 export const metadata: Metadata = {
   title: "Reset password",
-  description: "Set a new password for your Your Next Hair account",
+  description: "Set a new password for your YourNextHair account",
   robots: {
     index: false,
     follow: false,

@@ -110,7 +110,7 @@ export const ChangePasswordForm: React.FC<{
           <UiDialog aria-label="Password reset successful">
             <h2 className="text-md mb-12">Password reset successful!</h2>
             <p className="text-grayscale-500">
-              Your password has been updated. You can now log in to Your Next Hair with your new
+              Your password has been updated. You can now log in to YourNextHair with your new
               password.
             </p>
             <UiCloseButton variant="ghost" className="absolute top-4 right-6 p-0">

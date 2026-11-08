@@ -57,7 +57,7 @@ const Review = ({ cart }: { cart: StoreCart }) => {
             By placing your order, you confirm that you have read, understand and
             accept our <LocalizedLink href="/terms-of-use" variant="underline">Terms of Use</LocalizedLink>{" "}
             and <LocalizedLink href="/refund-policy" variant="underline">Refund Policy</LocalizedLink>,
-            and acknowledge that you have read Your Next Hair&apos;s{" "}
+            and acknowledge that you have read YourNextHair&apos;s{" "}
             <LocalizedLink href="/privacy-policy" variant="underline">Privacy Policy</LocalizedLink>.
           </p>
           <PaymentButton

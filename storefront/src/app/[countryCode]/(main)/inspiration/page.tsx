@@ -32,13 +32,13 @@ export default function InspirationPage() {
           src="/images/content/guidehair.jpg"
           width={2880}
           height={1500}
-          alt="Your Next Hair Guide"
+          alt="YourNextHair Guide"
           className="mb-8 h-128 w-full object-cover sm:h-144 md:mb-26 md:h-screen"
         />
         <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent" />
         <div className="absolute bottom-8 left-0 right-0 px-4 sm:px-6 md:bottom-14 md:px-16 lg:px-24">
           <p className="mb-3 text-xs uppercase tracking-widest text-white/70 md:text-sm">
-            Your Next Hair
+            YourNextHair
           </p>
           <h1 className="mb-8 max-w-xl text-3xl font-medium leading-tight text-white sm:text-4xl md:mb-26 md:max-w-2xl md:text-5xl lg:text-6xl">
             Know your hair before you buy it
@@ -140,7 +140,7 @@ export default function InspirationPage() {
           src="/images/content/bone-straight.jpg"
           width={2880}
           height={1618}
-          alt="Your Next Hair origins guide"
+          alt="YourNextHair origins guide"
           className="w-full aspect-video object-cover mt-26 md:mt-36 mb-8 md:mb-26"
         />
         <Layout>

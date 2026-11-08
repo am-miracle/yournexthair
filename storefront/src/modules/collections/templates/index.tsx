@@ -56,7 +56,7 @@ export default async function CollectionTemplate({
         <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent" />
         <div className="absolute bottom-8 left-0 right-0 px-4 sm:px-6 md:bottom-14 md:px-16 lg:px-24">
           <p className="mb-3 text-xs uppercase tracking-widest text-white/70 md:text-sm">
-            Your Next Hair
+            YourNextHair
           </p>
           <h1 className="mb-8 max-w-xl text-3xl font-medium leading-tight text-white sm:text-4xl md:mb-19 md:max-w-2xl md:text-5xl lg:text-6xl">
             {collection.title}

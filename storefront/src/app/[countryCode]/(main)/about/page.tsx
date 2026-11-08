@@ -6,7 +6,7 @@ import { Layout, LayoutColumn } from "@/components/Layout"
 
 export const metadata: Metadata = {
   title: "About",
-  description: "Learn more about Your Next Hair, raw and virgin donor hair extensions and wigs.",
+  description: "Learn more about YourNextHair, raw and virgin donor hair extensions and wigs.",
   alternates: {
     canonical: getCanonicalPath("/about"),
   },
@@ -30,7 +30,7 @@ export default function AboutPage() {
           src="/images/content/abouthair.jpg"
           width={2880}
           height={1500}
-          alt="Your Next Hair"
+          alt="YourNextHair"
           className="h-128 w-full object-cover sm:h-144 md:h-screen"
         />
         <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent" />
@@ -47,13 +47,13 @@ export default function AboutPage() {
         <Layout>
           <LayoutColumn start={1} end={{ base: 13, lg: 7 }}>
             <h2 className="text-md max-lg:mb-6 md:text-2xl">
-              At Your Next Hair, we believe great hair starts at the source.
+              At YourNextHair, we believe great hair starts at the source.
             </h2>
           </LayoutColumn>
           <LayoutColumn start={{ base: 1, lg: 8 }} end={13}>
             <div className="md:text-md lg:mt-18">
               <p className="mb-5 lg:mb-9">
-                Your Next Hair is built around one thing: raw, unprocessed donor hair that you can
+                YourNextHair is built around one thing: raw, unprocessed donor hair that you can
                 actually trust. We deal strictly in virgin and raw bundles, closures, frontals, and
                 wigs sourced directly from real donors.
               </p>
@@ -68,7 +68,7 @@ export default function AboutPage() {
               src="/images/content/hero-hair.jpg"
               width={2496}
               height={1404}
-              alt="Your Next Hair collection"
+              alt="YourNextHair collection"
               className="w-full aspect-video object-cover mt-26 lg:mt-36 mb-8 lg:mb-26"
             />
           </LayoutColumn>
@@ -95,7 +95,7 @@ export default function AboutPage() {
               src="/images/content/short-wig.jpg"
               width={1200}
               height={1600}
-              alt="Your Next Hair quality"
+              alt="YourNextHair quality"
               className="w-full aspect-3/4 object-cover mb-16 lg:mb-46"
             />
           </LayoutColumn>
@@ -119,7 +119,7 @@ export default function AboutPage() {
           src="/images/content/ourclient.jpg"
           width={2880}
           height={1618}
-          alt="Your Next Hair"
+          alt="YourNextHair"
           className="w-full aspect-video object-cover mb-8 lg:mb-26"
         />
         <Layout>
@@ -137,7 +137,7 @@ export default function AboutPage() {
                   href="https://api.whatsapp.com/send?phone=2348156197614"
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label="Chat with Your Next Hair on WhatsApp (opens in a new tab)"
+                  aria-label="Chat with YourNextHair on WhatsApp (opens in a new tab)"
                   className="underline"
                 >
                   WhatsApp
@@ -145,7 +145,7 @@ export default function AboutPage() {
                 .
               </p>
               <p>
-                Thank you for choosing Your Next Hair. We are not just selling extensions. We are
+                Thank you for choosing YourNextHair. We are not just selling extensions. We are
                 helping you show up exactly how you want to.
               </p>
             </div>

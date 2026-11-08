@@ -129,7 +129,7 @@ export default async function Home({ params }: { params: Promise<{ countryCode: 
         <div className="absolute inset-0 bg-linear-to-t from-black/75 via-black/30 to-transparent" />
         <div className="absolute bottom-8 left-0 right-0 px-4 sm:px-6 md:bottom-10 md:px-16 lg:px-24">
           <h1 className="max-w-2xl text-3xl font-medium leading-tight text-white sm:text-4xl md:text-5xl lg:text-6xl">
-            Welcome to Your next hair.
+            Welcome to YourNextHair.
           </h1>
           <p className="mt-4 max-w-2xl text-sm leading-relaxed text-white/95 sm:text-base md:mt-6 md:text-md">
             We offer our clients high end exclusive raw hair and premium virgin hair extensions and wigs.
@@ -150,7 +150,7 @@ export default async function Home({ params }: { params: Promise<{ countryCode: 
         <CollectionsSection className="mb-22 md:mb-36" />
         <Layout>
           <LayoutColumn className="col-span-full">
-            <h3 className="text-md md:text-2xl mb-8 md:mb-16">About Your Next Hair</h3>
+            <h3 className="text-md md:text-2xl mb-8 md:mb-16">About YourNextHair</h3>
             <Image
               src="/images/content/wigstore.jpg"
               width={2496}
@@ -161,7 +161,7 @@ export default async function Home({ params }: { params: Promise<{ countryCode: 
           </LayoutColumn>
           <LayoutColumn start={1} end={{ base: 13, md: 7 }}>
             <h2 className="text-md md:text-2xl">
-              At Your Next Hair, we believe every woman deserves to look and feel like the queen she is.
+              At YourNextHair, we believe every woman deserves to look and feel like the queen she is.
             </h2>
           </LayoutColumn>
           <LayoutColumn start={{ base: 1, md: 8 }} end={13} className="mt-6 md:mt-19">
@@ -172,7 +172,7 @@ export default async function Home({ params }: { params: Promise<{ countryCode: 
               </p>
               <p className="mb-5 md:mb-3">Because for us, hair isn&apos;t just hair. It&apos;s how you show up.</p>
               <LocalizedLink href="/about" variant="underline">
-                Learn more about Your Next Hair
+                Learn more about YourNextHair
               </LocalizedLink>
             </div>
           </LayoutColumn>

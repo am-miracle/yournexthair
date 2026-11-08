@@ -24,7 +24,7 @@ export const Footer: React.FC = () => {
                 <LocalizedLink href="/" className="mb-4 block">
                   <BrandLogo className="h-auto w-35" />
                 </LocalizedLink>
-                <p className="text-xs">&copy; {new Date().getFullYear()}, Your Next Hair</p>
+                <p className="text-xs">&copy; {new Date().getFullYear()}, YourNextHair</p>
               </div>
               <div className="flex gap-10 xl:gap-18 max-md:text-xs flex-1 justify-between lg:justify-center">
                 <ul aria-label="Company" className="flex flex-col gap-6 md:gap-3.5">
@@ -44,7 +44,7 @@ export const Footer: React.FC = () => {
                       href="https://www.instagram.com/yournexthair/"
                       target="_blank"
                       rel="noopener noreferrer"
-                      aria-label="Visit Your Next Hair on Instagram"
+                      aria-label="Visit YourNextHair on Instagram"
                     >
                       Instagram
                     </a>
@@ -54,7 +54,7 @@ export const Footer: React.FC = () => {
                       href="https://www.facebook.com/1412930315494374"
                       target="_blank"
                       rel="noopener noreferrer"
-                      aria-label="Visit Your Next Hair on Facebook"
+                      aria-label="Visit YourNextHair on Facebook"
                     >
                       Facebook
                     </a>
@@ -64,7 +64,7 @@ export const Footer: React.FC = () => {
                       href="https://api.whatsapp.com/send?phone=2348156197614"
                       target="_blank"
                       rel="noopener noreferrer"
-                      aria-label="Chat with Your Next Hair on WhatsApp"
+                      aria-label="Chat with YourNextHair on WhatsApp"
                     >
                       WhatsApp
                     </a>
