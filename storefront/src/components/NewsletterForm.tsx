@@ -31,7 +31,7 @@ export const NewsletterForm: React.FC<{ className?: string }> = ({ className }) 
               <InputField
                 inputProps={{
                   uiSize: "sm",
-                  className: "rounded-xs",
+                  className: "rounded-xs bg-white/80 focus:border-accent",
                   autoComplete: "email",
                 }}
                 name="email"
@@ -44,8 +44,8 @@ export const NewsletterForm: React.FC<{ className?: string }> = ({ className }) 
               </Button>
             </div>
           </Form>
-          <p className="text-xs text-grayscale-500">
-            By subscribing you agree to with our{" "}
+          <p className="text-xs text-grayscale-600">
+            By subscribing you agree to our{" "}
             <LocalizedLink href="/privacy-policy" variant="underline" className="pb-0!">
               Privacy Policy
             </LocalizedLink>{" "}

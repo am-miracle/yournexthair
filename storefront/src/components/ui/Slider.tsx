@@ -7,7 +7,7 @@ export const UiSliderTrack: React.FC<ReactAria.SliderTrackProps> = ({
 }) => (
   <ReactAria.SliderTrack
     {...props}
-    className={twMerge("h-px bg-black", className as string)}
+    className={twMerge("h-px bg-accent", className as string)}
   />
 )
 
@@ -18,7 +18,7 @@ export const UiSliderThumb: React.FC<ReactAria.SliderThumbProps> = ({
   <ReactAria.SliderThumb
     {...props}
     className={twMerge(
-      "w-4 h-4 border border-black bg-white rounded-full cursor-pointer",
+      "w-4 h-4 border border-accent bg-white rounded-full cursor-pointer",
       className as string
     )}
   />

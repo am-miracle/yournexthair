@@ -76,7 +76,7 @@ export const Icon: React.FC<IconProps> = ({
     {Boolean(status) && (
       <div
         className={twJoin(
-          "absolute -right-1 -top-0.5 leading-none rounded-full flex items-center justify-center w-4 h-4 bg-black text-white text-[0.625rem]",
+          "absolute -right-1 -top-0.5 leading-none rounded-full flex items-center justify-center w-4 h-4 bg-accent text-white text-[0.625rem]",
           status > 99 && "text-[0.5rem]!",
         )}
       >

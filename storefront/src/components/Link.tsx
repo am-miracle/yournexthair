@@ -8,7 +8,7 @@ export type LinkOwnProps = {
 
 export const getLinkClassNames = ({ variant }: LinkOwnProps): string =>
   twJoin(
-    variant !== "unstyled" && "transition-colors",
+    variant !== "unstyled" && "text-accent hover:text-accent-hover transition-colors",
     (variant === "underline" || variant === "hover:underline") &&
       "border-b border-current pb-0.5 md:pb-1",
     variant === "hover:underline" &&

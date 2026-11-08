@@ -83,8 +83,8 @@ const sortValues = (values: Array<{ id: string; value: string }>) =>
 // Shared pill button style
 const pillClass =
   "px-3 py-1.5 text-xs tracking-wide cursor-pointer rounded border transition-all " +
-  "border-grayscale-200 hover:border-grayscale-700 " +
-  "data-selected:border-black data-selected:bg-black data-selected:text-white " +
+  "border-grayscale-200 hover:border-accent " +
+  "data-selected:border-accent data-selected:bg-accent data-selected:text-white " +
   "data-disabled:opacity-35 data-disabled:cursor-not-allowed data-disabled:line-through " +
   "data-disabled:border-grayscale-100"
 

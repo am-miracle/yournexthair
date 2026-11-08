@@ -180,29 +180,42 @@ export default async function Home({ params }: { params: Promise<{ countryCode: 
       </div>
       <section
         aria-labelledby="order-information-heading"
-        className="border-t border-grayscale-200 bg-grayscale-50 py-16 md:py-24"
+        className="bg-accent-soft py-16 text-grayscale-800 md:py-24"
       >
         <Layout>
-          <LayoutColumn start={{ base: 1, md: 3 }} end={{ base: 13, md: 11 }}>
+          <LayoutColumn className="col-span-full">
             <h2
               id="order-information-heading"
-              className="mb-8 text-center text-2xl font-medium leading-tight md:text-3xl"
+              className="mx-auto mb-6 max-w-4xl text-center text-lg font-medium leading-tight text-accent md:text-2xl"
             >
               In stock and Custom order information
             </h2>
-            <div className="space-y-6 text-center text-sm leading-relaxed text-grayscale-700 md:text-md">
-              <p>
-                Our hair extensions and wigs are made to fulfill our client’s order requirements.
-                When an extension or wig is purchased, it will follow our standard time frame of{" "}
-                <strong className="font-semibold text-black">10 business working days</strong>,
-                allowing our team to create your wig or wash your bundles.
-              </p>
-              <p>
-                For custom orders, the time frame is{" "}
-                <strong className="font-semibold text-black">6 weeks for our premium virgin hair</strong>{" "}
-                and <strong className="font-semibold text-black">9–12 weeks for raw hair</strong>,
-                as we have to source the hair and customize it to your specifications.
-              </p>
+            <p className="mx-auto mb-10 max-w-2xl text-center text-base leading-relaxed text-grayscale-700 md:mb-14 md:text-sm">
+              Our hair extensions and wigs are made to fulfill our client’s order requirements.
+            </p>
+            <div className="grid gap-5 md:grid-cols-3 md:gap-8">
+              <div className="rounded-2xl border border-accent/15 bg-white/80 p-6 md:p-8">
+                <h3 className="mb-3 text-sm font-medium">In-stock orders</h3>
+                <p className="mb-4 text-md font-semibold text-accent">10 business days</p>
+                <p className="text-base leading-relaxed text-grayscale-700">
+                  When an extension or wig is purchased, this allows our team to create your wig
+                  or wash your bundles.
+                </p>
+              </div>
+              <div className="rounded-2xl border border-accent/15 bg-white/80 p-6 md:p-8">
+                <h3 className="mb-3 text-sm font-medium">Custom premium virgin hair</h3>
+                <p className="mb-4 text-md font-semibold text-accent">6 weeks</p>
+                <p className="text-base leading-relaxed text-grayscale-700">
+                  Time to source your premium virgin hair and customize it to your specifications.
+                </p>
+              </div>
+              <div className="rounded-2xl border border-accent/15 bg-white/80 p-6 md:p-8">
+                <h3 className="mb-3 text-sm font-medium">Custom raw hair</h3>
+                <p className="mb-4 text-md font-semibold text-accent">9–12 weeks</p>
+                <p className="text-base leading-relaxed text-grayscale-700">
+                  Time to source your raw hair and customize it to your specifications.
+                </p>
+              </div>
             </div>
           </LayoutColumn>
         </Layout>
