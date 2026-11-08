@@ -71,6 +71,9 @@ export const Footer: React.FC = () => {
                 </ul>
                 <ul aria-label="Legal" className="flex flex-col gap-6 md:gap-3.5">
                   <li>
+                    <LocalizedLink href="/refund-policy">Refund Policy</LocalizedLink>
+                  </li>
+                  <li>
                     <LocalizedLink href="/privacy-policy">Privacy Policy</LocalizedLink>
                   </li>
                   <li>

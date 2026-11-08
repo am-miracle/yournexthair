@@ -4,6 +4,7 @@ import { twJoin } from "tailwind-merge"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 
 import { Button } from "@/components/Button"
+import { LocalizedLink } from "@/components/LocalizedLink"
 import PaymentButton from "@modules/checkout/components/payment-button"
 import { StoreCart } from "@medusajs/types"
 
@@ -53,10 +54,11 @@ const Review = ({ cart }: { cart: StoreCart }) => {
       {isOpen && previousStepsCompleted && (
         <>
           <p className="mb-8">
-            By clicking the Place Order button, you confirm that you have read,
-            understand and accept our Terms of Use, Terms of Sale and Returns
-            Policy and acknowledge that you have read Medusa Store&apos;s
-            Privacy Policy.
+            By placing your order, you confirm that you have read, understand and
+            accept our <LocalizedLink href="/terms-of-use" variant="underline">Terms of Use</LocalizedLink>{" "}
+            and <LocalizedLink href="/refund-policy" variant="underline">Refund Policy</LocalizedLink>,
+            and acknowledge that you have read Your Next Hair&apos;s{" "}
+            <LocalizedLink href="/privacy-policy" variant="underline">Privacy Policy</LocalizedLink>.
           </p>
           <PaymentButton
             cart={cart}

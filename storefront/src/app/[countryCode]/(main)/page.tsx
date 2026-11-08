@@ -126,14 +126,16 @@ export default async function Home({ params }: { params: Promise<{ countryCode: 
           <source src="/images/content/yournexthairvideo.webm" type="video/webm" />
           <source src="/images/content/yournexthairvideo-web.mp4" type="video/mp4" />
         </video>
-        <div className="absolute inset-0 bg-linear-to-t from-black/50 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-t from-black/75 via-black/30 to-transparent" />
         <div className="absolute bottom-8 left-0 right-0 px-4 sm:px-6 md:bottom-10 md:px-16 lg:px-24">
-          <p className="mb-3 text-xs uppercase tracking-widest text-white/70 md:text-sm">
-            Raw. Virgin. Donor.
-          </p>
-          <h1 className="max-w-xl text-3xl font-medium leading-tight text-white sm:text-4xl md:max-w-2xl md:text-5xl lg:text-6xl">
-            Hair that starts at the source
+          <h1 className="max-w-2xl text-3xl font-medium leading-tight text-white sm:text-4xl md:text-5xl lg:text-6xl">
+            Welcome to Your next hair.
           </h1>
+          <p className="mt-4 max-w-2xl text-sm leading-relaxed text-white/95 sm:text-base md:mt-6 md:text-md">
+            We offer our clients high end exclusive raw hair and premium virgin hair extensions and wigs.
+            Our commitment to sourcing the best quality of hair is unwavering and known to last for years
+            with proper maintenance.
+          </p>
           <LocalizedLink
             href="/store"
             className="inline-block mt-5 border-b border-white/60 pb-0.5 text-sm text-white transition-colors hover:border-white md:mt-6 md:text-md"
@@ -144,20 +146,10 @@ export default async function Home({ params }: { params: Promise<{ countryCode: 
       </div>
       <div className="pt-8 pb-26 md:pt-26 md:pb-36">
         <Layout className="mb-26 md:mb-36">
-          <LayoutColumn start={1} end={{ base: 13, md: 8 }}>
-            <h3 className="text-md max-md:mb-6 md:text-2xl">
-              Raw and Virgin Hair, Direct from the Donor
-            </h3>
-          </LayoutColumn>
-          <LayoutColumn start={{ base: 1, md: 9 }} end={13}>
-            <div className="flex items-center h-full">
-              <div className="md:text-md">
-                <p>Bundles, closures, frontals, and wigs. Strictly donor hair.</p>
-                <LocalizedLink href="/store" variant="underline">
-                  Shop now
-                </LocalizedLink>
-              </div>
-            </div>
+          <LayoutColumn>
+            <LocalizedLink href="/store" variant="underline" className="md:text-md">
+              Shop now
+            </LocalizedLink>
           </LayoutColumn>
         </Layout>
         <ProductTypesSection />
@@ -176,16 +168,16 @@ export default async function Home({ params }: { params: Promise<{ countryCode: 
           </LayoutColumn>
           <LayoutColumn start={1} end={{ base: 13, md: 7 }}>
             <h2 className="text-md md:text-2xl">
-              Raw and virgin hair sourced for consistency, longevity, and natural movement.
+              At Your Next Hair, we believe every woman deserves to look and feel like the queen she is.
             </h2>
           </LayoutColumn>
           <LayoutColumn start={{ base: 1, md: 8 }} end={13} className="mt-6 md:mt-19">
             <div className="md:text-md">
               <p className="mb-5 md:mb-9">
-                Bundles, closures, frontals, and wigs that blend naturally and hold up with wear. No
-                guesswork, no mixed hair.
+                Our extensions are meticulously made by skillful artisans for durability, comfort,
+                and flexibility — so you can switch up your style with ease, and enjoy ultimate luxury.
               </p>
-              <p className="mb-5 md:mb-3">Ships nationwide and worldwide.</p>
+              <p className="mb-5 md:mb-3">Because for us, hair isn&apos;t just hair. It&apos;s how you show up.</p>
               <LocalizedLink href="/about" variant="underline">
                 Learn more about Your Next Hair
               </LocalizedLink>
@@ -193,6 +185,35 @@ export default async function Home({ params }: { params: Promise<{ countryCode: 
           </LayoutColumn>
         </Layout>
       </div>
+      <section
+        aria-labelledby="order-information-heading"
+        className="border-t border-grayscale-200 bg-grayscale-50 py-16 md:py-24"
+      >
+        <Layout>
+          <LayoutColumn start={{ base: 1, md: 3 }} end={{ base: 13, md: 11 }}>
+            <h2
+              id="order-information-heading"
+              className="mb-8 text-center text-2xl font-medium leading-tight md:text-3xl"
+            >
+              In stock and Custom order information
+            </h2>
+            <div className="space-y-6 text-center text-sm leading-relaxed text-grayscale-700 md:text-md">
+              <p>
+                Our hair extensions and wigs are made to fulfill our client’s order requirements.
+                When an extension or wig is purchased, it will follow our standard time frame of{" "}
+                <strong className="font-semibold text-black">10 business working days</strong>,
+                allowing our team to create your wig or wash your bundles.
+              </p>
+              <p>
+                For custom orders, the time frame is{" "}
+                <strong className="font-semibold text-black">6 weeks for our premium virgin hair</strong>{" "}
+                and <strong className="font-semibold text-black">9–12 weeks for raw hair</strong>,
+                as we have to source the hair and customize it to your specifications.
+              </p>
+            </div>
+          </LayoutColumn>
+        </Layout>
+      </section>
     </>
   )
 }
