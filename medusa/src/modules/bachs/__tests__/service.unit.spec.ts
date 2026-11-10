@@ -115,6 +115,14 @@ describe("BachsPaymentService", () => {
     })
   })
 
+  it("reports underpaid checkouts as requiring more without authorizing them", async () => {
+    fetchMock.mockResolvedValueOnce(jsonResponse({
+      ...completedCheckout, status: "OPEN", payment_status: "underpaid",
+      charge: { payment_id: "pay_1", status: "underpaid", amount_paid: "100.00" },
+    }))
+    await expect(service.authorizePayment({ data: sessionData })).resolves.toMatchObject({ status: "requires_more" })
+  })
+
   it("refuses a second refund on the same charge", async () => {
     await expect(
       service.refundPayment({ amount: 100, data: { ...sessionData, payment_id: "pay_1", refund_id: "ref_1" } }),
@@ -160,6 +168,14 @@ describe("BachsPaymentService", () => {
       await expect(
         service.getWebhookActionAndData({ ...payload, rawData: Buffer.from("{}") }),
       ).resolves.toEqual({ action: "not_supported" })
+      expect(fetchMock).not.toHaveBeenCalled()
+    })
+
+    it("uses the signed body instead of an unverified parsed payload", async () => {
+      const payload = signed({ type: "customer.created", data: {} })
+      await expect(service.getWebhookActionAndData({
+        ...payload, data: { type: "collection.succeeded", data: { checkout_id: "chk_1" } },
+      })).resolves.toEqual({ action: "not_supported" })
       expect(fetchMock).not.toHaveBeenCalled()
     })
 

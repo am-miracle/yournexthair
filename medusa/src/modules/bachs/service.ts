@@ -37,7 +37,7 @@ import {
   type BachsCheckoutSession,
   resolveBachsBaseUrl,
 } from "./client"
-import { toRawBody, verifyBachsSignature } from "./webhook"
+import { verifiedBachsEvent } from "./webhook"
 
 export type BachsOptions = {
   api_key: string
@@ -265,16 +265,12 @@ export class BachsPaymentService extends AbstractPaymentProvider<BachsOptions> {
   private async resolveWebhook(
     payload: ProviderWebhookPayload["payload"],
   ): Promise<WebhookActionResult> {
-    const rawBody = toRawBody(payload.rawData)
-    const headers = (payload.headers ?? {}) as Record<string, string | string[] | undefined>
-
-    if (!rawBody || !verifyBachsSignature(rawBody, headers, this.config.webhook_secret)) {
+    const event = verifiedBachsEvent(payload, this.config.webhook_secret)
+    if (!event) {
       this.logger?.warn("Rejected Bachs webhook: missing body or invalid signature")
       return { action: PaymentActions.NOT_SUPPORTED }
     }
-
-    const event = payload.data as { type?: unknown; data?: unknown }
-    const type = asString(event?.type)
+    const type = event.type
 
     if (!type || !SUCCESS_EVENTS.has(type)) {
       return { action: PaymentActions.NOT_SUPPORTED }
@@ -361,7 +357,11 @@ export class BachsPaymentService extends AbstractPaymentProvider<BachsOptions> {
       return PaymentSessionStatus.CANCELED
     }
 
-    if (checkout.payment_status === "failed") {
+    if (checkout.payment_status === "underpaid" || checkout.charge?.status === "underpaid") {
+      return PaymentSessionStatus.REQUIRES_MORE
+    }
+
+    if (checkout.payment_status === "failed" || checkout.charge?.status === "failed") {
       return PaymentSessionStatus.ERROR
     }
 

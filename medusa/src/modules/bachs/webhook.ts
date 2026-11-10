@@ -96,3 +96,23 @@ export const verifyBachsSignature = (
   const expected = computeSignature(timestamp, rawBody, secret)
   return signatures.some((signature) => safeEqual(expected, signature))
 }
+
+/** Parse the authenticated bytes, rather than trusting a separate parsed payload. */
+export function verifiedBachsEvent(
+  payload: { rawData?: unknown; headers?: unknown },
+  secret: string,
+): { id?: string; type: string; data: Record<string, unknown> } | null {
+  const raw = toRawBody(payload.rawData)
+  if (!raw || !verifyBachsSignature(raw, (payload.headers ?? {}) as Headers, secret)) return null
+  try {
+    const event = JSON.parse(raw.toString("utf8")) as Record<string, unknown>
+    if (typeof event.type !== "string" || !event.data || typeof event.data !== "object") return null
+    return {
+      ...(typeof event.id === "string" ? { id: event.id } : {}),
+      type: event.type,
+      data: event.data as Record<string, unknown>,
+    }
+  } catch {
+    return null
+  }
+}

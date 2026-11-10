@@ -35,6 +35,8 @@ export type BachsRefund = {
   refund_id?: string
   charge_id?: string
   status?: string
+  requested_amount?: string
+  refunded_amount?: string | null
 }
 
 export type CreateCheckoutSessionBody = {
@@ -80,6 +82,10 @@ export class BachsClient {
 
   getPayment(paymentId: string) {
     return this.request<BachsCharge>("GET", `/v1/payments/${encodeURIComponent(paymentId)}`)
+  }
+
+  getRefund(refundId: string) {
+    return this.request<BachsRefund>("GET", `/v1/refunds/${encodeURIComponent(refundId)}`)
   }
 
   createRefund(body: CreateRefundBody, idempotencyKey: string) {
