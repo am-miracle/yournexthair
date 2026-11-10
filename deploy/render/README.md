@@ -2,8 +2,9 @@
 
 The Render Blueprints provision backends and datastores only. The Next.js
 frontends run on Vercel. These files do not provision or change live services.
-**Start with the free development Blueprint.** The production Blueprint remains
-a paid upgrade option: do not create it yet. Render auto deploy is off. Vercel Git deployments are configured separately in its dashboard.
+**Both Blueprints currently use Render's free plans.** See
+[Upgrading production](#upgrading-production) before taking real paid orders.
+Render auto deploy is off. Vercel Git deployments are configured separately in its dashboard.
 
 | Environment | Branch | Render backend Blueprint | Vercel project |
 | --- | --- | --- | --- |
@@ -22,13 +23,12 @@ image and CI. Vercel reads `storefront/package.json` for the Node major version.
 The major is constrained to 24 while patch updates are picked up on new builds.
 For local work, use `nvm install` and `nvm use` from the repository root.
 
-## Start here: free development setup
+## Start here: free setup
 
-1. In Render → New → Blueprint, use the `develop` branch and
-   **`deploy/render/backend.development.yaml`**. It uses `plan: free` for the
-   backend and Key Value; PostgreSQL is supplied by Neon. Do not select the
-   production YAML yet.
-2. Enter the dev Neon `DATABASE_URL`, `STOREFRONT_URL`, your storage details, and
+1. In Render → New → Blueprint, use the matching branch and backend Blueprint
+   from the table. Both use `plan: free` for the backend and Key Value;
+   PostgreSQL is supplied by Neon.
+2. Enter that environment's Neon `DATABASE_URL`, `STOREFRONT_URL`, your storage details, and
    `INITIAL_ADMIN_EMAIL` / `INITIAL_ADMIN_PASSWORD` in Render's prompts.
    These Admin values must be your own and must not be committed to Git.
 3. On startup, the free backend runs migrations, creates the initial Admin if
@@ -36,21 +36,22 @@ For local work, use `nvm install` and `nvm use` from the repository root.
    and Shell access. It does not create demo products or reset existing passwords.
 4. Sign in at `<backend-url>/app`, remove both initial Admin variables from Render,
    and create the default sales channel and publishable API key in Admin.
-5. Deploy the frontend on Vercel using the setup below and this dev backend.
+5. Deploy the frontend on Vercel using the setup below and the matching backend.
    Your media storage account and Vercel plan have their own usage limits and
    terms; the Render free plans do not include object storage.
 
 Free-tier constraints:
 
-- Render permits one free Key Value instance per workspace. Keep this free-first
-  deployment to the development stack.
+- Render permits one free Key Value instance per workspace. To run both free
+  stacks, put development and production in separate Render workspaces.
 - No Render Postgres is provisioned. Neon has its own plan limits, retention and
   backup settings; verify those before relying on persistent client data.
 - The web service sleeps after 15 idle minutes and has limited memory. This
   Medusa app may exceed the free instance's resources; upgrade if it runs out of
   memory. A free plan selection is not a guarantee that Medusa will fit.
-- Redis data is lost on restart, including queued workflow jobs. This is for
-  development and demos, not real paid orders.
+- Redis data is lost on restart, including queued workflow jobs. Payment
+  webhooks that arrive while the service sleeps wait for it to wake. This is
+  fine for development, demos and a soft launch, not for real paid orders.
 - No Render Shell, one-off jobs or persistent disks. Store uploads in external
   object storage. Free usage quotas still apply.
 
@@ -71,7 +72,7 @@ See https://render.com/docs/free for current platform limits.
    environment. Use Bachs sandbox keys in development. Do not copy your local
    `.env` or production customer data into the dev stack.
 
-## Backend configuration (free dev now, paid production later)
+## Backend configuration
 
 In Render choose **New → Blueprint**, connect `am-miracle/yournexthair`, choose the
 matching branch and specify the backend Blueprint path from the table. Render
@@ -79,7 +80,7 @@ allows a custom Blueprint path. Confirm the proposed plans and resources there.
 Render services use Frankfurt. Use a nearby Neon region where possible; Neon
 connections use its external TLS endpoint, while Redis remains on Render’s private network.
 
-Supply these prompted variables (plus the initial Admin values on free dev):
+Supply these prompted variables (plus the initial Admin values on free plans):
 
 - `DATABASE_URL`: the matching environment’s Neon PostgreSQL connection string.
   Use the direct endpoint for this configuration, which also runs migrations, and
@@ -104,18 +105,16 @@ by this repository edit; review any previously provisioned Render Postgres resou
 separately and back it up before considering removal.
 
 `REDIS_URL` is wired using Render's private Key Value connection string. Its
-public IP allow list is empty. Production Redis has persistence and no eviction
-because it holds workflow jobs and locks as well as caches. Free dev Redis has
-no persistence.
+public IP allow list is empty. Both use no eviction because Redis holds
+workflow jobs and locks as well as caches. Free Redis has no persistence.
 
 The backend build installs all build dependencies, compiles Medusa/Admin, then
-installs production dependencies in `.medusa/server`. On paid production the pre-deploy command runs
-migrations once before release. Free dev runs migrations and its bootstrap
-script in the start command instead. The start command serves the compiled server on
-port 9000. `/health` is the liveness probe.
+installs production dependencies in `.medusa/server`. On free plans the start
+command runs migrations and the bootstrap script, then serves the compiled
+server on port 9000. `/health` is the liveness probe.
 
-Open `<actual-backend-url>/app` after the service is healthy. In the backend's
-Render Shell (**paid production only**; free dev bootstraps automatically), work from the compiled server directory (relative to `medusa`):
+Open `<actual-backend-url>/app` after the service is healthy. On a paid plan
+with Render Shell (free plans bootstrap automatically), work from the compiled server directory (relative to `medusa`):
 
 ```sh
 cd .medusa/server
@@ -208,7 +207,8 @@ repository change does not delete cloud resources.
 ## Optional integrations (configure independently in each backend)
 
 - Payments: `BACHS_SECRET_KEY`, `BACHS_WEBHOOK_SECRET`. Webhook endpoint:
-  `<backend>/hooks/payment/bachs_bachs`. Enable the provider on the regions.
+  `<backend>/hooks/payment/bachs_bachs`. Follow [Bachs setup](../../medusa/src/modules/bachs/README.md)
+  for required scopes, webhook events and refund outcome tracking. Enable the provider on the regions.
   Changing env vars alone does not add it to existing regions. Remove manual/test
   payment providers from production regions before accepting customer orders.
 - Email: `RESEND_API_KEY`, `RESEND_FROM` using your client's verified sender.
@@ -235,8 +235,20 @@ Confirm database backups and test restoration before accepting live orders.
 Do not recreate production databases or rotate generated secrets as a routine
 release step. Back up database and object storage before bulk data changes.
 
-The free-first setup deploys only the development stack. When you upgrade, each
-environment uses one Medusa shared worker/server instance.
+## Upgrading production
+
+Before accepting real paid orders, edit `backend.production.yaml`:
+
+- Web service: `plan: 1c-2g` (2 GB RAM), add
+  `preDeployCommand: 'cd .medusa/server && pnpm exec medusa db:migrate'` and set
+  `startCommand: cd .medusa/server && pnpm start`. Remove the two
+  `INITIAL_ADMIN_*` variables.
+- Key Value: `plan: 256mb` and `persistenceMode: journal-snapshot`.
+
+Changing a Blueprint does not change existing services: apply the plans in the
+Render dashboard or sync the Blueprint, and confirm the bill before saving.
+
+Each environment uses one Medusa shared worker/server instance.
 Before scaling it, separate server/worker roles and review job execution, file
 storage, readiness and account capacity. These YAMLs do not create extra workers,
 public databases, Meilisearch instances, or migrate existing local data.
