@@ -31,10 +31,7 @@ services:
       - key: DATABASE_URL
         sync: false
       - key: REDIS_URL
-        fromService:
-          type: keyvalue
-          name: yournexthair-redis-prod
-          property: connectionString
+        sync: false
       - key: BACKEND_URL
         fromService:
           type: web
@@ -66,10 +63,3 @@ services:
         sync: false
       - key: INITIAL_ADMIN_PASSWORD
         sync: false
-  - type: keyvalue
-    name: yournexthair-redis-prod
-    region: frankfurt
-    plan: free
-    maxmemoryPolicy: noeviction
-    persistenceMode: 'off'
-    ipAllowList: []

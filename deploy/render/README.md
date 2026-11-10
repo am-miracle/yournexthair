@@ -26,9 +26,12 @@ For local work, use `nvm install` and `nvm use` from the repository root.
 ## Start here: free setup
 
 1. In Render → New → Blueprint, use the matching branch and backend Blueprint
-   from the table. Both use `plan: free` for the backend and Key Value;
-   PostgreSQL is supplied by Neon.
-2. Enter that environment's Neon `DATABASE_URL`, `STOREFRONT_URL`, your storage details, and
+   from the table. Both use `plan: free` for the backend; PostgreSQL is
+   supplied by Neon. Development uses a free Render Key Value; production uses
+   an external Redis (see [Production Redis](#production-redis)) because Render
+   allows only one free Key Value per workspace.
+2. Enter that environment's Neon `DATABASE_URL`, `STOREFRONT_URL`, your storage
+   details (plus `REDIS_URL` on production), and
    `INITIAL_ADMIN_EMAIL` / `INITIAL_ADMIN_PASSWORD` in Render's prompts.
    These Admin values must be your own and must not be committed to Git.
 3. On startup, the free backend runs migrations, creates the initial Admin if
@@ -42,8 +45,6 @@ For local work, use `nvm install` and `nvm use` from the repository root.
 
 Free-tier constraints:
 
-- Render permits one free Key Value instance per workspace. To run both free
-  stacks, put development and production in separate Render workspaces.
 - No Render Postgres is provisioned. Neon has its own plan limits, retention and
   backup settings; verify those before relying on persistent client data.
 - The web service sleeps after 15 idle minutes and has limited memory. This
@@ -104,9 +105,25 @@ Keep the Neon TLS connection parameters. Existing cloud databases are not delete
 by this repository edit; review any previously provisioned Render Postgres resource
 separately and back it up before considering removal.
 
-`REDIS_URL` is wired using Render's private Key Value connection string. Its
-public IP allow list is empty. Both use no eviction because Redis holds
-workflow jobs and locks as well as caches. Free Redis has no persistence.
+On development, `REDIS_URL` is wired using Render's private Key Value connection
+string, with an empty public IP allow list. On production it is entered in
+Render (see below). Redis must never evict keys because it holds workflow jobs
+and locks as well as caches. Neither free Redis has persistence.
+
+### Production Redis
+
+Until production is upgraded, use a free Redis Cloud database (fixed price,
+not billed per command):
+
+1. Create a free database at https://redis.io/cloud in AWS `eu-central-1`
+   (Frankfurt), next to the Render backend.
+2. In its configuration, set the data eviction policy to `noeviction`.
+3. Use its endpoint as `REDIS_URL`:
+   `redis://default:<password>@<host>:<port>` (use `rediss://` if TLS is enabled).
+
+Never point production at the development Key Value: both use the same queue
+names. The free tier is small and caps connections; if Medusa logs Redis
+connection or out-of-memory errors, upgrade as below.
 
 The backend build installs all build dependencies, compiles Medusa/Admin, then
 installs production dependencies in `.medusa/server`. On free plans the start
@@ -243,7 +260,25 @@ Before accepting real paid orders, edit `backend.production.yaml`:
   `preDeployCommand: 'cd .medusa/server && pnpm exec medusa db:migrate'` and set
   `startCommand: cd .medusa/server && pnpm start`. Remove the two
   `INITIAL_ADMIN_*` variables.
-- Key Value: `plan: 256mb` and `persistenceMode: journal-snapshot`.
+- Redis: add a Render Key Value service and wire `REDIS_URL` to it:
+
+  ```yaml
+        - key: REDIS_URL
+          fromService:
+            type: keyvalue
+            name: yournexthair-redis-prod
+            property: connectionString
+    - type: keyvalue
+      name: yournexthair-redis-prod
+      region: frankfurt
+      plan: 256mb
+      maxmemoryPolicy: noeviction
+      persistenceMode: journal-snapshot
+      ipAllowList: []
+  ```
+
+  After syncing, confirm the service's `REDIS_URL` points at the new Key Value,
+  not Redis Cloud.
 
 Changing a Blueprint does not change existing services: apply the plans in the
 Render dashboard or sync the Blueprint, and confirm the bill before saving.
