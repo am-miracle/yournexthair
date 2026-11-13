@@ -14,12 +14,16 @@ const CartTotals: React.FC<CartTotalsProps> = ({ cart }) => {
     currency_code,
     total,
     item_subtotal,
-    tax_total,
-    discount_total,
+    item_tax_total,
     shipping_subtotal,
+    shipping_tax_total,
+    discount_total,
+    discount_tax_total,
     gift_card_total,
   } = cart
   const hasShipping = (cart.shipping_methods?.length ?? 0) > 0
+  const discountAmount = (discount_total ?? 0) - (discount_tax_total ?? 0)
+  const shippingAmount = (shipping_subtotal ?? 0) + (shipping_tax_total ?? 0)
 
   return (
     <div>
@@ -32,7 +36,7 @@ const CartTotals: React.FC<CartTotalsProps> = ({ cart }) => {
             <p>{convertToLocale({ amount: item_subtotal ?? 0, currency_code })}</p>
           </div>
         </div>
-        {!!discount_total && (
+        {discountAmount > 0 && (
           <div className="flex justify-between max-lg:text-xs">
             <div>
               <p>Discount</p>
@@ -41,7 +45,7 @@ const CartTotals: React.FC<CartTotalsProps> = ({ cart }) => {
               <p>
                 -{" "}
                 {convertToLocale({
-                  amount: discount_total ?? 0,
+                  amount: discountAmount,
                   currency_code,
                 })}
               </p>
@@ -50,24 +54,26 @@ const CartTotals: React.FC<CartTotalsProps> = ({ cart }) => {
         )}
         <div className="flex justify-between max-lg:text-xs">
           <div>
-            <p>Shipping</p>
+            <p>Shipping{shipping_tax_total ? " (incl. VAT)" : ""}</p>
           </div>
           <div className="self-end">
             <p>
               {hasShipping
-                ? convertToLocale({ amount: shipping_subtotal ?? 0, currency_code })
+                ? convertToLocale({ amount: shippingAmount, currency_code })
                 : "Calculated at checkout"}
             </p>
           </div>
         </div>
-        <div className="flex justify-between max-lg:text-xs">
-          <div>
-            <p>VAT</p>
+        {!!item_tax_total && (
+          <div className="flex justify-between max-lg:text-xs">
+            <div>
+              <p>VAT</p>
+            </div>
+            <div className="self-end">
+              <p>{convertToLocale({ amount: item_tax_total, currency_code })}</p>
+            </div>
           </div>
-          <div className="self-end">
-            <p>{convertToLocale({ amount: tax_total ?? 0, currency_code })}</p>
-          </div>
-        </div>
+        )}
         {!!gift_card_total && (
           <div className="flex justify-between max-lg:text-xs">
             <div>

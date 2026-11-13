@@ -8,11 +8,15 @@ export const OrderTotals: React.FC<{
     currency_code,
     total,
     item_subtotal,
-    tax_total,
+    item_tax_total,
     shipping_subtotal,
+    shipping_tax_total,
     discount_total,
+    discount_tax_total,
     gift_card_total,
   } = order
+  const discountAmount = (discount_total ?? 0) - (discount_tax_total ?? 0)
+  const shippingAmount = (shipping_subtotal ?? 0) + (shipping_tax_total ?? 0)
 
   return (
     <div className="sm:max-w-65 w-full flex-1">
@@ -29,7 +33,7 @@ export const OrderTotals: React.FC<{
           </p>
         </div>
       </div>
-      {!!discount_total && (
+      {discountAmount > 0 && (
         <div className="flex justify-between gap-4 mb-2">
           <div className="text-grayscale-500">
             <p>Discount</p>
@@ -37,32 +41,34 @@ export const OrderTotals: React.FC<{
           <div className="self-end">
             <p>
               -{" "}
-              {convertToLocale({ amount: discount_total ?? 0, currency_code })}
+              {convertToLocale({ amount: discountAmount, currency_code })}
             </p>
           </div>
         </div>
       )}
       <div className="flex justify-between gap-4 mb-2">
         <div className="text-grayscale-500">
-          <p>Shipping</p>
+          <p>Shipping{shipping_tax_total ? " (incl. VAT)" : ""}</p>
         </div>
         <div className="self-end">
           <p>
             {convertToLocale({
               currency_code,
-              amount: shipping_subtotal ?? 0,
+              amount: shippingAmount,
             })}
           </p>
         </div>
       </div>
-      <div className="flex justify-between gap-4 mb-2">
-        <div className="text-grayscale-500">
-          <p>VAT</p>
+      {!!item_tax_total && (
+        <div className="flex justify-between gap-4 mb-2">
+          <div className="text-grayscale-500">
+            <p>VAT</p>
+          </div>
+          <div className="self-end">
+            <p>{convertToLocale({ amount: item_tax_total, currency_code })}</p>
+          </div>
         </div>
-        <div className="self-end">
-          <p>{convertToLocale({ amount: tax_total ?? 0, currency_code })}</p>
-        </div>
-      </div>
+      )}
       {!!gift_card_total && (
         <div className="flex justify-between gap-4 mb-2">
           <div className="text-grayscale-500">

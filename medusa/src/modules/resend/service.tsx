@@ -91,6 +91,10 @@ const renderTemplate = (
       const Template = emails['order-placed'];
       return <Template {...layoutOptions} {...(data as EmailTemplatePropsMap['order-placed'])} />;
     }
+    case 'order-transfer': {
+      const Template = emails['order-transfer'];
+      return <Template {...layoutOptions} {...(data as EmailTemplatePropsMap['order-transfer'])} />;
+    }
     case 'customer-welcome': {
       const Template = emails['customer-welcome'];
       return (

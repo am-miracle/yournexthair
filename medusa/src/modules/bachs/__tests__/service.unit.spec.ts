@@ -97,6 +97,12 @@ describe("BachsPaymentService", () => {
     })
   })
 
+  it("captures a completed checkout reported with lowercase status", async () => {
+    fetchMock.mockResolvedValueOnce(jsonResponse({ ...completedCheckout, status: "completed", payment_status: "SUCCEEDED" }))
+
+    await expect(service.authorizePayment({ data: sessionData })).resolves.toMatchObject({ status: "captured" })
+  })
+
   it("errors when the paid amount does not match the session", async () => {
     fetchMock.mockResolvedValueOnce(jsonResponse({ ...completedCheckout, amount: "500.00" }))
 

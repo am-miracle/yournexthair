@@ -8,8 +8,7 @@ export const listCartPaymentMethods = async function (regionId: string) {
       `/store/payment-providers`,
       {
         query: { region_id: regionId },
-        next: { tags: ["payment_providers"] },
-        cache: "force-cache",
+        cache: "no-store",
       }
     )
     .then(({ payment_providers }) => payment_providers)

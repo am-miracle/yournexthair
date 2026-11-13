@@ -48,6 +48,11 @@ export async function retrieveCart() {
       return null
     })
 
+  if (cart?.completed_at) {
+    await removeCartId().catch(() => undefined)
+    return null
+  }
+
   if (cart?.items && cart.items.length && cart.region_id) {
     cart.items = await enrichLineItems(cart.items, cart.region_id)
   }

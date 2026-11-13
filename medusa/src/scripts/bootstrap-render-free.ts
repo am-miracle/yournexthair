@@ -1,4 +1,4 @@
-import type { ExecArgs, IAuthModuleService, IUserModuleService } from "@medusajs/framework/types"
+import type { ExecArgs, IAuthModuleService, IStoreModuleService, IUserModuleService } from "@medusajs/framework/types"
 import { ContainerRegistrationKeys, Modules } from "@medusajs/framework/utils"
 import { createUsersWorkflow } from "@medusajs/medusa/core-flows"
 import seedRegions from "./seed-regions"
@@ -37,5 +37,12 @@ export default async function bootstrapRenderFree(args: ExecArgs) {
   }
   await seedRegions(args)
   await setupNigeriaVat(args)
-  if (process.env.BACHS_SECRET_KEY) await setupBachs(args)
+  if (process.env.BACHS_SECRET_KEY) {
+    const stores: IStoreModuleService = container.resolve(Modules.STORE)
+    const [store] = await stores.listStores()
+    if (store && !store.metadata?.bachs_regions_enabled) {
+      await setupBachs(args)
+      await stores.updateStores(store.id, { metadata: { ...store.metadata, bachs_regions_enabled: true } })
+    }
+  }
 }

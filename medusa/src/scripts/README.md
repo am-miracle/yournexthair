@@ -16,11 +16,15 @@ pricing, and (for Terminal) measured parcels and variant dimensions.
 
 ## Nigeria VAT
 
-Run `pnpm setup:nigeria-vat` once per environment (fresh seeds already include
-it). It sets a 7.5% default VAT rate on the Nigeria tax region (Nigeria Tax Act
-2025). Product prices are VAT-exclusive, so VAT is added at checkout. Terminal
-shipping quotes are treated as VAT-inclusive. International carts have no tax
-rate, so they pay no VAT. Rerunning the script is safe.
+VAT is **off** (0%) because the business is below the VAT registration
+threshold. Startup (and `pnpm setup:nigeria-vat`) creates the Nigeria tax
+region with a 0% default "VAT" rate if it is missing, and never changes an
+existing rate. Checkout hides the VAT line while it is zero.
+
+To start charging VAT once registered, set the rate to 7.5% (Nigeria Tax Act
+2025) in Admin → Settings → Tax Regions → Nigeria. No deploy is needed. Prices
+are then VAT-exclusive, so VAT is added at checkout; Terminal shipping quotes are
+treated as VAT-inclusive. International carts have no tax rate.
 
 ## International shipping
 

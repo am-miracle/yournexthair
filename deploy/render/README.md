@@ -35,7 +35,7 @@ For local work, use `nvm install` and `nvm use` from the repository root.
    `INITIAL_ADMIN_EMAIL` / `INITIAL_ADMIN_PASSWORD` in Render's prompts.
    These Admin values must be your own and must not be committed to Git.
 3. On startup, the free backend runs migrations, creates the initial Admin if
-   absent, seeds regions, sets the Nigeria 7.5% VAT rate, enables Bachs on all
+   absent, seeds regions, creates the Nigeria VAT rate at 0% if missing (change it in Admin once VAT-registered), enables Bachs on all
    regions when `BACHS_SECRET_KEY` is set, and starts Medusa. This replaces paid-only pre-deploy
    and Shell access. It does not create demo products or reset existing passwords.
 4. Sign in at `<backend-url>/app`, remove both initial Admin variables from Render,

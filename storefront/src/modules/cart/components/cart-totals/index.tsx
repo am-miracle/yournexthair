@@ -21,12 +21,16 @@ const CartTotals: React.FC<CartTotalsProps> = ({
     currency_code,
     total,
     item_subtotal,
-    tax_total,
+    item_tax_total,
     shipping_subtotal,
+    shipping_tax_total,
     discount_total,
+    discount_tax_total,
     gift_card_total,
   } = cart
   const hasShipping = (cart.shipping_methods?.length ?? 0) > 0
+  const discountAmount = (discount_total ?? 0) - (discount_tax_total ?? 0)
+  const shippingAmount = (shipping_subtotal ?? 0) + (shipping_tax_total ?? 0)
 
   return (
     <div className={className}>
@@ -46,41 +50,45 @@ const CartTotals: React.FC<CartTotalsProps> = ({
             {convertToLocale({ amount: item_subtotal ?? 0, currency_code })}
           </p>
         </div>
-        {!!discount_total && (
+        {discountAmount > 0 && (
           <div className="flex justify-between">
             <p className="text-grayscale-500">Discount:</p>
             <p
               className="self-end"
               data-testid="cart-discount"
-              data-value={discount_total || 0}
+              data-value={discountAmount}
             >
               -{" "}
-              {convertToLocale({ amount: discount_total ?? 0, currency_code })}
+              {convertToLocale({ amount: discountAmount, currency_code })}
             </p>
           </div>
         )}
         <div className="flex justify-between">
-          <p className="text-grayscale-500">Shipping:</p>
+          <p className="text-grayscale-500">
+            Shipping{shipping_tax_total ? " (incl. VAT)" : ""}:
+          </p>
           <p
             className="self-end"
             data-testid="cart-shipping"
-            data-value={shipping_subtotal || 0}
+            data-value={shippingAmount}
           >
             {hasShipping
-              ? convertToLocale({ amount: shipping_subtotal ?? 0, currency_code })
+              ? convertToLocale({ amount: shippingAmount, currency_code })
               : "Calculated at checkout"}
           </p>
         </div>
-        <div className="flex justify-between">
-          <p className="text-grayscale-500">VAT:</p>
-          <p
-            className="self-end"
-            data-testid="cart-taxes"
-            data-value={tax_total || 0}
-          >
-            {convertToLocale({ amount: tax_total ?? 0, currency_code })}
-          </p>
-        </div>
+        {!!item_tax_total && (
+          <div className="flex justify-between">
+            <p className="text-grayscale-500">VAT:</p>
+            <p
+              className="self-end"
+              data-testid="cart-taxes"
+              data-value={item_tax_total}
+            >
+              {convertToLocale({ amount: item_tax_total, currency_code })}
+            </p>
+          </div>
+        )}
         {!!gift_card_total && (
           <div className="flex justify-between">
             <p className="text-grayscale-500">Gift card:</p>

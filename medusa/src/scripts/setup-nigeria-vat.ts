@@ -1,8 +1,8 @@
 import type { ExecArgs } from "@medusajs/framework/types"
 import { ContainerRegistrationKeys, Modules } from "@medusajs/framework/utils"
 
-// Nigeria Tax Act 2025 (in force 1 Jan 2026) retained the 7.5% standard VAT rate.
-export const NIGERIA_VAT = { name: "VAT", code: "VAT", rate: 7.5 }
+
+export const NIGERIA_VAT = { name: "VAT", code: "VAT", rate: 0 }
 
 export default async function setupNigeriaVat({ container }: ExecArgs) {
   const logger = container.resolve(ContainerRegistrationKeys.LOGGER)
@@ -20,12 +20,5 @@ export default async function setupNigeriaVat({ container }: ExecArgs) {
   if (!existing) {
     await tax.createTaxRates({ tax_region_id: region.id, is_default: true, ...NIGERIA_VAT })
     logger.info(`Created Nigeria default VAT rate (${NIGERIA_VAT.rate}%).`)
-    return
   }
-  if (existing.rate === NIGERIA_VAT.rate && existing.code === NIGERIA_VAT.code) {
-    logger.info(`Nigeria VAT already ${NIGERIA_VAT.rate}%. Nothing to do.`)
-    return
-  }
-  await tax.updateTaxRates(existing.id, NIGERIA_VAT)
-  logger.info(`Updated Nigeria default VAT rate from ${existing.rate}% to ${NIGERIA_VAT.rate}%.`)
 }

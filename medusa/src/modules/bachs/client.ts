@@ -73,11 +73,15 @@ export class BachsClient {
     return this.request<BachsCreatedCheckout>("POST", "/v1/checkout-sessions", body, idempotencyKey)
   }
 
-  getCheckoutSession(checkoutId: string) {
-    return this.request<BachsCheckoutSession>(
+  async getCheckoutSession(checkoutId: string): Promise<BachsCheckoutSession> {
+    const checkout = await this.request<BachsCheckoutSession>(
       "GET",
       `/v1/checkout-sessions/${encodeURIComponent(checkoutId)}`,
     )
+    const normalized: BachsCheckoutSession = { ...checkout, status: checkout.status.toUpperCase() }
+    if (checkout.payment_status) normalized.payment_status = checkout.payment_status.toLowerCase()
+    if (checkout.charge?.status) normalized.charge = { ...checkout.charge, status: checkout.charge.status.toLowerCase() }
+    return normalized
   }
 
   getPayment(paymentId: string) {

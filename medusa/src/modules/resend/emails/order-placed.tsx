@@ -7,8 +7,12 @@ import EmailLayout, { type EmailLayoutProps } from "./components/EmailLayout"
 export type OrderPlacedEmailProps = {
   order: Pick<
     HttpTypes.AdminOrder,
-    "currency_code" | "email" | "shipping_subtotal" | "item_subtotal" | "total" | "tax_total"
+    "currency_code" | "email" | "item_subtotal" | "total"
   > & {
+    discount_amount: number
+    shipping_amount: number
+    shipping_includes_vat: boolean
+    vat_amount: number
     display_id?: string | number | null
     shipping_address:
       | (Pick<
@@ -192,21 +196,33 @@ export default function OrderPlacedEmail({ order, ...emailLayoutProps }: OrderPl
                   <Text className="m-0 text-base ml-auto">{formatter.format(order.item_subtotal)}</Text>
                 </Column>
               </Row>
+              {order.discount_amount > 0 && (
+                <Row className="mb-2">
+                  <Column className="flex">
+                    <Text className="text-grayscale-500 m-0 text-base">Discount</Text>
+                    <Text className="m-0 text-base ml-auto">-{formatter.format(order.discount_amount)}</Text>
+                  </Column>
+                </Row>
+              )}
               <Row className="mb-2">
                 <Column className="flex">
-                  <Text className="text-grayscale-500 m-0 text-base">Shipping</Text>
+                  <Text className="text-grayscale-500 m-0 text-base">
+                    {order.shipping_includes_vat ? "Shipping (incl. VAT)" : "Shipping"}
+                  </Text>
                   <Text className="m-0 text-base ml-auto">
-                    {formatter.format(order.shipping_subtotal)}
+                    {formatter.format(order.shipping_amount)}
                   </Text>
                 </Column>
               </Row>
-              <Row className="mb-6">
-                <Column className="flex">
-                  <Text className="text-grayscale-500 m-0 text-base">VAT</Text>
-                  <Text className="m-0 text-base ml-auto">{formatter.format(order.tax_total)}</Text>
-                </Column>
-              </Row>
-              <Row>
+              {order.vat_amount > 0 && (
+                <Row className="mb-2">
+                  <Column className="flex">
+                    <Text className="text-grayscale-500 m-0 text-base">VAT</Text>
+                    <Text className="m-0 text-base ml-auto">{formatter.format(order.vat_amount)}</Text>
+                  </Column>
+                </Row>
+              )}
+              <Row className="mt-4">
                 <Column className="flex">
                   <Text className="m-0 text-md">Total</Text>
                   <Text className="m-0 text-md ml-auto">{formatter.format(order.total)}</Text>
@@ -270,9 +286,11 @@ OrderPlacedEmail.PreviewProps = {
         },
       },
     ],
-    shipping_subtotal: 100,
     item_subtotal: 1300,
-    total: 1505,
-    tax_total: 105,
+    discount_amount: 0,
+    shipping_amount: 100,
+    shipping_includes_vat: false,
+    vat_amount: 97.5,
+    total: 1497.5,
   },
 } satisfies OrderPlacedEmailProps

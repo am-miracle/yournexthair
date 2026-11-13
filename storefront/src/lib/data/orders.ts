@@ -1,6 +1,7 @@
 "use server"
 
 import { cache } from "react"
+import { updateTag } from "next/cache"
 import { sdk } from "@lib/config"
 import medusaError from "@lib/util/medusa-error"
 import { enrichLineItems } from "@lib/util/enrich-line-items"
@@ -50,4 +51,23 @@ export const listOrders = async function (
       headers: { ...(await getAuthHeaders()) },
     })
     .catch((err) => medusaError(err))
+}
+
+export async function acceptOrderTransfer(orderId: unknown, token: unknown) {
+  if (
+    typeof orderId !== "string" ||
+    !/^order_[A-Za-z0-9]+$/.test(orderId) ||
+    typeof token !== "string" ||
+    !/^[A-Za-z0-9-]+$/.test(token)
+  ) {
+    return { ok: false as const }
+  }
+
+  try {
+    await sdk.store.order.acceptTransfer(orderId, { token }, {}, await getAuthHeaders())
+    updateTag("orders")
+    return { ok: true as const }
+  } catch {
+    return { ok: false as const }
+  }
 }
