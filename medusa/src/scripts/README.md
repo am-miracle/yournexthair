@@ -1,5 +1,27 @@
 # Custom CLI Script
 
+## Development checkout shipping
+
+After seeding the catalog, run `APP_ENV=development pnpm seed:dev-shipping`
+from `medusa`, with `DATABASE_URL` pointing to the development database.
+This repeatable seed adds a development warehouse, links active sales channels,
+and creates country service zones for the existing NGN/USD regions and shipping
+profiles. Existing matching options are preserved on subsequent runs.
+
+Delivery is labeled **Test delivery (sample rate)**: NGN 15,000 or USD 10.
+These are development fixtures, not real courier prices. The warehouse address
+is also a fixture. No product data, inventory quantities, or Terminal settings
+are changed. Production checkout requires real warehouse details, delivery
+pricing, and (for Terminal) measured parcels and variant dimensions.
+
+## Nigeria VAT
+
+Run `pnpm setup:nigeria-vat` once per environment (fresh seeds already include
+it). It sets a 7.5% default VAT rate on the Nigeria tax region (Nigeria Tax Act
+2025). Product prices are VAT-exclusive, so VAT is added at checkout. Terminal
+shipping quotes are treated as VAT-inclusive. International carts have no tax
+rate, so they pay no VAT. Rerunning the script is safe.
+
 A custom CLI script is a function to execute through Medusa's CLI tool. This is useful when creating custom Medusa tooling to run as a CLI tool.
 
 ## How to Create a Custom CLI Script?

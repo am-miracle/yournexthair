@@ -26,6 +26,7 @@ import type {
 import { ContainerRegistrationKeys, Modules, ProductStatus } from "@medusajs/framework/utils"
 import type FashionModuleService from "../modules/fashion/service"
 import type { MaterialModelType } from "../modules/fashion/models/material"
+import { NIGERIA_VAT } from "./setup-nigeria-vat"
 
 function requireDefined<T>(value: T | undefined, message: string): T {
   if (value === undefined) {
@@ -263,6 +264,7 @@ export default async function seedDemoData({ container }: ExecArgs) {
     input: countries.map((country_code) => ({
       country_code,
       provider_id: "tp_system",
+      ...(country_code === "ng" && { default_tax_rate: NIGERIA_VAT }),
     })),
   })
   logger.info("Finished seeding tax regions.")

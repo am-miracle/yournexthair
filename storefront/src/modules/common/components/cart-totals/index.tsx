@@ -13,10 +13,10 @@ const CartTotals: React.FC<CartTotalsProps> = ({ cart }) => {
   const {
     currency_code,
     total,
-    subtotal,
+    item_subtotal,
     tax_total,
     discount_total,
-    shipping_total,
+    shipping_subtotal,
     gift_card_total,
   } = cart
 
@@ -28,7 +28,7 @@ const CartTotals: React.FC<CartTotalsProps> = ({ cart }) => {
             <p>Subtotal</p>
           </div>
           <div className="self-end">
-            <p>{convertToLocale({ amount: subtotal ?? 0, currency_code })}</p>
+            <p>{convertToLocale({ amount: item_subtotal ?? 0, currency_code })}</p>
           </div>
         </div>
         {!!discount_total && (
@@ -53,13 +53,13 @@ const CartTotals: React.FC<CartTotalsProps> = ({ cart }) => {
           </div>
           <div className="self-end">
             <p>
-              {convertToLocale({ amount: shipping_total ?? 0, currency_code })}
+              {convertToLocale({ amount: shipping_subtotal ?? 0, currency_code })}
             </p>
           </div>
         </div>
         <div className="flex justify-between max-lg:text-xs">
           <div>
-            <p>Taxes</p>
+            <p>VAT</p>
           </div>
           <div className="self-end">
             <p>{convertToLocale({ amount: tax_total ?? 0, currency_code })}</p>

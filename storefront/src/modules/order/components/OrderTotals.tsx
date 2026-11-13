@@ -7,9 +7,9 @@ export const OrderTotals: React.FC<{
   const {
     currency_code,
     total,
-    subtotal,
+    item_subtotal,
     tax_total,
-    shipping_total,
+    shipping_subtotal,
     discount_total,
     gift_card_total,
   } = order
@@ -24,7 +24,7 @@ export const OrderTotals: React.FC<{
           <p>
             {convertToLocale({
               currency_code,
-              amount: subtotal ?? 0,
+              amount: item_subtotal ?? 0,
             })}
           </p>
         </div>
@@ -50,9 +50,17 @@ export const OrderTotals: React.FC<{
           <p>
             {convertToLocale({
               currency_code,
-              amount: shipping_total ?? 0,
+              amount: shipping_subtotal ?? 0,
             })}
           </p>
+        </div>
+      </div>
+      <div className="flex justify-between gap-4 mb-2">
+        <div className="text-grayscale-500">
+          <p>VAT</p>
+        </div>
+        <div className="self-end">
+          <p>{convertToLocale({ amount: tax_total ?? 0, currency_code })}</p>
         </div>
       </div>
       {!!gift_card_total && (
@@ -81,10 +89,6 @@ export const OrderTotals: React.FC<{
           </p>
         </div>
       </div>
-      <p className="text-xs text-grayscale-500">
-        Including {convertToLocale({ amount: tax_total ?? 0, currency_code })}{" "}
-        tax
-      </p>
     </div>
   )
 }

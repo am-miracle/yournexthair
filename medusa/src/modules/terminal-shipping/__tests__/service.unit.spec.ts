@@ -11,11 +11,11 @@ jest.mock("@medusajs/framework/utils", () => ({
 }))
 
 const option = { id: "terminal-pickup", terminal_shipping: {
-  name: "Wig box", packaging_id: "PA-1", weight_grams: 100,
+  name: "Wig box", packaging_id: "PA-1", environment: "sandbox", pickup_first_name: "Dispatch", pickup_last_name: "Contact", pickup_email: "dispatch@example.com", weight_grams: 100,
   length_cm: 30, width_cm: 25, height_cm: 10,
   max_items: 3, max_content_weight_grams: 2000, carrier_reference: "",
 } }
-const address = { address_1: "1 Test Street", city: "Port Harcourt", province: "Rivers", country_code: "ng" }
+const address = { first_name: "Test", last_name: "Contact", phone: "+2348000000000", postal_code: "500001", address_1: "1 Test Street", city: "Port Harcourt", province: "Rivers", country_code: "ng" }
 const context = {
   id: "cart_1", currency_code: "ngn", email: "customer@example.com",
   from_location: { address }, shipping_address: { ...address, city: "Lagos", province: "Lagos" },
@@ -29,8 +29,8 @@ it("registers packaging in kg and cm, including its empty weight", async () => {
   const fetchMock = jest.spyOn(global, "fetch").mockResolvedValueOnce(response({ packaging_id: "PA-1" }))
   await expect(new TerminalClient("test-key").createPackaging(option.terminal_shipping)).resolves.toBe("PA-1")
   const [url, init] = fetchMock.mock.calls[0]!
-  expect(url).toBe("https://api.terminal.africa/v1/packaging")
-  expect(JSON.parse(String(init?.body))).toMatchObject({ weight: 0.1, weight_unit: "kg", length: 30, width: 25, height: 10, size_unit: "cm" })
+  expect(url).toBe("https://sandbox.terminal.africa/v1/packaging")
+  expect(JSON.parse(init?.body as string)).toMatchObject({ weight: 0.1, weight_unit: "kg", length: 30, width: 25, height: 10, size_unit: "cm" })
 })
 
 it("uses server-calculated prices and ignores forged customer quote data", async () => {

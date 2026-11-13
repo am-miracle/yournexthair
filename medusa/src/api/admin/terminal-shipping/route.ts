@@ -13,7 +13,7 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
     fields: ["id", "name", "data"],
     filters: { provider_id: TERMINAL_PROVIDER_ID, price_type: "calculated" },
   })
-  res.json({ configured: Boolean(process.env.TERMINAL_SECRET_KEY), shipping_options: options.map((option) => ({
+  res.json({ configured: Boolean(process.env.TERMINAL_SECRET_KEY), environment: process.env.TERMINAL_ENVIRONMENT ?? "sandbox", automatic_booking: process.env.TERMINAL_AUTO_BOOKING === "true", shipping_options: options.map((option) => ({
     id: option.id, name: option.name,
     settings: optionSettingsSchema.safeParse(option.data?.terminal_shipping).success ? option.data?.terminal_shipping : null,
   })) })
@@ -32,9 +32,10 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
   }
   const previous = optionSettingsSchema.safeParse(option.data?.terminal_shipping)
   const settings = parsed.data.settings
-  const unchanged = previous.success && JSON.stringify(packagingSchema.parse(previous.data)) === JSON.stringify(settings)
+  const environment = process.env.TERMINAL_ENVIRONMENT ?? "sandbox"
+  const unchanged = previous.success && previous.data.environment === environment && JSON.stringify(packagingSchema.parse(previous.data)) === JSON.stringify(settings)
   const packagingId = unchanged && previous.success ? previous.data.packaging_id : await new TerminalClient(apiKey).createPackaging(settings)
-  const saved = { ...settings, packaging_id: packagingId }
+  const saved = { ...settings, packaging_id: packagingId, environment }
   await updateShippingOptionsWorkflow(req.scope).run({ input: [{
     id: option.id, data: { ...option.data, terminal_shipping: saved },
   }] })

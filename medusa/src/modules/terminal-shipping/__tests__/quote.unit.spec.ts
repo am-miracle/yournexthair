@@ -9,12 +9,12 @@ jest.mock("@medusajs/framework/utils", () => ({
 }))
 
 const settings = {
-  name: "Wig box", packaging_id: "PA-1", weight_grams: 100,
+  name: "Wig box", packaging_id: "PA-1", environment: "sandbox", pickup_first_name: "Dispatch", pickup_last_name: "Contact", pickup_email: "dispatch@example.com", weight_grams: 100,
   length_cm: 30, width_cm: 25, height_cm: 10,
   max_items: 3, max_content_weight_grams: 2000, carrier_reference: "",
 }
 const option = { id: "terminal-pickup", terminal_shipping: settings }
-const address = { address_1: "1 Test Street", city: "Port Harcourt", province: "ng-ri", country_code: "ng" }
+const address = { first_name: "Test", last_name: "Contact", phone: "+2348000000000", postal_code: "500001", address_1: "1 Test Street", city: "Port Harcourt", province: "ng-ri", country_code: "ng" }
 const context: ShippingContext = {
   currency_code: "ngn", email: "customer@example.com",
   from_location: { address }, shipping_address: { ...address, city: "Lagos", province: "ng-la" },
@@ -50,6 +50,20 @@ describe("Terminal shipping parcel", () => {
     expect(buildQuoteRequest(option, { ...context, items: [{ ...context.items?.[0], quantity: 1 }] }).fingerprint).not.toBe(original)
     expect(buildQuoteRequest(option, { ...context, shipping_address: { ...address, city: "Abuja", province: "FC" } }).fingerprint).not.toBe(original)
   })
+  it("blocks packages registered in another environment", () => {
+    expect(() => buildQuoteRequest({ ...option, terminal_shipping: { ...settings, environment: "live" } }, context)).toThrow("another Terminal environment")
+  })
+  it("requires booking contact details before quoting a charge to the customer", () => {
+    expect(() => buildQuoteRequest(option, { ...context, shipping_address: { ...address, phone: "" } })).toThrow("phone number")
+  })
+  it("requires customs data internationally and a manufacturer profile for EU goods", () => {
+    const international = { ...context, shipping_address: { ...address, country_code: "de" } }
+    expect(() => buildQuoteRequest(option, international)).toThrow("HS code")
+    const items = [{ ...context.items?.[0], variant: { ...context.items?.[0]?.variant, metadata: { hs_code: "670420" } } }]
+    expect(() => buildQuoteRequest(option, { ...international, items })).toThrow("manufacturer profile")
+    const configured = [{ ...items[0], variant: { ...items[0]!.variant, metadata: { hs_code: "670420", manufacturers_profile: "AD-MAKER" } } }]
+    expect(buildQuoteRequest(option, { ...international, items: configured }).body.parcel.items[0]).toMatchObject({ hs_code: "670420", manufacturers_profile: "AD-MAKER" })
+  })
 })
 
 describe("Terminal rate selection", () => {
@@ -61,5 +75,11 @@ describe("Terminal rate selection", () => {
   it("honors the selected carrier and never substitutes another currency or courier", () => {
     expect(() => selectRate([rate], "USD", "")).toThrow("No courier")
     expect(() => selectRate([rate], "NGN", "CA-2")).toThrow("No courier")
+  })
+  it("excludes dropoff-only, priority-only and scheduled-only pickup options", () => {
+    for (const type of ["dropoff", "priority_pickup", "scheduled_pickup"]) {
+      expect(() => selectRate([{ ...rate, pickup_options: [{ type }] }], "NGN", "")).toThrow("No courier")
+    }
+    expect(selectRate([{ ...rate, pickup_options: [{ type: "pickup" }] }], "NGN", "")).toEqual(expect.objectContaining({ amount: 5000 }))
   })
 })

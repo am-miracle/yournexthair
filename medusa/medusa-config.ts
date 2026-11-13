@@ -108,6 +108,7 @@ module.exports = defineConfig({
     },
   },
   modules: [
+    { resolve: "./src/modules/terminal-operations" },
     {
       resolve: "@medusajs/medusa/fulfillment",
       options: {

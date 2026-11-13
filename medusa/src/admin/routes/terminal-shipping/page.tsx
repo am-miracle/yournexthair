@@ -5,13 +5,17 @@ import { Container, Heading, Text, Button, Input, Label } from "@medusajs/ui"
 import type { PackagingSettings } from "../../../modules/terminal-shipping/config"
 
 type ShippingOption = { id: string; name: string; settings: PackagingSettings | null }
-type SetupResponse = { configured: boolean; shipping_options: ShippingOption[] }
+type SetupResponse = { configured: boolean; environment: string; automatic_booking: boolean; shipping_options: ShippingOption[] }
 const emptySettings = {
   name: "", weight_grams: "", length_cm: "", width_cm: "", height_cm: "",
   max_items: "", max_content_weight_grams: "", carrier_reference: "",
+  pickup_first_name: "", pickup_last_name: "", pickup_email: "",
 }
 type FormState = typeof emptySettings
 const fields: { key: keyof FormState; label: string; type: "text" | "number" }[] = [
+  { key: "pickup_first_name", label: "Dispatch contact first name", type: "text" },
+  { key: "pickup_last_name", label: "Dispatch contact last name", type: "text" },
+  { key: "pickup_email", label: "Dispatch contact email", type: "text" },
   { key: "name", label: "Package name", type: "text" },
   { key: "weight_grams", label: "Empty packaging weight (grams)", type: "number" },
   { key: "length_cm", label: "Outer length (cm)", type: "number" },
@@ -71,6 +75,7 @@ export default function TerminalShippingPage() {
   return (
     <Container className="space-y-6">
       <div><Heading>Terminal shipping</Heading><Text>Manage the package used for live courier quotes.</Text></div>
+      {setup && <Text>Terminal environment: {setup.environment}. Automatic courier booking: {setup.automatic_booking ? "enabled" : "disabled"}.</Text>}
       <Text>Set each product variant’s weight in grams and its folded or packed dimensions in centimetres under Products → variant → Edit. Hair length in inches belongs in the hair attributes, not the shipping length field.</Text>
       <Text>Your pickup address comes from the stock location linked to the shipping option. Manage its street address, city (Port Harcourt), state (Rivers), country, postal code and phone under Settings → Locations &amp; Shipping.</Text>
       {setup && !setup.configured && <Text>Ask your developer to configure the backend’s Terminal API key before enabling live shipping.</Text>}
@@ -91,7 +96,7 @@ export default function TerminalShippingPage() {
         <Button type="submit" isLoading={saving} disabled={!selectedId || !setup?.configured}>Save package</Button>
         <Text role="status" aria-live="polite">{message}</Text>
       </form>
-      <Text>Rates do not book or pay for courier shipments. After payment, book the shipment in Terminal Africa, then enter its tracking details when dispatching the order in Medusa.</Text>
+      <Text>Checkout quotes do not buy shipments. When automatic booking is enabled, creating a fulfillment for a fully paid order purchases courier delivery. Pack the complete order first. Tracking and booking problems appear under Terminal bookings.</Text>
     </Container>
   )
 }

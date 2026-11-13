@@ -113,8 +113,10 @@ export default async function sendOrderConfirmationHandler({
     currency_code: string;
     total: MathBNInput | null;
     subtotal: MathBNInput | null;
+    item_subtotal: MathBNInput | null;
     tax_total: MathBNInput | null;
     shipping_total: MathBNInput | null;
+    shipping_subtotal: MathBNInput | null;
     email: string | null;
     shipping_address:
       | ({
@@ -220,8 +222,8 @@ export default async function sendOrderConfirmationHandler({
 
   const orderForEmail = {
     ...order,
-    subtotal: toNumber(order.subtotal),
-    shipping_total: toNumber(order.shipping_total),
+    item_subtotal: toNumber(order.item_subtotal),
+    shipping_subtotal: toNumber(order.shipping_subtotal),
     total: toNumber(order.total),
     tax_total: toNumber(order.tax_total),
     shipping_address: shippingAddressForEmail,

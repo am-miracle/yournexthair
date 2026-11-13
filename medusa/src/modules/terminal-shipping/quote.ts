@@ -13,7 +13,7 @@ export type ShippingContext = {
     quantity?: unknown
     unit_price?: unknown
     requires_shipping?: boolean | undefined
-    variant?: { weight?: unknown; length?: unknown; height?: unknown; width?: unknown } | null | undefined
+    variant?: { weight?: unknown; length?: unknown; height?: unknown; width?: unknown; metadata?: Record<string, unknown> | null | undefined } | null | undefined
   }[]
 }
 type Address = {
@@ -41,9 +41,12 @@ const nigerianStates: Record<string, string> = {
   la: "Lagos", na: "Nasarawa", ni: "Niger", og: "Ogun", on: "Ondo", os: "Osun", oy: "Oyo", pl: "Plateau",
   ri: "Rivers", so: "Sokoto", ta: "Taraba", yo: "Yobe", za: "Zamfara",
 }
-function terminalAddress(address: Address | null | undefined, label: string) {
+function terminalAddress(address: Address | null | undefined, label: string, requireName = false) {
   if (!address?.city?.trim() || !address.province?.trim() || !address.country_code?.trim() || !address.address_1?.trim()) {
     return invalid(`${label} needs a street address, city, state and country before shipping can be quoted.`)
+  }
+  if (!address.phone?.trim() || !address.postal_code?.trim() || (requireName && (!address.first_name?.trim() || !address.last_name?.trim()))) {
+    return invalid(`${label} needs a contact name, phone number and postal code before shipping can be quoted.`)
   }
   const country = address.country_code.toUpperCase()
   const province = address.province.trim()
@@ -60,12 +63,17 @@ export function buildQuoteRequest(optionData: Record<string, unknown>, context: 
   const parsed = optionSettingsSchema.safeParse(optionData.terminal_shipping)
   if (!parsed.success) return invalid("Shipping packaging has not been configured. Please contact the store.")
   const settings = parsed.data
+  if (settings.environment !== (process.env.TERMINAL_ENVIRONMENT ?? "sandbox")) return invalid("Shipping packaging belongs to another Terminal environment. Configure this package again.")
   const currency = typeof context.currency_code === "string" ? context.currency_code.toUpperCase() : ""
   if (!currency) return invalid("A cart currency is required for shipping.")
+  const pickupAddress = { ...terminalAddress(context.from_location?.address, "Pickup location"), first_name: settings.pickup_first_name, last_name: settings.pickup_last_name, email: settings.pickup_email }
+  const deliveryAddress = { ...terminalAddress(context.shipping_address, "Delivery address", true), email: typeof context.email === "string" ? context.email : "" }
   const box = [settings.length_cm, settings.width_cm, settings.height_cm].sort((a, b) => a - b)
   let count = 0
   let weightGrams = 0
   let volume = 0
+  const international = context.from_location?.address?.country_code?.toLowerCase() !== context.shipping_address?.country_code?.toLowerCase()
+  const eu = new Set(["at", "be", "bg", "hr", "cy", "cz", "dk", "ee", "fi", "fr", "de", "gr", "hu", "ie", "it", "lv", "lt", "lu", "mt", "nl", "pl", "pt", "ro", "sk", "si", "es", "se"])
   const items = (context.items ?? []).filter((item) => item.requires_shipping !== false).map((item) => {
     const quantity = positive(item.quantity, "Item quantity")
     if (!Number.isInteger(quantity)) return invalid("Item quantity must be a whole number.")
@@ -82,15 +90,21 @@ export function buildQuoteRequest(optionData: Record<string, unknown>, context: 
     volume += dimensions.reduce((total, dimension) => total * dimension, 1) * quantity
     const unitPrice = Number(item.unit_price)
     if (!Number.isFinite(unitPrice) || unitPrice < 0) return invalid("Product value is invalid for shipping.")
-    return { name: label, description: label, type: "parcel", quantity, weight: weight / 1000, value: unitPrice * quantity, currency }
+    const hsCode = item.variant?.metadata?.hs_code
+    const manufacturer = item.variant?.metadata?.manufacturers_profile
+    if (international && (typeof hsCode !== "string" || !/^\d{6,10}$/.test(hsCode))) return invalid(`${label} needs a valid customs HS code before international shipping can be quoted.`)
+    if (international && eu.has(context.shipping_address?.country_code?.toLowerCase() ?? "") && (typeof manufacturer !== "string" || !manufacturer.trim())) return invalid(`${label} needs a Terminal manufacturer profile before shipping to the EU.`)
+    return { name: label, description: label, type: "parcel", quantity, weight: weight / 1000, value: unitPrice * quantity, currency,
+      ...(international ? { hs_code: hsCode } : {}), ...(typeof manufacturer === "string" && manufacturer.trim() ? { manufacturers_profile: manufacturer } : {}),
+    }
   })
   if (!items.length) return invalid("There are no shippable items in this cart.")
   if (count > settings.max_items || weightGrams > settings.max_content_weight_grams || volume > settings.length_cm * settings.width_cm * settings.height_cm) {
     return invalid("This order exceeds the configured shipping package capacity. Please contact the store for delivery.")
   }
   const body = {
-    pickup_address: terminalAddress(context.from_location?.address, "Pickup location"),
-    delivery_address: { ...terminalAddress(context.shipping_address, "Delivery address"), email: typeof context.email === "string" ? context.email : "" },
+    pickup_address: pickupAddress,
+    delivery_address: deliveryAddress,
     parcel: { description: "Hair products", packaging: settings.packaging_id, weight_unit: "kg", items },
     currency,
     persist_data: false,
@@ -101,7 +115,9 @@ export function buildQuoteRequest(optionData: Record<string, unknown>, context: 
 }
 
 export function selectRate(rates: TerminalRate[], currency: string, carrierReference: string) {
-  const eligible = rates.filter((rate) => rate.currency.toUpperCase() === currency && !rate.dropoff_required && (!carrierReference || rate.carrier_reference === carrierReference))
+  const eligible = rates.filter((rate) => rate.currency.toUpperCase() === currency && !rate.dropoff_required &&
+    (!rate.pickup_options || rate.pickup_options.some((option) => option.type === "pickup")) &&
+    (!carrierReference || rate.carrier_reference === carrierReference))
   const rate = eligible.sort((a, b) => a.amount - b.amount)[0]
   if (!rate) return invalid("No courier pickup service is available for this address and parcel. Please contact the store.")
   return rate

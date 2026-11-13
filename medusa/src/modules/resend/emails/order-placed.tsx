@@ -7,7 +7,7 @@ import EmailLayout, { type EmailLayoutProps } from "./components/EmailLayout"
 export type OrderPlacedEmailProps = {
   order: Pick<
     HttpTypes.AdminOrder,
-    "currency_code" | "email" | "shipping_total" | "subtotal" | "total" | "tax_total"
+    "currency_code" | "email" | "shipping_subtotal" | "item_subtotal" | "total" | "tax_total"
   > & {
     display_id?: string | number | null
     shipping_address:
@@ -189,29 +189,27 @@ export default function OrderPlacedEmail({ order, ...emailLayoutProps }: OrderPl
               <Row className="mb-2">
                 <Column className="flex">
                   <Text className="text-grayscale-500 m-0 text-base">Subtotal</Text>
-                  <Text className="m-0 text-base ml-auto">{formatter.format(order.subtotal)}</Text>
+                  <Text className="m-0 text-base ml-auto">{formatter.format(order.item_subtotal)}</Text>
+                </Column>
+              </Row>
+              <Row className="mb-2">
+                <Column className="flex">
+                  <Text className="text-grayscale-500 m-0 text-base">Shipping</Text>
+                  <Text className="m-0 text-base ml-auto">
+                    {formatter.format(order.shipping_subtotal)}
+                  </Text>
                 </Column>
               </Row>
               <Row className="mb-6">
                 <Column className="flex">
-                  <Text className="text-grayscale-500 m-0 text-base">Shipping</Text>
-                  <Text className="m-0 text-base ml-auto">
-                    {formatter.format(order.shipping_total)}
-                  </Text>
+                  <Text className="text-grayscale-500 m-0 text-base">VAT</Text>
+                  <Text className="m-0 text-base ml-auto">{formatter.format(order.tax_total)}</Text>
                 </Column>
               </Row>
               <Row>
                 <Column className="flex">
                   <Text className="m-0 text-md">Total</Text>
                   <Text className="m-0 text-md ml-auto">{formatter.format(order.total)}</Text>
-                </Column>
-              </Row>
-              <Row>
-                <Column className="flex">
-                  <Text className="text-grayscale-500 m-0 text-xs">Including</Text>
-                  <Text className="m-0 text-xs text-grayscale-500 ml-1">
-                    {formatter.format(order.tax_total)} tax
-                  </Text>
                 </Column>
               </Row>
             </Section>
@@ -272,9 +270,9 @@ OrderPlacedEmail.PreviewProps = {
         },
       },
     ],
-    shipping_total: 100,
-    subtotal: 1400,
-    total: 1500,
-    tax_total: 100,
+    shipping_subtotal: 100,
+    item_subtotal: 1300,
+    total: 1505,
+    tax_total: 105,
   },
 } satisfies OrderPlacedEmailProps

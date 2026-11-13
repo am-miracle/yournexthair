@@ -10,7 +10,10 @@ export const packagingSchema = z.object({
   max_items: z.number().int().positive().max(100),
   max_content_weight_grams: z.number().finite().positive().max(100000),
   carrier_reference: z.string().trim().max(100).default(""),
+  pickup_first_name: z.string().trim().min(1).max(100),
+  pickup_last_name: z.string().trim().min(1).max(100),
+  pickup_email: z.string().trim().email(),
 })
 export type PackagingSettings = z.infer<typeof packagingSchema>
-export const optionSettingsSchema = packagingSchema.extend({ packaging_id: z.string().min(1) })
+export const optionSettingsSchema = packagingSchema.extend({ packaging_id: z.string().min(1), environment: z.enum(["sandbox", "live"]) })
 export type OptionSettings = z.infer<typeof optionSettingsSchema>
