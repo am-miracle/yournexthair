@@ -19,6 +19,7 @@ const CartTotals: React.FC<CartTotalsProps> = ({ cart }) => {
     shipping_subtotal,
     gift_card_total,
   } = cart
+  const hasShipping = (cart.shipping_methods?.length ?? 0) > 0
 
   return (
     <div>
@@ -53,7 +54,9 @@ const CartTotals: React.FC<CartTotalsProps> = ({ cart }) => {
           </div>
           <div className="self-end">
             <p>
-              {convertToLocale({ amount: shipping_subtotal ?? 0, currency_code })}
+              {hasShipping
+                ? convertToLocale({ amount: shipping_subtotal ?? 0, currency_code })
+                : "Calculated at checkout"}
             </p>
           </div>
         </div>

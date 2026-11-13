@@ -22,6 +22,14 @@ it). It sets a 7.5% default VAT rate on the Nigeria tax region (Nigeria Tax Act
 shipping quotes are treated as VAT-inclusive. International carts have no tax
 rate, so they pay no VAT. Rerunning the script is safe.
 
+## International shipping
+
+`pnpm setup:international-shipping 40 [stock_location_id]` creates a flat
+**International delivery** option (USD 40 per order) for every country in the
+USD region. Orders are booked by hand with the courier. The checkout tells
+non-Nigerian customers that import duties are paid on delivery. Reruns keep the
+existing option; change its price in Admin.
+
 A custom CLI script is a function to execute through Medusa's CLI tool. This is useful when creating custom Medusa tooling to run as a CLI tool.
 
 ## How to Create a Custom CLI Script?

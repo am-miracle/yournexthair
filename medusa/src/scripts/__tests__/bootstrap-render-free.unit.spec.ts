@@ -1,10 +1,14 @@
 import bootstrap from "../bootstrap-render-free"
 import { createUsersWorkflow } from "@medusajs/medusa/core-flows"
 import type { ExecArgs } from "@medusajs/framework/types"
+import setupBachs from "../setup-bachs"
+import setupNigeriaVat from "../setup-nigeria-vat"
 
 jest.mock("@medusajs/framework/utils", () => ({ ContainerRegistrationKeys: { LOGGER: "logger" }, Modules: { USER: "user", AUTH: "auth" } }))
 jest.mock("@medusajs/medusa/core-flows", () => ({ createUsersWorkflow: jest.fn() }))
 jest.mock("../seed-regions", () => ({ __esModule: true, default: jest.fn() }))
+jest.mock("../setup-nigeria-vat", () => ({ __esModule: true, default: jest.fn() }))
+jest.mock("../setup-bachs", () => ({ __esModule: true, default: jest.fn() }))
 const oldEnv = { ...process.env }
 afterEach(() => { process.env = { ...oldEnv }; jest.resetAllMocks() })
 
@@ -27,4 +31,18 @@ it("creates login credentials without requiring the optional RBAC module", async
   await bootstrap(args)
   expect(run).toHaveBeenCalledWith({ input: { users: [{ email: "admin@example.com" }] } })
   expect(update).toHaveBeenCalledWith({ id: "auth_1", app_metadata: { user_id: "user_1" } })
+})
+
+it("runs on production and configures VAT, and Bachs only when its key is set", async () => {
+  delete process.env.INITIAL_ADMIN_EMAIL
+  delete process.env.INITIAL_ADMIN_PASSWORD
+  process.env.APP_ENV = "production"
+  const args = { container: { resolve: () => ({ info: jest.fn() }) }, args: [] } as unknown as ExecArgs
+  delete process.env.BACHS_SECRET_KEY
+  await bootstrap(args)
+  expect(setupNigeriaVat).toHaveBeenCalledWith(args)
+  expect(setupBachs).not.toHaveBeenCalled()
+  process.env.BACHS_SECRET_KEY = "sk_sandbox_test"
+  await bootstrap(args)
+  expect(setupBachs).toHaveBeenCalledWith(args)
 })

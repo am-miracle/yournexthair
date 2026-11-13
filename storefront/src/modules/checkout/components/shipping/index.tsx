@@ -127,6 +127,14 @@ const Shipping = ({ cart }: { cart: StoreCart }) => {
               ))}
             </UiRadioGroup>
 
+            {cart.shipping_address?.country_code &&
+              cart.shipping_address.country_code.toLowerCase() !== "ng" && (
+                <p className="text-grayscale-500 text-xs mb-8">
+                  Import duties and taxes may be charged by your country on
+                  delivery. These are not included in your order total.
+                </p>
+              )}
+
             <ErrorMessage error={error} />
 
             <Button

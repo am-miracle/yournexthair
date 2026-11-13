@@ -26,6 +26,7 @@ const CartTotals: React.FC<CartTotalsProps> = ({
     discount_total,
     gift_card_total,
   } = cart
+  const hasShipping = (cart.shipping_methods?.length ?? 0) > 0
 
   return (
     <div className={className}>
@@ -65,7 +66,9 @@ const CartTotals: React.FC<CartTotalsProps> = ({
             data-testid="cart-shipping"
             data-value={shipping_subtotal || 0}
           >
-            {convertToLocale({ amount: shipping_subtotal ?? 0, currency_code })}
+            {hasShipping
+              ? convertToLocale({ amount: shipping_subtotal ?? 0, currency_code })
+              : "Calculated at checkout"}
           </p>
         </div>
         <div className="flex justify-between">

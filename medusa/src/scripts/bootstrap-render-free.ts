@@ -2,11 +2,12 @@ import type { ExecArgs, IAuthModuleService, IUserModuleService } from "@medusajs
 import { ContainerRegistrationKeys, Modules } from "@medusajs/framework/utils"
 import { createUsersWorkflow } from "@medusajs/medusa/core-flows"
 import seedRegions from "./seed-regions"
+import setupBachs from "./setup-bachs"
+import setupNigeriaVat from "./setup-nigeria-vat"
 
-// Free Render services have no Shell or pre-deploy commands. Run only on the
-// free development stack; never reset an existing admin's password on restart.
+// Free Render services have no Shell or pre-deploy commands, so every step here
+// must be idempotent; never reset an existing admin's password on restart.
 export default async function bootstrapRenderFree(args: ExecArgs) {
-  if (process.env.APP_ENV !== "development") throw new Error("Free bootstrap is restricted to the development environment.")
   const { container } = args
   const email = process.env.INITIAL_ADMIN_EMAIL?.trim().toLowerCase()
   const password = process.env.INITIAL_ADMIN_PASSWORD
@@ -35,4 +36,6 @@ export default async function bootstrapRenderFree(args: ExecArgs) {
     throw new Error("Provide both initial Admin variables, or remove both after setup.")
   }
   await seedRegions(args)
+  await setupNigeriaVat(args)
+  if (process.env.BACHS_SECRET_KEY) await setupBachs(args)
 }
