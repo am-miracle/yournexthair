@@ -11,6 +11,7 @@ import { UiTag } from "@/components/ui/Tag"
 import { LocalizedLink } from "@/components/LocalizedLink"
 import { getCustomer } from "@lib/data/customer"
 import { redirect } from "next/navigation"
+import { formatOrderDate, getOrderStage } from "@lib/util/order-format"
 
 export const metadata: Metadata = {
   title: "Account - Orders",
@@ -21,41 +22,23 @@ const OrderStatus: React.FC<{
   order: HttpTypes.StoreOrder
   className?: string
 }> = ({ order, className }) => {
-  if (order.fulfillment_status === "canceled") {
-    return (
-      <UiTag iconName="close" isActive className={twMerge("self-start mt-auto", className)}>
-        Canceled
-      </UiTag>
-    )
-  }
-
-  if (order.fulfillment_status === "delivered") {
-    return (
-      <UiTag iconName="check" isActive className={twMerge("self-start mt-auto", className)}>
-        Delivered
-      </UiTag>
-    )
-  }
-
-  if (
-    order.fulfillment_status === "shipped" ||
-    order.fulfillment_status === "partially_delivered"
-  ) {
-    return (
-      <UiTag iconName="truck" isActive className={twMerge("self-start mt-auto", className)}>
-        Delivering
-      </UiTag>
-    )
-  }
+  const stage = getOrderStage(order)
+  const tag = {
+    canceled: { icon: "close", label: "Canceled" },
+    delivered: { icon: "check", label: "Delivered" },
+    shipped: { icon: "truck", label: "Delivering" },
+    processing: { icon: "package", label: "Packing" },
+  } as const
 
   return (
-    <UiTag iconName="package" isActive className={twMerge("self-start mt-auto", className)}>
-      Packing
+    <UiTag iconName={tag[stage].icon} isActive className={twMerge("self-start mt-auto", className)}>
+      {tag[stage].label}
     </UiTag>
   )
 }
 
 type PageProps = {
+  params: Promise<{ countryCode: string }>
   searchParams: Promise<{
     page?: string
   }>
@@ -63,13 +46,14 @@ type PageProps = {
 
 const ORDERS_PER_PAGE = 6
 
-export default async function AccountMyOrdersPage({ searchParams }: PageProps) {
+export default async function AccountMyOrdersPage({ params, searchParams }: PageProps) {
+  const { countryCode } = await params
   const { page } = await searchParams
 
   const customer = await getCustomer().catch(() => null)
 
   if (!customer) {
-    redirect(`/`)
+    redirect(`/${countryCode}/auth/login?redirect=${encodeURIComponent(`/${countryCode}/account/my-orders`)}`)
   }
 
   const pageNumber = page ? parseInt(page, 10) : 1
@@ -92,11 +76,11 @@ export default async function AccountMyOrdersPage({ searchParams }: PageProps) {
                     <OrderStatus order={order} className="sm:hidden mb-6" />
                     <div className="mb-2">
                       <LocalizedLink href={`/account/my-orders/${order.id}`} className="text-md">
-                        <span className="font-semibold">Order:</span> {order.display_id}
+                        <span className="font-semibold">Order #{order.display_id}</span>
                       </LocalizedLink>
                     </div>
                     <p className="text-grayscale-500">
-                      Order date: {new Date(order.created_at).toLocaleDateString()}
+                      Order date: {formatOrderDate(order.created_at)}
                     </p>
                   </div>
                   <div className="flex gap-3 overflow-x-auto sm:max-w-91 md:max-w-full lg:max-w-91">

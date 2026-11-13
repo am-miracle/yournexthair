@@ -36,11 +36,27 @@ export const setCartId = async (cartId: string) => {
   return (await cookies()).set("_medusa_cart_id", cartId, {
     maxAge: 60 * 60 * 24 * 7,
     httpOnly: true,
-    sameSite: "strict",
+    sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
   })
 }
 
 export const removeCartId = async () => {
   return (await cookies()).set("_medusa_cart_id", "", { maxAge: -1 })
+}
+
+const ORDER_ACCESS_COOKIE = "_medusa_order_access"
+
+export const getOrderAccessIds = async () => {
+  return ((await cookies()).get(ORDER_ACCESS_COOKIE)?.value ?? "").split(",").filter(Boolean)
+}
+
+export const rememberOrderAccess = async (orderId: string) => {
+  const ids = [orderId, ...(await getOrderAccessIds()).filter((id) => id !== orderId)].slice(0, 5)
+  return (await cookies()).set(ORDER_ACCESS_COOKIE, ids.join(","), {
+    maxAge: 60 * 60 * 24 * 30,
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+  })
 }

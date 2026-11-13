@@ -15,7 +15,7 @@ export const retrieveOrder = cache(async (id: unknown) => {
 
   const order = await sdk.client
     .fetch<HttpTypes.StoreOrderResponse>(`/store/orders/${id}`, {
-      query: { fields: "*payment_collections.payments" },
+      query: { fields: "*payment_collections.payments,+customer_id,+fulfillment_status,+payment_status,*fulfillments,*fulfillments.labels" },
       next: { tags: ["orders"] },
       headers: { ...(await getAuthHeaders()) },
     })
@@ -46,7 +46,7 @@ export const listOrders = async function (
 
   return sdk.client
     .fetch<HttpTypes.StoreOrderListResponse>(`/store/orders`, {
-      query: { limit, offset, order: "-created_at" },
+      query: { limit, offset, order: "-created_at", fields: "*items,+fulfillment_status,+payment_status" },
       next: { tags: ["orders"] },
       headers: { ...(await getAuthHeaders()) },
     })

@@ -1,15 +1,16 @@
 import { LocalizedLink } from "@/components/LocalizedLink"
 import { HttpTypes } from "@medusajs/types"
-import LineItemUnitPrice from "@modules/common/components/line-item-unit-price"
+import { convertToLocale } from "@lib/util/money"
 import Thumbnail from "@modules/products/components/thumbnail"
 import { twMerge } from "tailwind-merge"
 
 type ItemProps = {
   item: HttpTypes.StoreOrderLineItem
+  currencyCode: string
   className?: string
 }
 
-const Item = ({ item, className }: ItemProps) => {
+const Item = ({ item, currencyCode, className }: ItemProps) => {
   return (
     <li
       className={twMerge(
@@ -49,10 +50,16 @@ const Item = ({ item, className }: ItemProps) => {
                 {item.quantity}
               </p>
             </div>
-            <LineItemUnitPrice
-              item={item}
-              regularPriceClassName="text-base sm:text-md font-normal"
-            />
+            <div className="sm:text-right">
+              <p className="text-base sm:text-md">
+                {convertToLocale({ amount: item.subtotal ?? item.unit_price * item.quantity, currency_code: currencyCode })}
+              </p>
+              {item.quantity > 1 && (
+                <p className="text-grayscale-500">
+                  {convertToLocale({ amount: item.unit_price, currency_code: currencyCode })} each
+                </p>
+              )}
+            </div>
           </div>
         </div>
       </div>

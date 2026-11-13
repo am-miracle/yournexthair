@@ -13,6 +13,7 @@ import {
   getAuthHeaders,
   setCartId,
   removeCartId,
+  rememberOrderAccess,
 } from "@lib/data/cookies"
 import { getRegion } from "@lib/data/regions"
 import { addressesFormSchema } from "@/hooks/cart"
@@ -383,6 +384,7 @@ export async function placeOrder() {
 
   if (cartRes?.type === "order") {
     await removeCartId()
+    await rememberOrderAccess(cartRes.order.id)
     const countryCode =
       cartRes.order.shipping_address?.country_code?.toLowerCase() ??
       process.env.NEXT_PUBLIC_DEFAULT_REGION ??

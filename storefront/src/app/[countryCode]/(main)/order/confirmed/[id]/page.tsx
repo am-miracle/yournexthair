@@ -5,12 +5,12 @@ import OrderCompletedTemplate from "@modules/order/templates/order-completed-tem
 import { retrieveOrder } from "@lib/data/orders"
 
 type Props = {
-  params: Promise<{ id: string }>
+  params: Promise<{ id: string; countryCode: string }>
 }
 
 export const metadata: Metadata = {
   title: "Order Confirmed",
-  description: "You purchase was successful",
+  description: "Your purchase was successful",
   robots: {
     index: false,
     follow: false,
@@ -18,11 +18,11 @@ export const metadata: Metadata = {
 }
 
 export default async function OrderConfirmedPage({ params }: Props) {
-  const { id } = await params
+  const { id, countryCode } = await params
   const order = await retrieveOrder(id)
   if (!order) {
     return notFound()
   }
 
-  return <OrderCompletedTemplate order={order} />
+  return <OrderCompletedTemplate order={order} countryCode={countryCode} />
 }

@@ -5,6 +5,7 @@ import * as Sentry from "@sentry/nextjs"
 import { HttpTypes } from "@medusajs/types"
 import { useRouter } from "next/navigation"
 
+import { preparePaymentReturn } from "@lib/data/payment-return"
 import { isBachs, isManual } from "@lib/constants"
 import { getCheckoutPaymentSession, getReviewPaymentSession } from "@lib/util/payment-session"
 import { withDefinedProp } from "@lib/util/optional-props"
@@ -132,6 +133,7 @@ const BachsPaymentButton = ({
         return
       }
 
+      await preparePaymentReturn()
       window.location.assign(checkoutUrl)
     } catch (error) {
       Sentry.captureException(error, { tags: { provider: "bachs", stage: "start_payment" } })
