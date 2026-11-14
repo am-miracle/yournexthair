@@ -5,7 +5,9 @@ import checkEnvVariables from "./check-env-variables"
 checkEnvVariables()
 
 const mediaUrl = process.env.S3_FILE_URL ? new URL(process.env.S3_FILE_URL) : null
-const storefrontUrl = process.env.NEXT_PUBLIC_BASE_URL ? new URL(process.env.NEXT_PUBLIC_BASE_URL) : null
+const storefrontUrl = process.env.NEXT_PUBLIC_BASE_URL
+  ? new URL(process.env.NEXT_PUBLIC_BASE_URL)
+  : null
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
@@ -17,12 +19,16 @@ const nextConfig: NextConfig = {
     dangerouslyAllowLocalIP: process.env.NODE_ENV === "development",
     qualities: [50, 75, 90],
     remotePatterns: [
-      ...(storefrontUrl ? [{
-        protocol: storefrontUrl.protocol === "http:" ? "http" as const : "https" as const,
-        hostname: storefrontUrl.hostname,
-        port: storefrontUrl.port,
-        pathname: "/images/content/**",
-      }] : []),
+      ...(storefrontUrl
+        ? [
+            {
+              protocol: storefrontUrl.protocol === "http:" ? ("http" as const) : ("https" as const),
+              hostname: storefrontUrl.hostname,
+              port: storefrontUrl.port,
+              pathname: "/images/content/**",
+            },
+          ]
+        : []),
       {
         protocol: "http",
         hostname: "localhost",

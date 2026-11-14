@@ -31,7 +31,12 @@ const StoreTemplate = async ({
   const pageNumber = page ? parseInt(page, 10) : 1
 
   const [collections, categories, types, region] = await Promise.all([
-    getCollectionsList(0, 100, ["id", "title", "handle", "metadata"] as (keyof HttpTypes.StoreCollection)[]),
+    getCollectionsList(0, 100, [
+      "id",
+      "title",
+      "handle",
+      "metadata",
+    ] as (keyof HttpTypes.StoreCollection)[]),
     getCategoriesList(0, 100, ["id", "name", "handle"]),
     getProductTypesList(0, 100, ["id", "value"]),
     getRegion(countryCode),
@@ -44,15 +49,11 @@ const StoreTemplate = async ({
       </div>
       <CollectionsSlider collections={collections.collections.slice(0, 20)} />
       <RefinementList
-        collections={Object.fromEntries(
-          collections.collections.map((c) => [c.handle, c.title])
-        )}
+        collections={Object.fromEntries(collections.collections.map((c) => [c.handle, c.title]))}
         categories={Object.fromEntries(
-          categories.product_categories.map((c) => [c.handle, c.name])
+          categories.product_categories.map((c) => [c.handle, c.name]),
         )}
-        types={Object.fromEntries(
-          types.productTypes.map((t) => [t.value, t.value])
-        )}
+        types={Object.fromEntries(types.productTypes.map((t) => [t.value, t.value]))}
         sortBy={sortBy}
         {...withDefinedProp("collection", collection)}
         {...withDefinedProp("category", category)}
@@ -70,7 +71,7 @@ const StoreTemplate = async ({
                 ? collections.collections
                     .filter((c) => collection.includes(c.handle))
                     .map((c) => c.id)
-                : undefined
+                : undefined,
             )}
             {...withDefinedProp(
               "categoryId",
@@ -78,15 +79,13 @@ const StoreTemplate = async ({
                 ? categories.product_categories
                     .filter((c) => category.includes(c.handle))
                     .map((c) => c.id)
-                : undefined
+                : undefined,
             )}
             {...withDefinedProp(
               "typeId",
               type
-                ? types.productTypes
-                    .filter((t) => type.includes(t.value))
-                    .map((t) => t.id)
-                : undefined
+                ? types.productTypes.filter((t) => type.includes(t.value)).map((t) => t.id)
+                : undefined,
             )}
           />
         )}

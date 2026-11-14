@@ -23,8 +23,8 @@ export default async function BachsReturnPage({
       <div className="flex flex-col gap-4" role="status">
         <h1 className="text-md font-semibold">We couldn’t restore your checkout session</h1>
         <p>
-          If you completed your payment, check your email for an order confirmation.
-          Please contact us before attempting another payment.
+          If you completed your payment, check your email for an order confirmation. Please contact
+          us before attempting another payment.
         </p>
         <a href="mailto:yournexthair@gmail.com" className="text-accent underline">
           Contact YourNextHair

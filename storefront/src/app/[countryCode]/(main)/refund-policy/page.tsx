@@ -19,7 +19,11 @@ export default function RefundPolicyPage() {
       <LayoutColumn start={{ base: 1, lg: 2, xl: 3 }} end={{ base: 13, lg: 11, xl: 10 }}>
         <h1 className="text-lg md:text-2xl mb-16 md:mb-25">Refund Policy for YourNextHair</h1>
       </LayoutColumn>
-      <LayoutColumn start={{ base: 1, lg: 2, xl: 3 }} end={{ base: 13, lg: 10, xl: 9 }} className="article">
+      <LayoutColumn
+        start={{ base: 1, lg: 2, xl: 3 }}
+        end={{ base: 13, lg: 10, xl: 9 }}
+        className="article"
+      >
         <h2>1. Eligibility for Returns</h2>
         <p>We accept returns only under the following circumstances:</p>
         <ol>
@@ -29,7 +33,9 @@ export default function RefundPolicyPage() {
         </ol>
         <p>To be eligible for a return:</p>
         <ul>
-          <li>The request must be submitted within <strong>48 hours of receipt of delivery</strong>.</li>
+          <li>
+            The request must be submitted within <strong>48 hours of receipt of delivery</strong>.
+          </li>
           <li>The item must be unused, unworn, unwashed, and in its original condition.</li>
           <li>Original packaging, tags, and accessories must be included.</li>
           <li>Proof of purchase and photographs of the item must be provided.</li>
@@ -44,9 +50,9 @@ export default function RefundPolicyPage() {
         <h2>3. Contact Us</h2>
         <p>
           To submit a return request, contact{" "}
-          <a href="mailto:yournexthair@gmail.com">yournexthair@gmail.com</a>{" "}
-          within 48 hours of receiving your delivery. Include your order number,
-          proof of purchase, a description of the issue, and photographs of the item.
+          <a href="mailto:yournexthair@gmail.com">yournexthair@gmail.com</a> within 48 hours of
+          receiving your delivery. Include your order number, proof of purchase, a description of
+          the issue, and photographs of the item.
         </p>
       </LayoutColumn>
     </Layout>

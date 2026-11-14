@@ -1,9 +1,6 @@
-import type { HttpTypes } from '@medusajs/framework/types';
-import type {
-  AuthenticatedMedusaRequest,
-  MedusaResponse,
-} from '@medusajs/framework';
-import { listProductTypes } from './helpers';
+import type { HttpTypes } from "@medusajs/framework/types"
+import type { AuthenticatedMedusaRequest, MedusaResponse } from "@medusajs/framework"
+import { listProductTypes } from "./helpers"
 
 export const GET = async (
   req: AuthenticatedMedusaRequest<HttpTypes.AdminProductTypeListParams>,
@@ -21,5 +18,5 @@ export const GET = async (
     count: metadata?.count ?? 0,
     offset: metadata?.skip ?? 0,
     limit: metadata?.take ?? 0,
-  });
-};
+  })
+}

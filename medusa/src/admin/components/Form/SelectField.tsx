@@ -1,17 +1,17 @@
-import { Label, clx, Select } from '@medusajs/ui';
-import { useController, type ControllerRenderProps } from 'react-hook-form';
+import { Label, clx, Select } from "@medusajs/ui"
+import { useController, type ControllerRenderProps } from "react-hook-form"
 
 export interface SelectFieldProps {
-  className?: string;
-  name: string;
-  label?: string;
-  labelProps?: React.ComponentProps<typeof Label>;
+  className?: string
+  name: string
+  label?: string
+  labelProps?: React.ComponentProps<typeof Label>
   selectProps?: Omit<
     React.ComponentProps<typeof Select>,
-    'name' | 'id' | keyof ControllerRenderProps
-  >;
-  isRequired?: boolean;
-  children?: React.ReactNode;
+    "name" | "id" | keyof ControllerRenderProps
+  >
+  isRequired?: boolean
+  children?: React.ReactNode
 }
 
 export const SelectField: React.FC<SelectFieldProps> = ({
@@ -23,20 +23,16 @@ export const SelectField: React.FC<SelectFieldProps> = ({
   isRequired,
   children,
 }) => {
-  const { field, fieldState } = useController<{ __name__: string }, '__name__'>(
-    { name: name as '__name__' },
-  );
+  const { field, fieldState } = useController<{ __name__: string }, "__name__">({
+    name: name as "__name__",
+  })
 
   return (
     <div className={className}>
-      {typeof label !== 'undefined' && (
-        <Label
-          {...labelProps}
-          htmlFor={name}
-          className={clx('block mb-1', labelProps?.className)}
-        >
+      {typeof label !== "undefined" && (
+        <Label {...labelProps} htmlFor={name} className={clx("block mb-1", labelProps?.className)}>
           {label}
-          {isRequired ? <span className="text-red-primary">*</span> : ''}
+          {isRequired ? <span className="text-red-primary">*</span> : ""}
         </Label>
       )}
       <Select
@@ -44,20 +40,18 @@ export const SelectField: React.FC<SelectFieldProps> = ({
         onValueChange={field.onChange}
         onOpenChange={(open) => {
           if (!open) {
-            field.onBlur();
+            field.onBlur()
           }
         }}
-        value={field.value || ''}
+        value={field.value || ""}
         name={field.name}
-        {...(typeof isRequired === 'boolean' ? { required: isRequired } : {})}
+        {...(typeof isRequired === "boolean" ? { required: isRequired } : {})}
       >
         {children}
       </Select>
       {fieldState.error && (
-        <div className="text-red-primary text-sm mt-1">
-          {fieldState.error.message}
-        </div>
+        <div className="text-red-primary text-sm mt-1">{fieldState.error.message}</div>
       )}
     </div>
-  );
-};
+  )
+}

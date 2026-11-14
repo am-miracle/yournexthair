@@ -158,7 +158,8 @@ function ProductActions({ product, materials, disabled }: ProductActionsProps) {
     () => buildAvailabilityMap(product.variants ?? [], options),
     [product.variants, options],
   )
-  const getAvailableValues = (optionId: string) => availabilityMap.get(optionId) ?? new Set<string>()
+  const getAvailableValues = (optionId: string) =>
+    availabilityMap.get(optionId) ?? new Set<string>()
 
   const itemsInStock = selectedVariant ? getVariantItemsInStock(selectedVariant) : 0
 

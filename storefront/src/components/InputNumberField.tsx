@@ -47,7 +47,7 @@ export const InputNumberField: React.FC<InputNumberFieldProps> = ({
 }) => {
   const resolvedValue = typeof value === "number" ? value : undefined
   const [inputValue, setInputValue] = React.useState(
-    resolvedValue === undefined ? "" : `${resolvedValue}`
+    resolvedValue === undefined ? "" : `${resolvedValue}`,
   )
   const isFocusedRef = React.useRef(false)
 
@@ -66,10 +66,8 @@ export const InputNumberField: React.FC<InputNumberFieldProps> = ({
   }, [inputValue, minValue, resolvedValue])
 
   const baseValue = getBaseValue()
-  const canDecrement =
-    typeof minValue === "number" ? baseValue > minValue : true
-  const canIncrement =
-    typeof maxValue === "number" ? baseValue < maxValue : true
+  const canDecrement = typeof minValue === "number" ? baseValue > minValue : true
+  const canIncrement = typeof maxValue === "number" ? baseValue < maxValue : true
 
   const handleInputChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -81,7 +79,7 @@ export const InputNumberField: React.FC<InputNumberFieldProps> = ({
       if (parsed === null) return
       onChange(clampValue(parsed, minValue, maxValue))
     },
-    [maxValue, minValue, onChange]
+    [maxValue, minValue, onChange],
   )
 
   const normalizeOnBlur = React.useCallback(() => {
@@ -112,16 +110,7 @@ export const InputNumberField: React.FC<InputNumberFieldProps> = ({
     onChange(nextValue)
     setInputValue(`${nextValue}`)
     onCommit?.(nextValue)
-  }, [
-    canDecrement,
-    baseValue,
-    isDisabled,
-    maxValue,
-    minValue,
-    onChange,
-    onCommit,
-    step,
-  ])
+  }, [canDecrement, baseValue, isDisabled, maxValue, minValue, onChange, onCommit, step])
 
   const handleIncrement = React.useCallback(() => {
     if (!onChange || isDisabled || !canIncrement) return
@@ -129,16 +118,7 @@ export const InputNumberField: React.FC<InputNumberFieldProps> = ({
     onChange(nextValue)
     setInputValue(`${nextValue}`)
     onCommit?.(nextValue)
-  }, [
-    canIncrement,
-    baseValue,
-    isDisabled,
-    maxValue,
-    minValue,
-    onChange,
-    onCommit,
-    step,
-  ])
+  }, [canIncrement, baseValue, isDisabled, maxValue, minValue, onChange, onCommit, step])
 
   const handleKeyDown = React.useCallback(
     (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -160,7 +140,7 @@ export const InputNumberField: React.FC<InputNumberFieldProps> = ({
         }
       }
     },
-    [handleDecrement, handleIncrement, normalizeOnBlur, onCommit]
+    [handleDecrement, handleIncrement, normalizeOnBlur, onCommit],
   )
 
   return (
@@ -168,7 +148,7 @@ export const InputNumberField: React.FC<InputNumberFieldProps> = ({
       className={twMerge(
         "flex justify-between border border-grayscale-200 rounded-xs",
         size === "sm" ? "h-8 px-4" : "h-12 px-6",
-        className as string
+        className as string,
       )}
     >
       <ReactAria.Button
@@ -176,10 +156,7 @@ export const InputNumberField: React.FC<InputNumberFieldProps> = ({
         isDisabled={isDisabled || !canDecrement}
         className="disabled:text-grayscale-200 transition-colors shrink-0"
       >
-        <Icon
-          name="minus"
-          className={twJoin(size === "sm" ? "w-4 h-4" : "w-6 h-6")}
-        />
+        <Icon name="minus" className={twJoin(size === "sm" ? "w-4 h-4" : "w-6 h-6")} />
       </ReactAria.Button>
       <ReactAria.Input
         {...rest}
@@ -205,7 +182,7 @@ export const InputNumberField: React.FC<InputNumberFieldProps> = ({
         disabled={isDisabled}
         className={twJoin(
           "disabled:text-grayscale-200 disabled:bg-transparent text-center focus-within:outline-none w-7 leading-none appearance-none [-moz-appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none",
-          size === "sm" ? "text-xs" : "text-sm"
+          size === "sm" ? "text-xs" : "text-sm",
         )}
       />
       <ReactAria.Button
@@ -213,10 +190,7 @@ export const InputNumberField: React.FC<InputNumberFieldProps> = ({
         isDisabled={isDisabled || !canIncrement}
         className="disabled:text-grayscale-200 transition-colors shrink-0"
       >
-        <Icon
-          name="plus"
-          className={twJoin(size === "sm" ? "w-4 h-4" : "w-6 h-6")}
-        />
+        <Icon name="plus" className={twJoin(size === "sm" ? "w-4 h-4" : "w-6 h-6")} />
       </ReactAria.Button>
     </div>
   )

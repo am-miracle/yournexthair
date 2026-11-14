@@ -38,9 +38,7 @@ export const PersonalInfoForm = ({
     >
       {({ watch, formState }) => {
         const formData = watch()
-        const isDisabled =
-          !Object.values(formData).some((value) => value) ||
-          !formState.isDirty
+        const isDisabled = !Object.values(formData).some((value) => value) || !formState.isDirty
         return (
           <>
             <p className="text-md mb-8 sm:mb-10">Personal information</p>

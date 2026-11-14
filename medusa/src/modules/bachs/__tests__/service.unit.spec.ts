@@ -52,7 +52,12 @@ describe("BachsPaymentService", () => {
     const result = await service.initiatePayment({
       amount: 50000,
       currency_code: "ngn",
-      data: { session_id: "payses_1", email: "jane@example.com", customer_name: "Jane Doe", country_code: "NG" },
+      data: {
+        session_id: "payses_1",
+        email: "jane@example.com",
+        customer_name: "Jane Doe",
+        country_code: "NG",
+      },
     })
 
     const [url, init] = fetchMock.mock.calls[0]!
@@ -67,7 +72,10 @@ describe("BachsPaymentService", () => {
       success_url: "https://shop.example.com/ng/checkout/bachs/return",
       cancel_url: "https://shop.example.com/ng/checkout?step=payment",
     })
-    expect(result).toMatchObject({ id: "chk_1", data: { checkout_url: "https://checkout.bachs.io/chk_1" } })
+    expect(result).toMatchObject({
+      id: "chk_1",
+      data: { checkout_url: "https://checkout.bachs.io/chk_1" },
+    })
   })
 
   it("rejects an invalid country code before calling Bachs", async () => {
@@ -98,9 +106,13 @@ describe("BachsPaymentService", () => {
   })
 
   it("captures a completed checkout reported with lowercase status", async () => {
-    fetchMock.mockResolvedValueOnce(jsonResponse({ ...completedCheckout, status: "completed", payment_status: "SUCCEEDED" }))
+    fetchMock.mockResolvedValueOnce(
+      jsonResponse({ ...completedCheckout, status: "completed", payment_status: "SUCCEEDED" }),
+    )
 
-    await expect(service.authorizePayment({ data: sessionData })).resolves.toMatchObject({ status: "captured" })
+    await expect(service.authorizePayment({ data: sessionData })).resolves.toMatchObject({
+      status: "captured",
+    })
   })
 
   it("errors when the paid amount does not match the session", async () => {
@@ -122,16 +134,25 @@ describe("BachsPaymentService", () => {
   })
 
   it("reports underpaid checkouts as requiring more without authorizing them", async () => {
-    fetchMock.mockResolvedValueOnce(jsonResponse({
-      ...completedCheckout, status: "OPEN", payment_status: "underpaid",
-      charge: { payment_id: "pay_1", status: "underpaid", amount_paid: "100.00" },
-    }))
-    await expect(service.authorizePayment({ data: sessionData })).resolves.toMatchObject({ status: "requires_more" })
+    fetchMock.mockResolvedValueOnce(
+      jsonResponse({
+        ...completedCheckout,
+        status: "OPEN",
+        payment_status: "underpaid",
+        charge: { payment_id: "pay_1", status: "underpaid", amount_paid: "100.00" },
+      }),
+    )
+    await expect(service.authorizePayment({ data: sessionData })).resolves.toMatchObject({
+      status: "requires_more",
+    })
   })
 
   it("refuses a second refund on the same charge", async () => {
     await expect(
-      service.refundPayment({ amount: 100, data: { ...sessionData, payment_id: "pay_1", refund_id: "ref_1" } }),
+      service.refundPayment({
+        amount: 100,
+        data: { ...sessionData, payment_id: "pay_1", refund_id: "ref_1" },
+      }),
     ).rejects.toThrow("one refund per charge")
   })
 
@@ -141,7 +162,9 @@ describe("BachsPaymentService", () => {
     await service.refundPayment({ amount: 1000, data: { ...sessionData, payment_id: "pay_1" } })
     await service.refundPayment({ amount: 50000, data: { ...sessionData, payment_id: "pay_1" } })
 
-    const bodies = fetchMock.mock.calls.map(([, init]) => JSON.parse(init?.body as string) as Record<string, unknown>)
+    const bodies = fetchMock.mock.calls.map(
+      ([, init]) => JSON.parse(init?.body as string) as Record<string, unknown>,
+    )
     expect(bodies[0]).toEqual({ charge_id: "pay_1", reference: "refund_pay_1", amount: "1000.00" })
     expect(bodies[1]).toEqual({ charge_id: "pay_1", reference: "refund_pay_1" })
   })
@@ -153,7 +176,9 @@ describe("BachsPaymentService", () => {
       return {
         data: event as Record<string, unknown>,
         rawData: raw,
-        headers: { "x-bachs-signature-v2": `t=${ts},v1=${computeSignature(ts, raw, options.webhook_secret)}` },
+        headers: {
+          "x-bachs-signature-v2": `t=${ts},v1=${computeSignature(ts, raw, options.webhook_secret)}`,
+        },
       }
     }
 
@@ -164,12 +189,21 @@ describe("BachsPaymentService", () => {
         service.getWebhookActionAndData(
           signed({ id: "evt_1", type: "collection.succeeded", data: { checkout_id: "chk_1" } }),
         ),
-      ).resolves.toEqual({ action: "authorized", data: { session_id: "payses_1", amount: "50000.00" } })
-      expect(fetchMock.mock.calls[0]![0]).toBe("https://sandbox-api.bachs.io/v1/checkout-sessions/chk_1")
+      ).resolves.toEqual({
+        action: "authorized",
+        data: { session_id: "payses_1", amount: "50000.00" },
+      })
+      expect(fetchMock.mock.calls[0]![0]).toBe(
+        "https://sandbox-api.bachs.io/v1/checkout-sessions/chk_1",
+      )
     })
 
     it("ignores deliveries with a bad signature", async () => {
-      const payload = signed({ id: "evt_1", type: "collection.succeeded", data: { checkout_id: "chk_1" } })
+      const payload = signed({
+        id: "evt_1",
+        type: "collection.succeeded",
+        data: { checkout_id: "chk_1" },
+      })
 
       await expect(
         service.getWebhookActionAndData({ ...payload, rawData: Buffer.from("{}") }),
@@ -179,15 +213,20 @@ describe("BachsPaymentService", () => {
 
     it("uses the signed body instead of an unverified parsed payload", async () => {
       const payload = signed({ type: "customer.created", data: {} })
-      await expect(service.getWebhookActionAndData({
-        ...payload, data: { type: "collection.succeeded", data: { checkout_id: "chk_1" } },
-      })).resolves.toEqual({ action: "not_supported" })
+      await expect(
+        service.getWebhookActionAndData({
+          ...payload,
+          data: { type: "collection.succeeded", data: { checkout_id: "chk_1" } },
+        }),
+      ).resolves.toEqual({ action: "not_supported" })
       expect(fetchMock).not.toHaveBeenCalled()
     })
 
     it("ignores events it does not act on", async () => {
       await expect(
-        service.getWebhookActionAndData(signed({ id: "evt_2", type: "checkout.expired", data: {} })),
+        service.getWebhookActionAndData(
+          signed({ id: "evt_2", type: "checkout.expired", data: {} }),
+        ),
       ).resolves.toEqual({ action: "not_supported" })
     })
   })

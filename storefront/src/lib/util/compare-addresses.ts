@@ -39,7 +39,7 @@ export default function compareAddresses(
     | "country_code"
     | "province"
     | "phone"
-  >
+  >,
 ) {
   return addressKeys.every((key) => address1[key] === address2[key])
 }

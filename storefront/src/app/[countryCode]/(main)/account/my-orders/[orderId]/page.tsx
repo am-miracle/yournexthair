@@ -40,7 +40,11 @@ const OrderStatus: React.FC<{ order: HttpTypes.StoreOrder }> = ({ order }) => {
         Packing
       </UiTag>
       <UiTagListDivider />
-      <UiTag isActive={stage === "shipped" || stage === "delivered"} iconName="truck" className="self-start mt-auto">
+      <UiTag
+        isActive={stage === "shipped" || stage === "delivered"}
+        iconName="truck"
+        className="self-start mt-auto"
+      >
         Delivering
       </UiTag>
       <UiTagListDivider />
@@ -60,7 +64,9 @@ export default async function AccountOrderPage({
   const customer = await getCustomer().catch(() => null)
 
   if (!customer) {
-    redirect(`/${countryCode}/auth/login?redirect=${encodeURIComponent(`/${countryCode}/account/my-orders/${orderId}`)}`)
+    redirect(
+      `/${countryCode}/auth/login?redirect=${encodeURIComponent(`/${countryCode}/account/my-orders/${orderId}`)}`,
+    )
   }
 
   const order = await retrieveOrder(orderId).catch(() => null)

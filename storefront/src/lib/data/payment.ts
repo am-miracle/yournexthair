@@ -4,13 +4,10 @@ import { HttpTypes } from "@medusajs/types"
 // Shipping actions
 export const listCartPaymentMethods = async function (regionId: string) {
   return sdk.client
-    .fetch<HttpTypes.StorePaymentProviderListResponse>(
-      `/store/payment-providers`,
-      {
-        query: { region_id: regionId },
-        cache: "no-store",
-      }
-    )
+    .fetch<HttpTypes.StorePaymentProviderListResponse>(`/store/payment-providers`, {
+      query: { region_id: regionId },
+      cache: "no-store",
+    })
     .then(({ payment_providers }) => payment_providers)
     .catch(() => {
       return null

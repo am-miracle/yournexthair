@@ -9,14 +9,9 @@ async function deleteOrphanedFiles(container: SubscriberArgs<unknown>["container
   const [allFiles] = await fileModuleService.listAndCountFiles()
   if (!allFiles.length) return
 
-  const products = await productModuleService.listProducts(
-    {},
-    { relations: ["images"] }
-  )
+  const products = await productModuleService.listProducts({}, { relations: ["images"] })
 
-  const referencedUrls = new Set(
-    products.flatMap((p) => p.images?.map((img) => img.url) ?? [])
-  )
+  const referencedUrls = new Set(products.flatMap((p) => p.images?.map((img) => img.url) ?? []))
 
   const orphaned = allFiles.filter((f) => !referencedUrls.has(f.url))
   if (!orphaned.length) return

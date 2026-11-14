@@ -107,9 +107,7 @@ export default function ServicesPage() {
           <LayoutColumn start={{ base: 1, md: 6 }} end={13} className="md:row-start-1 self-center">
             <div className="max-w-135 md:ml-auto">
               <p className="mb-4 text-xs uppercase tracking-widest text-grayscale-500">02</p>
-              <h2 className="text-md mb-6 md:mb-10 md:text-2xl">
-                Bone Straight &amp; Silk Press
-              </h2>
+              <h2 className="text-md mb-6 md:mb-10 md:text-2xl">Bone Straight &amp; Silk Press</h2>
               <div className="md:text-md max-md:mb-16">
                 <p className="mb-5 md:mb-8">
                   Achieve a flawless, glass-smooth finish with our professional straightening
@@ -211,9 +209,7 @@ export default function ServicesPage() {
           <LayoutColumn start={1} end={{ base: 13, md: 7 }}>
             <div className="border-t border-grayscale-200 pt-8 pb-16 md:pb-26">
               <p className="mb-4 text-xs uppercase tracking-widest text-grayscale-500">05</p>
-              <h3 className="mb-3 text-base font-medium">
-                Wig Maintenance &amp; Cleaning
-              </h3>
+              <h3 className="mb-3 text-base font-medium">Wig Maintenance &amp; Cleaning</h3>
               <p className="text-sm text-grayscale-600 md:text-base">
                 Extend the life of your investment. We wash, deep condition, and restore your unit
                 to keep it looking fresh and lasting longer. Regular maintenance means your hair
@@ -227,8 +223,8 @@ export default function ServicesPage() {
               <h3 className="mb-3 text-base font-medium">Hair Consultation</h3>
               <p className="text-sm text-grayscale-600 md:text-base">
                 Not sure which hair is right for you? Book a one-on-one consultation with our
-                experts. We help you match texture, origin, density, and length to your natural
-                hair and lifestyle before you spend a thing.
+                experts. We help you match texture, origin, density, and length to your natural hair
+                and lifestyle before you spend a thing.
               </p>
             </div>
           </LayoutColumn>

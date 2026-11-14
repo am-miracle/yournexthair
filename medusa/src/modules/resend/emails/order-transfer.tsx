@@ -8,12 +8,23 @@ type Props = {
 }
 
 const formatTotal = (amount: number, currency: string) =>
-  new Intl.NumberFormat([], { style: "currency", currencyDisplay: "narrowSymbol", currency }).format(amount)
+  new Intl.NumberFormat([], {
+    style: "currency",
+    currencyDisplay: "narrowSymbol",
+    currency,
+  }).format(amount)
 
 const formatDate = (iso: string) =>
-  new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric" }).format(new Date(iso))
+  new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric" }).format(
+    new Date(iso),
+  )
 
-export default function OrderTransferEmail({ customer, orders, claim_url, ...emailLayoutProps }: Props & EmailLayoutProps) {
+export default function OrderTransferEmail({
+  customer,
+  orders,
+  claim_url,
+  ...emailLayoutProps
+}: Props & EmailLayoutProps) {
   const count = orders.length
   const noun = count === 1 ? "order" : "orders"
   return (

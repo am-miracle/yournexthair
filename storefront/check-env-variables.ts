@@ -18,8 +18,7 @@ const requiredEnvs: RequiredEnv[] = [
   },
   {
     key: "NEXT_PUBLIC_BASE_URL",
-    description:
-      "Your store URL, should be updated to where you are hosting your storefront.",
+    description: "Your store URL, should be updated to where you are hosting your storefront.",
   },
   {
     key: "NEXT_PUBLIC_DEFAULT_REGION",
@@ -32,9 +31,7 @@ export default function checkEnvVariables(): void {
   const missingEnvs = requiredEnvs.filter((env) => !process.env[env.key])
 
   if (missingEnvs.length > 0) {
-    console.error(
-      c.red.bold("\nError: Missing required environment variables\n")
-    )
+    console.error(c.red.bold("\nError: Missing required environment variables\n"))
 
     missingEnvs.forEach((env) => {
       console.error(c.yellow(`  ${c.bold(env.key)}`))
@@ -43,8 +40,8 @@ export default function checkEnvVariables(): void {
 
     console.error(
       c.yellow(
-        "\nPlease set these variables in your .env file or environment before starting the application.\n"
-      )
+        "\nPlease set these variables in your .env file or environment before starting the application.\n",
+      ),
     )
 
     process.exit(1)

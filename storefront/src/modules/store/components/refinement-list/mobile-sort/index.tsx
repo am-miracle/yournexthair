@@ -1,12 +1,7 @@
 import * as React from "react"
 import * as ReactAria from "react-aria-components"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
-import {
-  UiRadio,
-  UiRadioBox,
-  UiRadioGroup,
-  UiRadioLabel,
-} from "@/components/ui/Radio"
+import { UiRadio, UiRadioBox, UiRadioGroup, UiRadioLabel } from "@/components/ui/Radio"
 import { UiModal, UiModalOverlay } from "@/components/ui/Modal"
 import { Button } from "@/components/Button"
 import { UiDialog, UiDialogTrigger } from "@/components/Dialog"
@@ -27,10 +22,7 @@ export const MobileSort: React.FC<{
         Sort by
       </Button>
       <UiModalOverlay className="p-0">
-        <UiModal
-          animateFrom="bottom"
-          className="w-full rounded-none max-w-full shadow-none pb-21"
-        >
+        <UiModal animateFrom="bottom" className="w-full rounded-none max-w-full shadow-none pb-21">
           <UiDialog aria-label="Sort products">
             {({ close }) => (
               <form

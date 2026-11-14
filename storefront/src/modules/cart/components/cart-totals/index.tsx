@@ -12,11 +12,7 @@ type CartTotalsProps = {
   className?: string
 }
 
-const CartTotals: React.FC<CartTotalsProps> = ({
-  cart,
-  isPartOfCartDrawer,
-  className,
-}) => {
+const CartTotals: React.FC<CartTotalsProps> = ({ cart, isPartOfCartDrawer, className }) => {
   const {
     currency_code,
     total,
@@ -34,44 +30,24 @@ const CartTotals: React.FC<CartTotalsProps> = ({
 
   return (
     <div className={className}>
-      <div
-        className={twMerge(
-          "flex flex-col gap-4",
-          isPartOfCartDrawer && "gap-2"
-        )}
-      >
+      <div className={twMerge("flex flex-col gap-4", isPartOfCartDrawer && "gap-2")}>
         <div className="flex justify-between">
           <p className="text-grayscale-500">Subtotal:</p>
-          <p
-            className="self-end"
-            data-testid="cart-subtotal"
-            data-value={item_subtotal || 0}
-          >
+          <p className="self-end" data-testid="cart-subtotal" data-value={item_subtotal || 0}>
             {convertToLocale({ amount: item_subtotal ?? 0, currency_code })}
           </p>
         </div>
         {discountAmount > 0 && (
           <div className="flex justify-between">
             <p className="text-grayscale-500">Discount:</p>
-            <p
-              className="self-end"
-              data-testid="cart-discount"
-              data-value={discountAmount}
-            >
-              -{" "}
-              {convertToLocale({ amount: discountAmount, currency_code })}
+            <p className="self-end" data-testid="cart-discount" data-value={discountAmount}>
+              - {convertToLocale({ amount: discountAmount, currency_code })}
             </p>
           </div>
         )}
         <div className="flex justify-between">
-          <p className="text-grayscale-500">
-            Shipping{shipping_tax_total ? " (incl. VAT)" : ""}:
-          </p>
-          <p
-            className="self-end"
-            data-testid="cart-shipping"
-            data-value={shippingAmount}
-          >
+          <p className="text-grayscale-500">Shipping{shipping_tax_total ? " (incl. VAT)" : ""}:</p>
+          <p className="self-end" data-testid="cart-shipping" data-value={shippingAmount}>
             {hasShipping
               ? convertToLocale({ amount: shippingAmount, currency_code })
               : "Calculated at checkout"}
@@ -80,11 +56,7 @@ const CartTotals: React.FC<CartTotalsProps> = ({
         {!!item_tax_total && (
           <div className="flex justify-between">
             <p className="text-grayscale-500">VAT:</p>
-            <p
-              className="self-end"
-              data-testid="cart-taxes"
-              data-value={item_tax_total}
-            >
+            <p className="self-end" data-testid="cart-taxes" data-value={item_tax_total}>
               {convertToLocale({ amount: item_tax_total, currency_code })}
             </p>
           </div>
@@ -97,17 +69,13 @@ const CartTotals: React.FC<CartTotalsProps> = ({
               data-testid="cart-gift-card-amount"
               data-value={gift_card_total || 0}
             >
-              -{" "}
-              {convertToLocale({ amount: gift_card_total ?? 0, currency_code })}
+              - {convertToLocale({ amount: gift_card_total ?? 0, currency_code })}
             </p>
           </div>
         )}
       </div>
       <hr
-        className={twJoin(
-          "my-8 md:my-6 text-grayscale-200",
-          isPartOfCartDrawer && "my-4 md:my-4"
-        )}
+        className={twJoin("my-8 md:my-6 text-grayscale-200", isPartOfCartDrawer && "my-4 md:my-4")}
       />
       <div className="flex justify-between text-md font-semibold">
         <p>Total:</p>

@@ -9,17 +9,22 @@ const text = (value: unknown) => (typeof value === "string" && value.trim() ? va
 
 export const OrderDelivery = ({ order }: { order: HttpTypes.StoreOrder }) => {
   const method = order.shipping_methods?.[0]
-  if (!method) return null
+  if (!method) {
+    return null
+  }
 
-  const quote = (method.data as { terminal_quote?: Quote } | null)?.terminal_quote
+  const data = method.data as { dhl_quote?: Quote; terminal_quote?: Quote } | null
+  const quote = data?.dhl_quote ?? data?.terminal_quote
   const carrier = text(quote?.carrier)
   const eta = text(quote?.delivery_time)
-  const fulfillments = (order as { fulfillments?: { labels?: Label[] | null }[] | null }).fulfillments ?? []
+  const fulfillments =
+    (order as { fulfillments?: { labels?: Label[] | null }[] | null }).fulfillments ?? []
   const tracking = fulfillments
     .flatMap((fulfillment) => fulfillment.labels ?? [])
     .filter((label) => text(label.tracking_number))
   const international = Boolean(
-    order.shipping_address?.country_code && order.shipping_address.country_code.toLowerCase() !== "ng"
+    order.shipping_address?.country_code &&
+    order.shipping_address.country_code.toLowerCase() !== "ng",
   )
 
   return (
@@ -38,7 +43,12 @@ export const OrderDelivery = ({ order }: { order: HttpTypes.StoreOrder }) => {
             <p key={label.tracking_number} className="text-grayscale-500">
               Tracking:{" "}
               {url?.startsWith("https://") ? (
-                <a href={url} target="_blank" rel="noopener noreferrer" className="underline text-black">
+                <a
+                  href={url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline text-black"
+                >
                   {label.tracking_number}
                 </a>
               ) : (
@@ -49,8 +59,8 @@ export const OrderDelivery = ({ order }: { order: HttpTypes.StoreOrder }) => {
         })}
         {international && (
           <p className="text-grayscale-500 text-xs mt-2">
-            Import duties and taxes may be charged by your country on delivery. These are not included in
-            your order total.
+            Import duties and taxes may be charged by your country on delivery. These are not
+            included in your order total.
           </p>
         )}
       </div>

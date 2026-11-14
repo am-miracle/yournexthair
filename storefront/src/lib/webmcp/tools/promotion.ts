@@ -11,7 +11,7 @@ type PromotionInput = z.infer<typeof promotionSchema>
 
 export const cartApplyPromotion = async (
   rawInput: unknown,
-  context?: WebMCPToolContext
+  context?: WebMCPToolContext,
 ): Promise<WebMCPToolResult<CartSnapshot>> => {
   const parsed = promotionSchema.safeParse(rawInput)
   if (!parsed.success) {
@@ -28,7 +28,7 @@ export const cartApplyPromotion = async (
 
   if (context?.client) {
     const confirmed = await context.client.requestUserInteraction(() =>
-      Promise.resolve(window.confirm(`Apply promotion code "${code}" to your cart?`))
+      Promise.resolve(window.confirm(`Apply promotion code "${code}" to your cart?`)),
     )
     if (!confirmed) {
       return {
@@ -60,8 +60,7 @@ export const cartApplyPromotion = async (
       ok: false,
       error: {
         code: "APPLY_FAILED",
-        message:
-          error instanceof Error ? error.message : "Failed to apply promotion code",
+        message: error instanceof Error ? error.message : "Failed to apply promotion code",
       },
     }
   }
@@ -69,7 +68,7 @@ export const cartApplyPromotion = async (
 
 export const cartRemovePromotion = async (
   rawInput: unknown,
-  context?: WebMCPToolContext
+  context?: WebMCPToolContext,
 ): Promise<WebMCPToolResult<CartSnapshot>> => {
   const parsed = promotionSchema.safeParse(rawInput)
   if (!parsed.success) {
@@ -88,9 +87,9 @@ export const cartRemovePromotion = async (
     const confirmed = await context.client.requestUserInteraction(() =>
       Promise.resolve(
         window.confirm(
-          `Remove promotion code "${code}" from your cart? This will remove the associated discount.`
-        )
-      )
+          `Remove promotion code "${code}" from your cart? This will remove the associated discount.`,
+        ),
+      ),
     )
     if (!confirmed) {
       return {
@@ -122,8 +121,7 @@ export const cartRemovePromotion = async (
       ok: false,
       error: {
         code: "REMOVE_FAILED",
-        message:
-          error instanceof Error ? error.message : "Failed to remove promotion code",
+        message: error instanceof Error ? error.message : "Failed to remove promotion code",
       },
     }
   }
@@ -141,8 +139,7 @@ export const applyPromotionTool: WebMCPTool<PromotionInput, CartSnapshot> = {
     properties: {
       code: {
         type: "string",
-        description:
-          "Promotion/discount code to apply (e.g., 'SUMMER25', 'FREESHIP')",
+        description: "Promotion/discount code to apply (e.g., 'SUMMER25', 'FREESHIP')",
       },
     },
     additionalProperties: false,
@@ -163,8 +160,7 @@ export const removePromotionTool: WebMCPTool<PromotionInput, CartSnapshot> = {
     properties: {
       code: {
         type: "string",
-        description:
-          "Promotion/discount code to remove (must match an applied code)",
+        description: "Promotion/discount code to remove (must match an applied code)",
       },
     },
     additionalProperties: false,

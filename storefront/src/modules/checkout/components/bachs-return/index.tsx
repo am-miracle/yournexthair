@@ -89,15 +89,13 @@ const BachsReturn = ({ countryCode }: { countryCode: string }) => {
             : "We couldn’t confirm your payment"}
         </h1>
         <p className="text-grayscale-500">
-          If you completed the payment, your order will be created automatically
-          and you’ll receive a confirmation email. You won’t be charged twice.
+          If you completed the payment, your order will be created automatically and you’ll receive
+          a confirmation email. You won’t be charged twice.
         </p>
         <ErrorMessage {...withDefinedProp("error", message)} />
       </div>
       <div className="flex flex-wrap gap-4">
-        <Button onPress={() => void confirm().catch(() => setStatus("failed"))}>
-          Check again
-        </Button>
+        <Button onPress={() => void confirm().catch(() => setStatus("failed"))}>Check again</Button>
         <LocalizedLink href="/checkout?step=review">
           <Button variant="outline">Back to checkout</Button>
         </LocalizedLink>

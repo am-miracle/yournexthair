@@ -32,11 +32,7 @@ const CartDrawerContent: React.FC<CartDrawerContentProps> = ({ onClose }) => {
         <div className="sticky left-0 bg-white bottom-0 pt-4 border-t border-grayscale-200 mt-auto">
           <CartTotals isPartOfCartDrawer cart={cart} />
           <DiscountCode cart={cart} className="mt-6" />
-          <LocalizedButtonLink
-            href={`/checkout/?step=${step}`}
-            isFullWidth
-            className="mt-4"
-          >
+          <LocalizedButtonLink href={`/checkout/?step=${step}`} isFullWidth className="mt-4">
             Proceed to checkout
           </LocalizedButtonLink>
         </div>
@@ -55,8 +51,8 @@ const CartDrawerContent: React.FC<CartDrawerContentProps> = ({ onClose }) => {
   return (
     <>
       <p className="md:text-sm max-sm:mr-10 mb-6 mt-2">
-        You don&apos;t have anything in your cart. Let&apos;s change that, use the link below
-        to start browsing our products.
+        You don&apos;t have anything in your cart. Let&apos;s change that, use the link below to
+        start browsing our products.
       </p>
       <div>
         <LocalizedLink href="/store" onClick={onClose}>

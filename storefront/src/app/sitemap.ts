@@ -23,7 +23,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return [
     ...staticRoutes.map((path) => ({
       url: getCanonicalUrl(path),
-      changeFrequency: path === "/" ? "weekly" as const : "monthly" as const,
+      changeFrequency: path === "/" ? ("weekly" as const) : ("monthly" as const),
       priority: path === "/" ? 1 : 0.7,
     })),
     ...collections.collections
@@ -32,9 +32,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         url: getCanonicalUrl(`/collections/${collection.handle}`),
         changeFrequency: "weekly" as const,
         priority: 0.8,
-        ...(collection.updated_at
-          ? { lastModified: new Date(collection.updated_at) }
-          : {}),
+        ...(collection.updated_at ? { lastModified: new Date(collection.updated_at) } : {}),
       })),
     ...products.products
       .filter((product) => typeof product.handle === "string" && product.handle.length > 0)
@@ -42,9 +40,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         url: getCanonicalUrl(`/products/${product.handle}`),
         changeFrequency: "weekly" as const,
         priority: 0.8,
-        ...(product.updated_at
-          ? { lastModified: new Date(product.updated_at) }
-          : {}),
+        ...(product.updated_at ? { lastModified: new Date(product.updated_at) } : {}),
       })),
   ]
 }

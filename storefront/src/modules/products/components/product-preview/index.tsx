@@ -3,19 +3,14 @@ import { LocalizedLink } from "@/components/LocalizedLink"
 import Thumbnail from "@modules/products/components/thumbnail"
 import { getProductPrice } from "@lib/util/get-product-price"
 
-export default function ProductPreview({
-  product,
-}: {
-  product: HttpTypes.StoreProduct
-}) {
+export default function ProductPreview({ product }: { product: HttpTypes.StoreProduct }) {
   const { cheapestPrice } = getProductPrice({
     product,
   })
 
   const hasReducedPrice =
     cheapestPrice &&
-    cheapestPrice.calculated_price_number <
-      (cheapestPrice?.original_price_number || 0)
+    cheapestPrice.calculated_price_number < (cheapestPrice?.original_price_number || 0)
 
   return (
     <LocalizedLink href={`/products/${product.handle}`}>
@@ -29,9 +24,7 @@ export default function ProductPreview({
         <div className="max-md:text-xs">
           <p className="mb-1">{product.title}</p>
           {product.collection && (
-            <p className="text-grayscale-500 text-xs max-md:hidden">
-              {product.collection.title}
-            </p>
+            <p className="text-grayscale-500 text-xs max-md:hidden">{product.collection.title}</p>
           )}
         </div>
         {cheapestPrice ? (
@@ -46,9 +39,7 @@ export default function ProductPreview({
             </div>
           ) : (
             <div>
-              <p className="font-semibold max-md:text-xs">
-                {cheapestPrice.calculated_price}
-              </p>
+              <p className="font-semibold max-md:text-xs">{cheapestPrice.calculated_price}</p>
             </div>
           )
         ) : null}

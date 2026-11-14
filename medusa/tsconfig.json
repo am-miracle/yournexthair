@@ -31,11 +31,5 @@
     "swc": true
   },
   "include": ["**/*", ".medusa/types/*"],
-  "exclude": [
-    "**/__fixtures__",
-    "node_modules",
-    ".medusa/server",
-    ".medusa/admin",
-    ".cache"
-  ]
+  "exclude": ["**/__fixtures__", "node_modules", ".medusa/server", ".medusa/admin", ".cache"]
 }

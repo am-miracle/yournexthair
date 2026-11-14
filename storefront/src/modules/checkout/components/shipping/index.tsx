@@ -6,12 +6,7 @@ import { twJoin } from "tailwind-merge"
 import { convertToLocale } from "@lib/util/money"
 import ErrorMessage from "@modules/checkout/components/error-message"
 import { Button } from "@/components/Button"
-import {
-  UiRadio,
-  UiRadioBox,
-  UiRadioGroup,
-  UiRadioLabel,
-} from "@/components/ui/Radio"
+import { UiRadio, UiRadioBox, UiRadioGroup, UiRadioLabel } from "@/components/ui/Radio"
 import { useCartShippingMethods, useSetShippingMethod } from "hooks/cart"
 import { StoreCart } from "@medusajs/types"
 
@@ -40,7 +35,7 @@ const Shipping = ({ cart }: { cart: StoreCart }) => {
 
   const { mutate, isPending } = useSetShippingMethod({ cartId: cart.id })
   const selectedShippingMethod = availableShippingMethods?.find(
-    (method) => method.id === cart.shipping_methods?.[0]?.shipping_option_id
+    (method) => method.id === cart.shipping_methods?.[0]?.shipping_option_id,
   )
   const selectedShippingMethodId: string | null = selectedShippingMethod?.id ?? null
   const shippingMethodOptions = availableShippingMethods ?? []
@@ -50,54 +45,53 @@ const Shipping = ({ cart }: { cart: StoreCart }) => {
   }
 
   const set = (id: string) => {
-    mutate(
-      { shippingMethodId: id },
-      { onError: (err) => setError(err.message) }
-    )
+    mutate({ shippingMethodId: id }, { onError: (err) => setError(err.message) })
   }
 
   return (
     <>
       <div className="flex justify-between mb-6 md:mb-8 border-t border-grayscale-200 pt-8 mt-8">
         <div>
-          <h2
-              className={twJoin(
-                "transition-[font-weight] duration-75",
-                isOpen && "font-semibold"
-              )}
-          >
+          <h2 className={twJoin("transition-[font-weight] duration-75", isOpen && "font-semibold")}>
             3. Shipping
           </h2>
         </div>
-        {!isOpen &&
-          cart?.shipping_address &&
-          cart?.billing_address &&
-          cart?.email && (
-            <Button
-              variant="link"
-              onPress={() => {
-                router.push(pathname + "?step=shipping", { scroll: false })
-              }}
-            >
-              Change
-            </Button>
-          )}
+        {!isOpen && cart?.shipping_address && cart?.billing_address && cart?.email && (
+          <Button
+            variant="link"
+            onPress={() => {
+              router.push(pathname + "?step=shipping", { scroll: false })
+            }}
+          >
+            Change
+          </Button>
+        )}
       </div>
       {isOpen ? (
         shippingMethodsPending ? (
-          <p role="status" aria-live="polite">Getting delivery options…</p>
+          <p role="status" aria-live="polite">
+            Getting delivery options…
+          </p>
         ) : shippingMethodsError ? (
           <div role="status" aria-live="polite">
             <p className="text-red-900">
               We couldn&apos;t load shipping methods right now. Please try again.
             </p>
-            <Button variant="link" onPress={() => { void refetchShippingMethods() }} isLoading={shippingMethodsFetching}>Try again</Button>
+            <Button
+              variant="link"
+              onPress={() => {
+                void refetchShippingMethods()
+              }}
+              isLoading={shippingMethodsFetching}
+            >
+              Try again
+            </Button>
           </div>
         ) : shippingMethodOptions.length === 0 ? (
           <div role="status" aria-live="polite">
             <p className="text-red-900">
-              There are no shipping methods available for your location. Please
-              contact us for further assistance.
+              There are no shipping methods available for your location. Please contact us for
+              further assistance.
             </p>
           </div>
         ) : (
@@ -109,12 +103,7 @@ const Shipping = ({ cart }: { cart: StoreCart }) => {
               aria-label="Shipping methods"
             >
               {shippingMethodOptions.map((option) => (
-                <UiRadio
-                  key={option.id}
-                  variant="outline"
-                  value={option.id}
-                  className="gap-4"
-                >
+                <UiRadio key={option.id} variant="outline" value={option.id} className="gap-4">
                   <UiRadioBox />
                   <UiRadioLabel>{option.name}</UiRadioLabel>
                   <UiRadioLabel className="ml-auto group-data-[selected=true]:font-normal">
@@ -130,8 +119,8 @@ const Shipping = ({ cart }: { cart: StoreCart }) => {
             {cart.shipping_address?.country_code &&
               cart.shipping_address.country_code.toLowerCase() !== "ng" && (
                 <p className="text-grayscale-500 text-xs mb-8">
-                  Import duties and taxes may be charged by your country on
-                  delivery. These are not included in your order total.
+                  Import duties and taxes may be charged by your country on delivery. These are not
+                  included in your order total.
                 </p>
               )}
 
@@ -146,9 +135,7 @@ const Shipping = ({ cart }: { cart: StoreCart }) => {
             </Button>
           </div>
         )
-      ) : cart &&
-        (cart.shipping_methods?.length ?? 0) > 0 &&
-        selectedShippingMethod ? (
+      ) : cart && (cart.shipping_methods?.length ?? 0) > 0 && selectedShippingMethod ? (
         <ul className="grid gap-2 md:grid-cols-[minmax(0,10rem)_1fr] md:gap-4">
           <li className="text-grayscale-500">Shipping</li>
           <li className="text-grayscale-600">{selectedShippingMethod.name}</li>

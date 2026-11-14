@@ -5,20 +5,17 @@ import { HttpTypes } from "@medusajs/types"
 
 export const retrieveCollection = async function (id: string) {
   return sdk.client
-    .fetch<{ collection: HttpTypes.StoreCollection }>(
-      `/store/collections/${id}`,
-      {
-        next: { tags: ["collections"] },
-        cache: "force-cache",
-      }
-    )
+    .fetch<{ collection: HttpTypes.StoreCollection }>(`/store/collections/${id}`, {
+      next: { tags: ["collections"] },
+      cache: "force-cache",
+    })
     .then(({ collection }) => collection)
 }
 
 export const getCollectionsList = async function (
   offset: number = 0,
   limit: number = 100,
-  fields?: (keyof HttpTypes.StoreCollection)[]
+  fields?: (keyof HttpTypes.StoreCollection)[],
 ): Promise<{ collections: HttpTypes.StoreCollection[]; count: number }> {
   return sdk.client
     .fetch<{
@@ -32,33 +29,35 @@ export const getCollectionsList = async function (
     .then(({ collections }) => ({ collections, count: collections.length }))
 }
 
-export const getCollectionByHandle = cache(async (
-  handle: string,
-  fields?: (keyof HttpTypes.StoreCollection)[]
-): Promise<HttpTypes.StoreCollection> => {
-  return sdk.client
-    .fetch<HttpTypes.StoreCollectionListResponse>(`/store/collections`, {
-      query: {
-        handle,
-        fields: fields ? fields.join(",") : undefined,
-        limit: 1,
-      },
-      next: { tags: ["collections"] },
-      cache: "force-cache",
-    })
-    .then(({ collections }) => {
-      const collection = collections[0]
+export const getCollectionByHandle = cache(
+  async (
+    handle: string,
+    fields?: (keyof HttpTypes.StoreCollection)[],
+  ): Promise<HttpTypes.StoreCollection> => {
+    return sdk.client
+      .fetch<HttpTypes.StoreCollectionListResponse>(`/store/collections`, {
+        query: {
+          handle,
+          fields: fields ? fields.join(",") : undefined,
+          limit: 1,
+        },
+        next: { tags: ["collections"] },
+        cache: "force-cache",
+      })
+      .then(({ collections }) => {
+        const collection = collections[0]
 
-      if (!collection) {
-        throw new Error(`Collection not found for handle: ${handle}`)
-      }
+        if (!collection) {
+          throw new Error(`Collection not found for handle: ${handle}`)
+        }
 
-      return collection
-    })
-})
+        return collection
+      })
+  },
+)
 
 export const getCollectionsWithProducts = async (
-  countryCode: string
+  countryCode: string,
 ): Promise<HttpTypes.StoreCollection[] | null> => {
   const { collections } = await getCollectionsList(0, 3)
 
@@ -66,9 +65,7 @@ export const getCollectionsWithProducts = async (
     return null
   }
 
-  const collectionIds = collections
-    .map((collection) => collection.id)
-    .filter(Boolean) as string[]
+  const collectionIds = collections.map((collection) => collection.id).filter(Boolean) as string[]
 
   const { response } = await getProductsList({
     queryParams: { collection_id: collectionIds },
@@ -76,9 +73,7 @@ export const getCollectionsWithProducts = async (
   })
 
   response.products.forEach((product) => {
-    const collection = collections.find(
-      (collection) => collection.id === product.collection_id
-    )
+    const collection = collections.find((collection) => collection.id === product.collection_id)
 
     if (collection) {
       if (!collection.products) {

@@ -1,16 +1,6 @@
 import { z } from "zod"
-import {
-  addToCart,
-  deleteLineItem,
-  retrieveCart,
-  updateLineItem,
-} from "@lib/data/cart"
-import {
-  CartSnapshot,
-  WebMCPTool,
-  WebMCPToolContext,
-  WebMCPToolResult,
-} from "../types"
+import { addToCart, deleteLineItem, retrieveCart, updateLineItem } from "@lib/data/cart"
+import { CartSnapshot, WebMCPTool, WebMCPToolContext, WebMCPToolResult } from "../types"
 import { mapCartToResult } from "../utils"
 
 const cartManageSchema = z.discriminatedUnion("action", [
@@ -56,12 +46,11 @@ const buildConfirmMessage = async (input: CartManageInput): Promise<string> => {
   return ""
 }
 
-const getCountryCode = (context?: WebMCPToolContext): string =>
-  context?.countryCode ?? ""
+const getCountryCode = (context?: WebMCPToolContext): string => context?.countryCode ?? ""
 
 export const cartManage = async (
   rawInput: unknown,
-  context?: WebMCPToolContext
+  context?: WebMCPToolContext,
 ): Promise<WebMCPToolResult<CartSnapshot>> => {
   const parsed = cartManageSchema.safeParse(rawInput)
   if (!parsed.success) {
@@ -82,8 +71,7 @@ export const cartManage = async (
       ok: false,
       error: {
         code: "INVALID_COUNTRY_CODE",
-        message:
-          "User must be on a localised page (e.g. /ng/store) before managing the cart.",
+        message: "User must be on a localised page (e.g. /ng/store) before managing the cart.",
       },
     }
   }
@@ -91,7 +79,7 @@ export const cartManage = async (
   if (input.action !== "view" && context?.client) {
     const confirmMessage = await buildConfirmMessage(input)
     const confirmed = await context.client.requestUserInteraction(() =>
-      Promise.resolve(window.confirm(confirmMessage))
+      Promise.resolve(window.confirm(confirmMessage)),
     )
 
     if (!confirmed) {
@@ -140,8 +128,7 @@ export const cartManage = async (
       ok: false,
       error: {
         code: "CART_OPERATION_FAILED",
-        message:
-          error instanceof Error ? error.message : "Failed to perform cart action",
+        message: error instanceof Error ? error.message : "Failed to perform cart action",
       },
     }
   }

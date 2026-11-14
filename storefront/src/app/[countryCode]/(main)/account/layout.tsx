@@ -20,10 +20,7 @@ export default function AccountLayout(props: { children: React.ReactNode }) {
             <p className="text-lg mb-14 max-md:hidden">My account</p>
             <SidebarNav />
           </div>
-          <SignOutButton
-            variant="ghost"
-            className="justify-start px-0 py-3 max-md:hidden"
-          >
+          <SignOutButton variant="ghost" className="justify-start px-0 py-3 max-md:hidden">
             Log out
           </SignOutButton>
         </div>

@@ -2,11 +2,7 @@ import { useRouter } from "next/navigation"
 
 type AppRouterInstance = ReturnType<typeof useRouter>
 import { isWebMCPSupported } from "./is-supported"
-import {
-  checkoutPrepareTool,
-  navigateToCartTool,
-  navigateToProductTool,
-} from "./tools/checkout"
+import { checkoutPrepareTool, navigateToCartTool, navigateToProductTool } from "./tools/checkout"
 import { productsSearchTool } from "./tools/products-search"
 import { cartManageTool } from "./tools/cart"
 import { WebMCPClient, WebMCPToolContext } from "./types"
@@ -24,7 +20,7 @@ interface ModelContext {
         readOnlyHint?: boolean
       }
     },
-    options?: { signal?: AbortSignal }
+    options?: { signal?: AbortSignal },
   ) => void
   unregisterTool?: (name: string) => void
 }
@@ -46,10 +42,7 @@ const getModelContext = (): ModelContext | null => {
   return (navigator as unknown as NavigatorWithModelContext).modelContext ?? null
 }
 
-export const registerWebMCPTools = (
-  router?: AppRouterInstance,
-  countryCode?: string
-) => {
+export const registerWebMCPTools = (router?: AppRouterInstance, countryCode?: string) => {
   if (!isWebMCPSupported()) {
     console.info("WebMCP is not supported, skipping registration")
     return () => {}
@@ -74,10 +67,7 @@ export const registerWebMCPTools = (
     annotations?: {
       readOnlyHint?: boolean
     }
-    handler: (
-      input: unknown,
-      context?: WebMCPToolContext
-    ) => Promise<unknown>
+    handler: (input: unknown, context?: WebMCPToolContext) => Promise<unknown>
   }
 
   const tools: RegisterableWebMCPTool[] = [
@@ -106,7 +96,7 @@ export const registerWebMCPTools = (
             })
           },
         },
-        { signal: controller.signal }
+        { signal: controller.signal },
       )
     })
   } catch (error) {

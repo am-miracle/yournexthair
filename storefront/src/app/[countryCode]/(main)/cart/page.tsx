@@ -9,7 +9,6 @@ export const metadata: Metadata = {
     follow: false,
   },
 }
-export default  function Cart() {
-
-  return <CartTemplate  />
+export default function Cart() {
+  return <CartTemplate />
 }

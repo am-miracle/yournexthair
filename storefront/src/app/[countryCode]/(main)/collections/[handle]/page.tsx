@@ -1,10 +1,7 @@
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
 
-import {
-  getCollectionByHandle,
-  getCollectionsList,
-} from "@lib/data/collections"
+import { getCollectionByHandle, getCollectionsList } from "@lib/data/collections"
 import { listStaticCountryCodes } from "@lib/data/regions"
 import { SITE_NAME, getCanonicalPath, getCanonicalUrl } from "@lib/util/seo"
 import { withDefinedProp } from "@lib/util/optional-props"
@@ -32,16 +29,14 @@ export async function generateStaticParams() {
 
   const countryCodes = await listStaticCountryCodes()
 
-  const collectionHandles = collections.map(
-    (collection: StoreCollection) => collection.handle
-  )
+  const collectionHandles = collections.map((collection: StoreCollection) => collection.handle)
 
   const staticParams = countryCodes
     ?.map((countryCode: string) =>
       collectionHandles.map((handle: string | undefined) => ({
         countryCode,
         handle,
-      }))
+      })),
     )
     .flat()
 
@@ -51,18 +46,14 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { handle } = await params
 
-  const collection = await getCollectionByHandle(handle, [
-    "id",
-    "title",
-    "metadata",
-  ])
+  const collection = await getCollectionByHandle(handle, ["id", "title", "metadata"])
 
   if (!collection) {
     notFound()
   }
 
   const collectionDetails = collectionMetadataCustomFieldsSchema.safeParse(
-    collection.metadata ?? {}
+    collection.metadata ?? {},
   )
 
   const metadata = {
@@ -96,11 +87,7 @@ export default async function CollectionPage({ params, searchParams }: Props) {
   const { handle, countryCode } = await params
   const { sortBy, page, category, type } = await searchParams
 
-  const collection = await getCollectionByHandle(handle, [
-    "id",
-    "title",
-    "metadata",
-  ])
+  const collection = await getCollectionByHandle(handle, ["id", "title", "metadata"])
 
   if (!collection) {
     notFound()
@@ -114,7 +101,7 @@ export default async function CollectionPage({ params, searchParams }: Props) {
       {...withDefinedProp("sortBy", sortBy)}
       {...withDefinedProp(
         "category",
-        !category ? undefined : Array.isArray(category) ? category : [category]
+        !category ? undefined : Array.isArray(category) ? category : [category],
       )}
       {...withDefinedProp("type", !type ? undefined : Array.isArray(type) ? type : [type])}
     />

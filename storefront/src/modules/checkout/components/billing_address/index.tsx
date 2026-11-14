@@ -353,7 +353,10 @@ const BillingAddress = ({
           <InputField
             placeholder="State / Province"
             name="billing_address.province"
-            inputProps={{ autoComplete: "address-level1", "aria-label": "Billing state or province" }}
+            inputProps={{
+              autoComplete: "address-level1",
+              "aria-label": "Billing state or province",
+            }}
             data-testid="billing-province-input"
           />
           <InputField

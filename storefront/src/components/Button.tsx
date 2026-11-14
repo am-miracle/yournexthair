@@ -35,8 +35,7 @@ export const getButtonClassNames = ({
     unstyled: "text-black h-auto disabled:text-grayscale-200",
     outline:
       "text-red-primary hover:text-red-900 hover:border-red-900 border border-red-primary disabled:text-grayscale-200 disabled:border-grayscale-200",
-    solid:
-      "bg-red-primary hover:bg-red-900 text-white disabled:bg-grayscale-200",
+    solid: "bg-red-primary hover:bg-red-900 text-white disabled:bg-grayscale-200",
     link: "text-red-primary h-auto border-b border-current px-0 rounded-none disabled:text-grayscale-200 hover:border-transparent",
   }
 
@@ -51,12 +50,9 @@ export const getButtonClassNames = ({
     : ""
 
   const flexDirection =
-    iconPosition === "end" || spinnerPosition === "end"
-      ? "flex-row-reverse"
-      : ""
+    iconPosition === "end" || spinnerPosition === "end" ? "flex-row-reverse" : ""
   const hasGap = (isLoading && loadingText) || iconName
-  const sizeClasses =
-    size === "sm" ? "px-4 h-8 text-xs" : size === "md" ? "px-6 h-12" : ""
+  const sizeClasses = size === "sm" ? "px-4 h-8 text-xs" : size === "md" ? "px-6 h-12" : ""
 
   return twJoin(
     "inline-flex items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 rounded-xs justify-center transition-colors disabled:pointer-events-none",
@@ -65,7 +61,7 @@ export const getButtonClassNames = ({
     hasGap && "gap-2",
     sizeClasses,
     variantClasses[variant],
-    visuallyDisabledClasses
+    visuallyDisabledClasses,
   )
 }
 
@@ -104,22 +100,16 @@ export const Button: React.FC<ButtonProps> = ({
         spinnerPosition,
         variant,
       }),
-      className
+      className,
     )}
   >
     {Boolean(isLoading) && <Icon name="loader" className="animate-spin" />}
     {iconName && !Boolean(isLoading) && <Icon name={iconName} />}
-    {Boolean(isLoading)
-      ? Boolean(loadingText)
-        ? loadingText
-        : null
-      : children}
+    {Boolean(isLoading) ? (Boolean(loadingText) ? loadingText : null) : children}
   </ReactAria.Button>
 )
 
-export const ButtonAnchor: React.FC<
-  React.ComponentPropsWithoutRef<"a"> & ButtonOwnProps
-> = ({
+export const ButtonAnchor: React.FC<React.ComponentPropsWithoutRef<"a"> & ButtonOwnProps> = ({
   isFullWidth,
   isVisuallyDisabled,
   iconName,
@@ -147,16 +137,12 @@ export const ButtonAnchor: React.FC<
         spinnerPosition,
         variant,
       }),
-      className
+      className,
     )}
   >
     {Boolean(isLoading) && <Icon name="loader" className="animate-spin" />}
     {iconName && !Boolean(isLoading) && <Icon name={iconName} />}
-    {Boolean(isLoading)
-      ? Boolean(loadingText)
-        ? loadingText
-        : null
-      : children}
+    {Boolean(isLoading) ? (Boolean(loadingText) ? loadingText : null) : children}
   </a>
 )
 
@@ -194,15 +180,11 @@ export const ButtonLink: React.FC<
         spinnerPosition,
         variant,
       }),
-      className
+      className,
     )}
   >
     {Boolean(isLoading) && <Icon name="loader" className="animate-spin" />}
     {iconName && !Boolean(isLoading) && <Icon name={iconName} />}
-    {Boolean(isLoading)
-      ? Boolean(loadingText)
-        ? loadingText
-        : null
-      : children}
+    {Boolean(isLoading) ? (Boolean(loadingText) ? loadingText : null) : children}
   </Link>
 )

@@ -80,7 +80,8 @@ export class BachsClient {
     )
     const normalized: BachsCheckoutSession = { ...checkout, status: checkout.status.toUpperCase() }
     if (checkout.payment_status) normalized.payment_status = checkout.payment_status.toLowerCase()
-    if (checkout.charge?.status) normalized.charge = { ...checkout.charge, status: checkout.charge.status.toLowerCase() }
+    if (checkout.charge?.status)
+      normalized.charge = { ...checkout.charge, status: checkout.charge.status.toLowerCase() }
     return normalized
   }
 

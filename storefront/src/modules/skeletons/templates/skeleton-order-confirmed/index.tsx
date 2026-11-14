@@ -5,10 +5,7 @@ import SkeletonButton from "@modules/skeletons/components/skeleton-button"
 const SkeletonOrderConfirmed = () => {
   return (
     <Layout className="pt-39 pb-36">
-      <LayoutColumn
-        start={{ base: 1, lg: 3, xl: 4 }}
-        end={{ base: 13, lg: 11, xl: 10 }}
-      >
+      <LayoutColumn start={{ base: 1, lg: 3, xl: 4 }} end={{ base: 13, lg: 11, xl: 10 }}>
         <Skeleton className="w-full h-17 mb-6" />
         <Skeleton className="w-[90%] h-12 mb-4" />
         <Skeleton className="w-[80%] h-12 mb-4" />

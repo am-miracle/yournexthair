@@ -1,31 +1,31 @@
-import type { ComponentProps } from 'react';
-import AuthPasswordForgotResetEmail from './auth-forgot-password';
-import AuthPasswordResetEmail from './auth-password-reset';
-import OrderPlacedEmail from './order-placed';
-import OrderTransferEmail from './order-transfer';
-import WelcomeEmail from './welcome';
+import type { ComponentProps } from "react"
+import AuthPasswordForgotResetEmail from "./auth-forgot-password"
+import AuthPasswordResetEmail from "./auth-password-reset"
+import OrderPlacedEmail from "./order-placed"
+import OrderTransferEmail from "./order-transfer"
+import WelcomeEmail from "./welcome"
 
 // TODO: we should be able to use notification data in subjects too
 export const subjects = {
-  'auth-password-reset': 'Reset your password',
-  'order-placed': 'Your order has been placed',
-  'order-transfer': 'Add your past orders to your account',
-  'customer-welcome': 'Welcome to YourNextHair!',
-  'auth-forgot-password': 'Reset your password',
-} as const;
+  "auth-password-reset": "Reset your password",
+  "order-placed": "Your order has been placed",
+  "order-transfer": "Add your past orders to your account",
+  "customer-welcome": "Welcome to YourNextHair!",
+  "auth-forgot-password": "Reset your password",
+} as const
 
 const emails = {
-  'auth-password-reset': AuthPasswordResetEmail,
-  'order-placed': OrderPlacedEmail,
-  'order-transfer': OrderTransferEmail,
-  'customer-welcome': WelcomeEmail,
-  'auth-forgot-password': AuthPasswordForgotResetEmail,
-} as const;
+  "auth-password-reset": AuthPasswordResetEmail,
+  "order-placed": OrderPlacedEmail,
+  "order-transfer": OrderTransferEmail,
+  "customer-welcome": WelcomeEmail,
+  "auth-forgot-password": AuthPasswordForgotResetEmail,
+} as const
 
-export type EmailTemplateKey = keyof typeof emails;
+export type EmailTemplateKey = keyof typeof emails
 
 export type EmailTemplatePropsMap = {
-  [Key in EmailTemplateKey]: ComponentProps<(typeof emails)[Key]>;
-};
+  [Key in EmailTemplateKey]: ComponentProps<(typeof emails)[Key]>
+}
 
-export default emails;
+export default emails

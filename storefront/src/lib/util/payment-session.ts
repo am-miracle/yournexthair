@@ -6,7 +6,7 @@ const REVIEWABLE_SESSION_STATUSES = new Set(["pending", "requires_more", "author
 const getPaymentSession = (
   sessions: StorePaymentSession[] | null | undefined,
   statuses: Set<string>,
-  providerId?: string | null
+  providerId?: string | null,
 ) => {
   if (!sessions?.length) {
     return undefined
@@ -31,10 +31,10 @@ const getPaymentSession = (
 
 export const getCheckoutPaymentSession = (
   sessions: StorePaymentSession[] | null | undefined,
-  providerId?: string | null
+  providerId?: string | null,
 ) => getPaymentSession(sessions, CHECKOUT_SESSION_STATUSES, providerId)
 
 export const getReviewPaymentSession = (
   sessions: StorePaymentSession[] | null | undefined,
-  providerId?: string | null
+  providerId?: string | null,
 ) => getPaymentSession(sessions, REVIEWABLE_SESSION_STATUSES, providerId)

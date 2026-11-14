@@ -25,7 +25,9 @@ export default async function LoginPage({
 }) {
   const { countryCode } = await params
   const { redirect: requested } = await searchParams
-  const returnPath = isValidReturnPath(requested, countryCode) ? requested : `/${countryCode}/account`
+  const returnPath = isValidReturnPath(requested, countryCode)
+    ? requested
+    : `/${countryCode}/account`
   const customer = await getCustomer().catch(() => null)
 
   if (customer) {

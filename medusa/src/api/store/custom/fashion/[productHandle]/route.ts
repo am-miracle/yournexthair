@@ -1,71 +1,64 @@
-import type { MedusaRequest, MedusaResponse } from '@medusajs/framework';
-import { Modules } from '@medusajs/framework/utils';
-import type { IProductModuleService } from '@medusajs/framework/types';
-import { FASHION_MODULE } from '../../../../../modules/fashion';
-import type FashionModuleService from '../../../../../modules/fashion/service';
+import type { MedusaRequest, MedusaResponse } from "@medusajs/framework"
+import { Modules } from "@medusajs/framework/utils"
+import type { IProductModuleService } from "@medusajs/framework/types"
+import { FASHION_MODULE } from "../../../../../modules/fashion"
+import type FashionModuleService from "../../../../../modules/fashion/service"
 
 export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
-  const productModuleService: IProductModuleService = req.scope.resolve(
-    Modules.PRODUCT,
-  );
-  const fashionModuleService: FashionModuleService =
-    req.scope.resolve(FASHION_MODULE);
+  const productModuleService: IProductModuleService = req.scope.resolve(Modules.PRODUCT)
+  const fashionModuleService: FashionModuleService = req.scope.resolve(FASHION_MODULE)
 
-  const { productHandle } = req.params as { productHandle: string };
+  const { productHandle } = req.params as { productHandle: string }
 
   const [product] = await productModuleService.listProducts(
     {
       handle: productHandle,
     },
     {
-      relations: ['options', 'variants', 'variants.options'],
+      relations: ["options", "variants", "variants.options"],
       take: 1,
     },
-  );
+  )
 
   if (!product) {
-    res.status(404).json({ message: 'Product not found' });
-    return;
+    res.status(404).json({ message: "Product not found" })
+    return
   }
 
-  const materialOption = product.options.find(
-    (option) => option.title === 'Material',
-  );
-  const colorOption = product.options.find(
-    (option) => option.title === 'Color',
-  );
+  const materialOption = product.options.find((option) => option.title === "Material")
+  const colorOption = product.options.find((option) => option.title === "Color")
 
   if (!materialOption || !colorOption) {
     res.status(200).json({
       materials: [],
-    });
-    return;
+    })
+    return
   }
 
-  const materialsAndColorsNamesTree = new Map<string, string[]>();
+  const materialsAndColorsNamesTree = new Map<string, string[]>()
 
   for (const productVariant of product.variants) {
     const materialName = productVariant.options.find(
       (option) => option.option_id === materialOption.id,
-    )?.value;
+    )?.value
 
     if (!materialName) {
-      continue;
+      continue
     }
 
     const colorNames = productVariant.options
       .filter((option) => option.option_id === colorOption.id)
-      .map((option) => option.value);
+      .map((option) => option.value)
 
     if (!materialsAndColorsNamesTree.has(materialName)) {
-      materialsAndColorsNamesTree.set(materialName, colorNames);
+      materialsAndColorsNamesTree.set(materialName, colorNames)
     } else {
-      const existingColorNames = materialsAndColorsNamesTree.get(materialName) ?? [];
+      const existingColorNames = materialsAndColorsNamesTree.get(materialName) ?? []
 
       materialsAndColorsNamesTree.set(
         materialName,
         Array.from(new Set([...existingColorNames, ...colorNames])),
-      );
+      )
     }
   }
 
@@ -74,9 +67,9 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
       name: Array.from(materialsAndColorsNamesTree.keys()),
     },
     {
-      relations: ['colors'],
+      relations: ["colors"],
     },
-  );
+  )
 
   res.status(200).json({
     materials: materials.map((material) => ({
@@ -92,5 +85,5 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
           hex_code: color.hex_code,
         })),
     })),
-  });
-};
+  })
+}

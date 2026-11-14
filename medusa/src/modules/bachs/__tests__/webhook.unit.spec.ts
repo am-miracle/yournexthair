@@ -25,13 +25,17 @@ describe("verifyBachsSignature", () => {
     const header = `t=${ts},v1=${computeSignature(ts, body, secret)}`
     const tampered = Buffer.from(body.toString().replace("evt_1", "evt_2"))
 
-    expect(verifyBachsSignature(tampered, { "x-bachs-signature-v2": header }, secret, now)).toBe(false)
+    expect(verifyBachsSignature(tampered, { "x-bachs-signature-v2": header }, secret, now)).toBe(
+      false,
+    )
   })
 
   it("rejects stale timestamps", () => {
     const header = `t=${ts},v1=${computeSignature(ts, body, secret)}`
 
-    expect(verifyBachsSignature(body, { "x-bachs-signature-v2": header }, secret, now + 301)).toBe(false)
+    expect(verifyBachsSignature(body, { "x-bachs-signature-v2": header }, secret, now + 301)).toBe(
+      false,
+    )
   })
 
   it("rejects deliveries without signature headers", () => {

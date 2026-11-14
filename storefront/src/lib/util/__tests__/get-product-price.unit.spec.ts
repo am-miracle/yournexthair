@@ -2,11 +2,7 @@ import { describe, it, expect } from "vitest"
 import { HttpTypes } from "@medusajs/types"
 import { getProductPrice } from "../get-product-price"
 
-const makeVariant = (
-  id: string,
-  amount: number,
-  currency = "GBP",
-): HttpTypes.StoreProductVariant =>
+const makeVariant = (id: string, amount: number, currency = "GBP"): HttpTypes.StoreProductVariant =>
   ({
     id,
     calculated_price: {
@@ -17,9 +13,7 @@ const makeVariant = (
     },
   }) as unknown as HttpTypes.StoreProductVariant
 
-const makeProduct = (
-  variants: HttpTypes.StoreProductVariant[],
-): HttpTypes.StoreProduct =>
+const makeProduct = (variants: HttpTypes.StoreProductVariant[]): HttpTypes.StoreProduct =>
   ({ id: "prod_1", variants }) as unknown as HttpTypes.StoreProduct
 
 describe("getProductPrice", () => {
@@ -71,10 +65,7 @@ describe("getProductPrice", () => {
   })
 
   it("returns the exact variant price when variantId is provided", () => {
-    const product = makeProduct([
-      makeVariant("v1", 189_00),
-      makeVariant("v2", 349_00),
-    ])
+    const product = makeProduct([makeVariant("v1", 189_00), makeVariant("v2", 349_00)])
     const { variantPrice } = getProductPrice({ product, variantId: "v2" })
     expect(variantPrice?.calculated_price_number).toBe(34900)
   })

@@ -1,21 +1,18 @@
-import {
-  createWorkflow,
-  WorkflowResponse,
-} from '@medusajs/framework/workflows-sdk';
-import { emitEventStep } from '@medusajs/medusa/core-flows';
+import { createWorkflow, WorkflowResponse } from "@medusajs/framework/workflows-sdk"
+import { emitEventStep } from "@medusajs/medusa/core-flows"
 
 const emitCustomerWelcomeEvent = createWorkflow(
-  'emit-customer-welcome-event',
+  "emit-customer-welcome-event",
   (input: { id: string }) => {
     emitEventStep({
-      eventName: 'customer.welcome',
+      eventName: "customer.welcome",
       data: {
         id: input.id,
       },
-    });
+    })
 
-    return new WorkflowResponse({ id: input.id });
+    return new WorkflowResponse({ id: input.id })
   },
-);
+)
 
-export default emitCustomerWelcomeEvent;
+export default emitCustomerWelcomeEvent

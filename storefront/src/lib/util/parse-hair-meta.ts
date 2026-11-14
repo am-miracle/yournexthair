@@ -40,20 +40,34 @@ export function parseHairMeta(raw: Record<string, unknown> | null | undefined): 
 
   const result: HairMeta = {}
 
-  const s = str(raw, "hair_origin");        if (s  !== undefined) result.hair_origin     = s
-  const f = str(raw, "hair_family");        if (f  !== undefined) result.hair_family     = f
-  const t = str(raw, "texture");            if (t  !== undefined) result.texture          = t
-  const l = num(raw, "length_in_inches");   if (l  !== undefined) result.length_in_inches = l
-  const c = str(raw, "color");              if (c  !== undefined) result.color            = c
-  const ls = str(raw, "lace_size");         if (ls !== undefined) result.lace_size        = ls
-  const lt = str(raw, "lace_type");         if (lt !== undefined) result.lace_type        = lt
-  const d = num(raw, "density");            if (d  !== undefined) result.density          = d
-  const cc = str(raw, "cap_construction");  if (cc !== undefined) result.cap_construction = cc
-  const fm = str(raw, "fulfillment_mode");  if (fm !== undefined) result.fulfillment_mode = fm
-  const pb = bool(raw, "pre_bleached");     if (pb !== undefined) result.pre_bleached     = pb
-  const pp = bool(raw, "pre_plucked");      if (pp !== undefined) result.pre_plucked      = pp
-  const bd = bool(raw, "bundle_deal");      if (bd !== undefined) result.bundle_deal      = bd
-  const le = bool(raw, "limited_edition");  if (le !== undefined) result.limited_edition  = le
+  const s = str(raw, "hair_origin")
+  if (s !== undefined) result.hair_origin = s
+  const f = str(raw, "hair_family")
+  if (f !== undefined) result.hair_family = f
+  const t = str(raw, "texture")
+  if (t !== undefined) result.texture = t
+  const l = num(raw, "length_in_inches")
+  if (l !== undefined) result.length_in_inches = l
+  const c = str(raw, "color")
+  if (c !== undefined) result.color = c
+  const ls = str(raw, "lace_size")
+  if (ls !== undefined) result.lace_size = ls
+  const lt = str(raw, "lace_type")
+  if (lt !== undefined) result.lace_type = lt
+  const d = num(raw, "density")
+  if (d !== undefined) result.density = d
+  const cc = str(raw, "cap_construction")
+  if (cc !== undefined) result.cap_construction = cc
+  const fm = str(raw, "fulfillment_mode")
+  if (fm !== undefined) result.fulfillment_mode = fm
+  const pb = bool(raw, "pre_bleached")
+  if (pb !== undefined) result.pre_bleached = pb
+  const pp = bool(raw, "pre_plucked")
+  if (pp !== undefined) result.pre_plucked = pp
+  const bd = bool(raw, "bundle_deal")
+  if (bd !== undefined) result.bundle_deal = bd
+  const le = bool(raw, "limited_edition")
+  if (le !== undefined) result.limited_edition = le
 
   return Object.keys(result).length > 0 ? result : null
 }

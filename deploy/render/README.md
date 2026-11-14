@@ -6,10 +6,10 @@ frontends run on Vercel. These files do not provision or change live services.
 [Upgrading production](#upgrading-production) before taking real paid orders.
 Render auto deploy is off. Vercel Git deployments are configured separately in its dashboard.
 
-| Environment | Branch | Render backend Blueprint | Vercel project |
-| --- | --- | --- | --- |
+| Environment | Branch    | Render backend Blueprint                 | Vercel project     |
+| ----------- | --------- | ---------------------------------------- | ------------------ |
 | Development | `develop` | `deploy/render/backend.development.yaml` | `yournexthair-dev` |
-| Production | `master` | `deploy/render/backend.production.yaml` | `yournexthair` |
+| Production  | `master`  | `deploy/render/backend.production.yaml`  | `yournexthair`     |
 
 Each backend uses a separate Neon database/branch, Redis-compatible Key Value, JWT/cookie
 secrets, and storage credentials. Each Vercel frontend uses its matching backend
@@ -70,7 +70,7 @@ See https://render.com/docs/free for current platform limits.
 2. Prepare separate S3-compatible buckets and credentials for dev and production.
    Use public media origins that serve uploaded images. Do not use local MinIO,
    localhost URLs, or Render's temporary filesystem for persistent media.
-3. Keep Bachs, Resend, Terminal, search and reporting credentials separate per
+3. Keep Bachs, Resend, DHL, search and reporting credentials separate per
    environment. Use Bachs sandbox keys in development. Do not copy your local
    `.env` or production customer data into the dev stack.
 
@@ -157,16 +157,16 @@ entered/reviewed by the client; never run the full demo seed on production.
 Use two Vercel projects for stable environment URLs and straightforward CORS and
 backend revalidation. In each, import `am-miracle/yournexthair` and set:
 
-| Setting | Production project | Development project |
-| --- | --- | --- |
-| Project name (example) | `yournexthair` | `yournexthair-dev` |
-| Root Directory | `storefront` | `storefront` |
-| Framework | Next.js | Next.js |
-| Production Branch | `master` | `develop` |
-| Node.js | 24.x | 24.x |
-| Install command | `pnpm install --frozen-lockfile` | same |
-| Build command | `pnpm build` | same |
-| Output Directory | Leave Next.js default | same |
+| Setting                | Production project               | Development project |
+| ---------------------- | -------------------------------- | ------------------- |
+| Project name (example) | `yournexthair`                   | `yournexthair-dev`  |
+| Root Directory         | `storefront`                     | `storefront`        |
+| Framework              | Next.js                          | Next.js             |
+| Production Branch      | `master`                         | `develop`           |
+| Node.js                | 24.x                             | 24.x                |
+| Install command        | `pnpm install --frozen-lockfile` | same                |
+| Build command          | `pnpm build`                     | same                |
+| Output Directory       | Leave Next.js default            | same                |
 
 `storefront/vercel.json` already supplies the framework, install/build commands
 and unchanged-build skipping. No Render storefront Blueprint is needed.
@@ -177,21 +177,21 @@ to Vercel's Production target; the development project's app label is still
 `development`. Vercel's Development target is for local development, not this
 hosted dev site.
 
-| Variable | Value for that project |
-| --- | --- |
-| `NEXT_PUBLIC_MEDUSA_BACKEND_URL` | Matching Render backend's public HTTPS URL |
-| `NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY` | Publishable key created in that backend |
-| `NEXT_PUBLIC_BASE_URL` | Actual stable Vercel project/custom-domain URL |
-| `NEXT_PUBLIC_DEFAULT_REGION` | `ng` |
-| `STOREFRONT_REVALIDATE_SECRET` | Exact secret from the matching Render backend |
-| `S3_FILE_URL` | Matching backend's public media origin |
-| `APP_ENV` | `production` or `development` |
-| `NEXT_PUBLIC_APP_ENV` | Same label as `APP_ENV` |
-| `NEXT_PUBLIC_FEATURE_SEARCH_ENABLED` | `false` until search is configured |
-| `NEXT_PUBLIC_ENABLE_WEBMCP` | `false` unless explicitly enabled |
-| `DISALLOW_ROBOTS` | `true` on dev; omit entirely on production |
+| Variable                             | Value for that project                         |
+| ------------------------------------ | ---------------------------------------------- |
+| `NEXT_PUBLIC_MEDUSA_BACKEND_URL`     | Matching Render backend's public HTTPS URL     |
+| `NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY` | Publishable key created in that backend        |
+| `NEXT_PUBLIC_BASE_URL`               | Actual stable Vercel project/custom-domain URL |
+| `NEXT_PUBLIC_DEFAULT_REGION`         | `ng`                                           |
+| `STOREFRONT_REVALIDATE_SECRET`       | Exact secret from the matching Render backend  |
+| `S3_FILE_URL`                        | Matching backend's public media origin         |
+| `APP_ENV`                            | `production` or `development`                  |
+| `NEXT_PUBLIC_APP_ENV`                | Same label as `APP_ENV`                        |
+| `NEXT_PUBLIC_FEATURE_SEARCH_ENABLED` | `false` until search is configured             |
+| `NEXT_PUBLIC_ENABLE_WEBMCP`          | `false` unless explicitly enabled              |
+| `DISALLOW_ROBOTS`                    | `true` on dev; omit entirely on production     |
 
-Do not copy database passwords, S3 private keys, Bachs secrets or Terminal keys
+Do not copy database passwords, S3 private keys, Bachs secrets or DHL keys
 into Vercel. Only the backend needs those. The revalidation secret stays
 server-only: never prefix it with `NEXT_PUBLIC_`.
 
@@ -231,8 +231,8 @@ repository change does not delete cloud resources.
   payment providers from production regions before accepting customer orders.
 - Email: `RESEND_API_KEY`, `RESEND_FROM` using your client's verified sender.
   Without a key, notifications use the local logging provider, not real email.
-- Shipping: `TERMINAL_SECRET_KEY`, then follow
-  `medusa/src/modules/terminal-shipping/README.md`. There are no invented weights.
+- Shipping: `DHL_API_USERNAME`, `DHL_API_PASSWORD`, `DHL_ACCOUNT_NUMBER`, then follow
+  `medusa/src/modules/dhl-shipping/README.md`. There are no invented weights.
 - Search: separate Meilisearch instances/credentials per environment. Set backend
   `MEILISEARCH_HOST`/`MEILISEARCH_API_KEY`; set storefront
   `NEXT_PUBLIC_SEARCH_ENDPOINT`, a **search-only** `NEXT_PUBLIC_SEARCH_API_KEY`,

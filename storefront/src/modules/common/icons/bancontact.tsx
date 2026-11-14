@@ -2,10 +2,7 @@ import React from "react"
 
 import { IconProps } from "@/types/icon"
 
-const Ideal: React.FC<IconProps> = ({
-  color = "currentColor",
-  ...attributes
-}) => {
+const Ideal: React.FC<IconProps> = ({ color = "currentColor", ...attributes }) => {
   return (
     <svg
       width="24px"

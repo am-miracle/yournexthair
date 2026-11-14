@@ -56,10 +56,7 @@ export default tseslint.config(
       "prefer-arrow-callback": "warn",
       "object-shorthand": "warn",
       eqeqeq: ["error", "always"],
-      "@typescript-eslint/consistent-type-imports": [
-        "error",
-        { prefer: "type-imports" },
-      ],
+      "@typescript-eslint/consistent-type-imports": ["error", { prefer: "type-imports" }],
       "@typescript-eslint/no-floating-promises": "error",
       "@typescript-eslint/no-misused-promises": "error",
       "@typescript-eslint/no-unused-vars": [
@@ -89,10 +86,7 @@ export default tseslint.config(
       "prefer-arrow-callback": "warn",
       "object-shorthand": "warn",
       eqeqeq: ["error", "always"],
-      "@typescript-eslint/consistent-type-imports": [
-        "error",
-        { prefer: "type-imports" },
-      ],
+      "@typescript-eslint/consistent-type-imports": ["error", { prefer: "type-imports" }],
       "@typescript-eslint/no-unused-vars": [
         "error",
         {

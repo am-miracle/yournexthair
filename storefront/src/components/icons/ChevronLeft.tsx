@@ -1,14 +1,7 @@
 import * as React from "react"
 
-export const ChevronLeft: React.FC<React.ComponentPropsWithoutRef<"svg">> = (
-  props
-) => (
-  <svg
-    {...props}
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-  >
+export const ChevronLeft: React.FC<React.ComponentPropsWithoutRef<"svg">> = (props) => (
+  <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
     <path
       fill="currentColor"
       fillRule="evenodd"

@@ -10,18 +10,16 @@ type NavigateToResult = {
   path: string
 }
 
-const normalizeOptionKey = (key: string) =>
-  key.trim().toLowerCase().replace(/\s+/g, "_")
+const normalizeOptionKey = (key: string) => key.trim().toLowerCase().replace(/\s+/g, "_")
 
-const getCountryCode = (context?: WebMCPToolContext): string =>
-  context?.countryCode ?? ""
+const getCountryCode = (context?: WebMCPToolContext): string => context?.countryCode ?? ""
 
 export const navigateToProduct = async (
   input: NavigateToProductInput,
-  context?: WebMCPToolContext
+  context?: WebMCPToolContext,
 ): Promise<WebMCPToolResult<NavigateToResult>> => {
   const normalizedOptionKeys = new Set(
-    Object.keys(input.options ?? {}).map((key) => normalizeOptionKey(key))
+    Object.keys(input.options ?? {}).map((key) => normalizeOptionKey(key)),
   )
 
   const hasColor = normalizedOptionKeys.has("color")
@@ -87,7 +85,7 @@ export const navigateToProduct = async (
 
 export const navigateToCart = async (
   _input: Record<string, never>,
-  context?: WebMCPToolContext
+  context?: WebMCPToolContext,
 ): Promise<WebMCPToolResult<NavigateToResult>> => {
   const countryCode = getCountryCode(context)
   if (!countryCode) {
@@ -95,8 +93,7 @@ export const navigateToCart = async (
       ok: false,
       error: {
         code: "INVALID_COUNTRY_CODE",
-        message:
-          "User must be on a localised page (e.g. /ng/store) before navigating to the cart.",
+        message: "User must be on a localised page (e.g. /ng/store) before navigating to the cart.",
       },
     }
   }
@@ -125,7 +122,7 @@ export const navigateToCart = async (
 
 export const checkoutPrepare = async (
   _input: Record<string, never>,
-  context?: WebMCPToolContext
+  context?: WebMCPToolContext,
 ): Promise<WebMCPToolResult<NavigateToResult>> => {
   const countryCode = getCountryCode(context)
   if (!countryCode) {
@@ -133,8 +130,7 @@ export const checkoutPrepare = async (
       ok: false,
       error: {
         code: "INVALID_COUNTRY_CODE",
-        message:
-          "User must be on a localised page (e.g. /ng/store) before proceeding to checkout.",
+        message: "User must be on a localised page (e.g. /ng/store) before proceeding to checkout.",
       },
     }
   }
@@ -172,8 +168,7 @@ export const checkoutPrepare = async (
       meta: { tool: "checkout.prepare" },
     }
   } catch (error: unknown) {
-    const message =
-      error instanceof Error ? error.message : "Failed to prepare checkout"
+    const message = error instanceof Error ? error.message : "Failed to prepare checkout"
 
     return {
       ok: false,
@@ -185,10 +180,7 @@ export const checkoutPrepare = async (
   }
 }
 
-export const navigateToProductTool: WebMCPTool<
-  NavigateToProductInput,
-  NavigateToResult
-> = {
+export const navigateToProductTool: WebMCPTool<NavigateToProductInput, NavigateToResult> = {
   name: "navigation.toProduct",
   description:
     "Navigate to product detail page, optionally preselect options. For products with Material and Color, Material must be set before Color.",
@@ -212,10 +204,7 @@ export const navigateToProductTool: WebMCPTool<
   handler: navigateToProduct,
 }
 
-export const navigateToCartTool: WebMCPTool<
-  Record<string, never>,
-  NavigateToResult
-> = {
+export const navigateToCartTool: WebMCPTool<Record<string, never>, NavigateToResult> = {
   name: "navigation.toCart",
   description: "Navigate to shopping cart page",
   annotations: {
@@ -229,10 +218,7 @@ export const navigateToCartTool: WebMCPTool<
   handler: navigateToCart,
 }
 
-export const checkoutPrepareTool: WebMCPTool<
-  Record<string, never>,
-  NavigateToResult
-> = {
+export const checkoutPrepareTool: WebMCPTool<Record<string, never>, NavigateToResult> = {
   name: "checkout.prepare",
   description:
     "Validate that the shopping cart has items and navigate to the checkout page. Performs pre-checkout validation (checks cart exists and is not empty) before proceeding. Returns error if cart is missing or empty.",

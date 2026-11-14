@@ -23,10 +23,7 @@ type PaymentButtonProps = {
   selectPaymentMethod: () => void
 }
 
-const PaymentButton: React.FC<PaymentButtonProps> = ({
-  cart,
-  selectPaymentMethod,
-}) => {
+const PaymentButton: React.FC<PaymentButtonProps> = ({ cart, selectPaymentMethod }) => {
   const notReady =
     !cart ||
     !cart.shipping_address ||
@@ -34,9 +31,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
     !cart.email ||
     (cart.shipping_methods?.length ?? 0) < 1
 
-  const paymentSession = getReviewPaymentSession(
-    cart.payment_collection?.payment_sessions
-  )
+  const paymentSession = getReviewPaymentSession(cart.payment_collection?.payment_sessions)
 
   if (paymentSession?.status === "authorized") {
     return <AuthorizedPaymentButton notReady={notReady} />
@@ -66,13 +61,12 @@ function useCompleteOrder() {
 
   const complete = (
     setSubmitting: (v: boolean) => void,
-    setErrorMessage: (v: string | null) => void
+    setErrorMessage: (v: string | null) => void,
   ) => {
     placeOrder.mutate(null, {
       onSuccess: (data) => {
         if (data?.type === "order") {
-          const countryCode =
-            data.order.shipping_address?.country_code?.toLowerCase()
+          const countryCode = data.order.shipping_address?.country_code?.toLowerCase()
           router.push(`/${countryCode}/order/confirmed/${data.order.id}`)
         } else if (data?.error) {
           setErrorMessage(data.error.message)
@@ -102,7 +96,7 @@ const BachsPaymentButton = ({
 
   const paymentSession = getCheckoutPaymentSession(
     cart.payment_collection?.payment_sessions,
-    BACHS_PROVIDER_ID
+    BACHS_PROVIDER_ID,
   )
 
   const getCheckoutUrl = async () => {
@@ -114,10 +108,8 @@ const BachsPaymentButton = ({
       providerId: BACHS_PROVIDER_ID,
     })
 
-    return getCheckoutPaymentSession(
-      payment_collection?.payment_sessions,
-      BACHS_PROVIDER_ID
-    )?.data?.checkout_url
+    return getCheckoutPaymentSession(payment_collection?.payment_sessions, BACHS_PROVIDER_ID)?.data
+      ?.checkout_url
   }
 
   const handlePayment = async () => {
@@ -138,7 +130,7 @@ const BachsPaymentButton = ({
     } catch (error) {
       Sentry.captureException(error, { tags: { provider: "bachs", stage: "start_payment" } })
       setErrorMessage(
-        error instanceof Error ? error.message : "Could not start payment. Please try again."
+        error instanceof Error ? error.message : "Could not start payment. Please try again.",
       )
       setSubmitting(false)
     }
@@ -173,8 +165,7 @@ const ManualTestPaymentButton = ({ notReady }: { notReady: boolean }) => {
     placeOrder.mutate(null, {
       onSuccess: (data) => {
         if (data?.type === "order") {
-          const countryCode =
-            data.order.shipping_address?.country_code?.toLowerCase()
+          const countryCode = data.order.shipping_address?.country_code?.toLowerCase()
           router.push(`/${countryCode}/order/confirmed/${data.order.id}`)
         } else if (data?.error) {
           setErrorMessage(data.error.message)

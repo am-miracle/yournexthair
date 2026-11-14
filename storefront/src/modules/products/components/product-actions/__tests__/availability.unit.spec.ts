@@ -4,10 +4,7 @@ import { buildAvailabilityMap } from "../availability"
 
 type VariantOptions = Record<string, string>
 
-const makeVariant = (
-  optionValues: VariantOptions,
-  inStock = true,
-): HttpTypes.StoreProductVariant =>
+const makeVariant = (optionValues: VariantOptions, inStock = true): HttpTypes.StoreProductVariant =>
   ({
     manage_inventory: true,
     inventory_quantity: inStock ? 10 : 0,
@@ -90,7 +87,7 @@ describe("buildAvailabilityMap", () => {
       manage_inventory: false,
       options: [
         { option_id: "opt_a", value: "X" },
-        { option_id: "", value: "Y" },   // no option_id
+        { option_id: "", value: "Y" }, // no option_id
         { option_id: "opt_b", value: "" }, // empty value
       ],
     } as unknown as HttpTypes.StoreProductVariant

@@ -20,7 +20,7 @@ export default async function fixTaxRegions({ container }: ExecArgs) {
     nullProviderRegions.map((r) => ({
       id: r.id,
       provider_id: "tp_system",
-    }))
+    })),
   )
 
   logger.info(`Updated ${nullProviderRegions.length} tax regions to use the system provider.`)

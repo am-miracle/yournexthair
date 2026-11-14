@@ -6,7 +6,8 @@ import { UiDialog } from "@/components/Dialog"
 import { withDefinedProp } from "@lib/util/optional-props"
 
 export interface DrawerProps
-  extends Omit<ReactAria.ModalOverlayProps, "children">,
+  extends
+    Omit<ReactAria.ModalOverlayProps, "children">,
     UiModalOwnProps,
     Pick<ReactAria.DialogProps, "children" | "aria-label"> {
   colorScheme?: "light" | "dark"
@@ -27,10 +28,8 @@ export const Drawer: React.FC<DrawerProps> = ({
         {...withDefinedProp("animateFrom", animateFrom)}
         className={twMerge(
           "flex justify-self-center overflow-y-scroll max-h-screen h-screen max-w-75 rounded-none",
-          colorScheme === "light"
-            ? "bg-white text-black"
-            : "bg-black text-white",
-          className
+          colorScheme === "light" ? "bg-white text-black" : "bg-black text-white",
+          className,
         )}
       >
         <UiDialog {...withDefinedProp("aria-label", ariaLabel)} className="flex flex-col flex-1">

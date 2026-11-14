@@ -84,11 +84,7 @@ export default function RegisterLoadingPage() {
         </form>
         <p className="text-grayscale-500">
           Already have an account? Just{" "}
-          <LocalizedLink
-            href="/auth/login"
-            variant="underline"
-            className="text-black md:pb-0.5"
-          >
+          <LocalizedLink href="/auth/login" variant="underline" className="text-black md:pb-0.5">
             log in
           </LocalizedLink>
           .

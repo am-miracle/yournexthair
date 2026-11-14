@@ -4,7 +4,7 @@ import dynamic from "next/dynamic"
 
 const CheckoutForm = dynamic(
   () => import("@modules/checkout/components/checkout-form").then((m) => m.CheckoutForm),
-  { ssr: false }
+  { ssr: false },
 )
 
 export const CheckoutFormClientWrapper = ({

@@ -1,9 +1,12 @@
 import { defineConfig, loadEnv } from "@medusajs/framework/utils"
 import type { ProductDTO } from "@medusajs/types"
+import { optionalDhlCredentials } from "./src/modules/dhl-shipping/config"
 
 import type { MeilisearchPluginOptions } from "./src/modules/meilisearch/types"
 
 loadEnv(process.env.NODE_ENV ?? "development", process.cwd())
+
+const dhlCredentials = optionalDhlCredentials()
 
 const requireSecret = (name: string): string => {
   const value = process.env[name]
@@ -21,9 +24,7 @@ const workerMode = (value: string | undefined): "shared" | "worker" | "server" =
 const meiliSearchOptions: MeilisearchPluginOptions = {
   config: {
     host: process.env.MEILISEARCH_HOST ?? "https://fashion-starter-search.agilo.agency",
-    ...(process.env.MEILISEARCH_API_KEY
-      ? { apiKey: process.env.MEILISEARCH_API_KEY }
-      : {}),
+    ...(process.env.MEILISEARCH_API_KEY ? { apiKey: process.env.MEILISEARCH_API_KEY } : {}),
   },
   settings: {
     products: {
@@ -98,8 +99,12 @@ module.exports = defineConfig({
     workerMode: workerMode(process.env.MEDUSA_WORKER_MODE),
     http: {
       storeCors: process.env.STORE_CORS ?? process.env.STOREFRONT_URL ?? "http://localhost:8000",
-      adminCors: process.env.ADMIN_CORS ?? process.env.BACKEND_URL ?? "http://localhost:5173,http://localhost:9000",
-      authCors: process.env.AUTH_CORS ??
+      adminCors:
+        process.env.ADMIN_CORS ??
+        process.env.BACKEND_URL ??
+        "http://localhost:5173,http://localhost:9000",
+      authCors:
+        process.env.AUTH_CORS ??
         ([process.env.STOREFRONT_URL, process.env.BACKEND_URL].filter(Boolean).join(",") ||
           "http://localhost:8000,http://localhost:5173,http://localhost:9000"),
       jwtSecret: requireSecret("JWT_SECRET"),
@@ -108,17 +113,21 @@ module.exports = defineConfig({
     },
   },
   modules: [
-    { resolve: "./src/modules/terminal-operations" },
+    { resolve: "./src/modules/dhl-operations" },
     {
       resolve: "@medusajs/medusa/fulfillment",
       options: {
         providers: [
           { resolve: "@medusajs/medusa/fulfillment-manual", id: "manual" },
-          ...(process.env.TERMINAL_SECRET_KEY ? [{
-            resolve: "./src/modules/terminal-shipping",
-            id: "terminal",
-            options: { api_key: process.env.TERMINAL_SECRET_KEY },
-          }] : []),
+          ...(dhlCredentials
+            ? [
+                {
+                  resolve: "./src/modules/dhl-shipping",
+                  id: "dhl",
+                  options: dhlCredentials,
+                },
+              ]
+            : []),
         ],
       },
     },

@@ -33,9 +33,7 @@ export const useStoreProducts = ({
       if (!lastPage.nextPage) {
         return undefined
       }
-      return (
-        Math.ceil(lastPage.nextPage / (lastPage.queryParams?.limit || 12)) + 1
-      )
+      return Math.ceil(lastPage.nextPage / (lastPage.queryParams?.limit || 12)) + 1
     },
   })
 }

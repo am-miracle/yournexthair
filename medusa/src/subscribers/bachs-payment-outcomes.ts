@@ -5,7 +5,10 @@ import * as Sentry from "@sentry/node"
 import { BachsClient, resolveBachsBaseUrl } from "../modules/bachs/client"
 import { reconcileBachsWebhook } from "../modules/bachs/reconcile"
 
-export default async function bachsPaymentOutcomes({ event, container }: SubscriberArgs<ProviderWebhookPayload>) {
+export default async function bachsPaymentOutcomes({
+  event,
+  container,
+}: SubscriberArgs<ProviderWebhookPayload>) {
   if (event.data.provider !== "bachs_bachs") return
   const key = process.env.BACHS_SECRET_KEY
   const secret = process.env.BACHS_WEBHOOK_SECRET
@@ -13,9 +16,11 @@ export default async function bachsPaymentOutcomes({ event, container }: Subscri
   const locking = container.resolve(Modules.LOCKING)
   try {
     await reconcileBachsWebhook({
-      payload: event.data.payload, secret,
+      payload: event.data.payload,
+      secret,
       client: new BachsClient(key, resolveBachsBaseUrl(key, process.env.BACHS_API_URL)),
-      payments: container.resolve(Modules.PAYMENT), logger: container.resolve("logger"),
+      payments: container.resolve(Modules.PAYMENT),
+      logger: container.resolve("logger"),
       withLock: (key, job) => locking.execute(key, job),
     })
   } catch (error) {

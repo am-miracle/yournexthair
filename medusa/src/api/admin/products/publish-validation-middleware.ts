@@ -1,17 +1,14 @@
 import type { MedusaRequest, MedusaResponse } from "@medusajs/framework"
 import { MedusaError, Modules } from "@medusajs/framework/utils"
 import type { IProductModuleService } from "@medusajs/framework/types"
-import {
-  getMissingPublishFields,
-  PRODUCT_TYPE_TO_FORM,
-} from "../../../modules/fashion/hair-fields"
+import { getMissingPublishFields, PRODUCT_TYPE_TO_FORM } from "../../../modules/fashion/hair-fields"
 
 type NextFn = (error?: unknown) => void
 
 export async function validatePublishHairFields(
   req: MedusaRequest,
   _res: MedusaResponse,
-  next: NextFn
+  next: NextFn,
 ): Promise<void> {
   const body = req.body as Record<string, unknown> | undefined
 
@@ -46,7 +43,7 @@ export async function validatePublishHairFields(
   next(
     new MedusaError(
       MedusaError.Types.INVALID_DATA,
-      `Cannot publish: missing required hair fields for ${productForm} — ${missing.map((f) => f.label).join(", ")}`
-    )
+      `Cannot publish: missing required hair fields for ${productForm} — ${missing.map((f) => f.label).join(", ")}`,
+    ),
   )
 }

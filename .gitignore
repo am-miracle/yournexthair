@@ -1,2 +1,5 @@
 .DS_Store
 .agents/
+
+# Root formatting tools
+/node_modules/

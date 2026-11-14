@@ -33,10 +33,7 @@ export default async function AccountPersonalAndSecurityPage({
     redirect(`/${countryCode}/auth/login`)
   }
 
-  const [region, regions] = await Promise.all([
-    getRegion(countryCode),
-    listRegions(),
-  ])
+  const [region, regions] = await Promise.all([getRegion(countryCode), listRegions()])
   const countries = regions.flatMap((region) => region.countries ?? [])
 
   return (
@@ -51,11 +48,7 @@ export default async function AccountPersonalAndSecurityPage({
           <div className="flex max-sm:flex-col sm:flex-wrap gap-6 sm:gap-x-16">
             <div>
               <p className="text-xs text-grayscale-500 mb-1.5">Name</p>
-              <p>
-                {[customer.first_name, customer.last_name]
-                  .filter(Boolean)
-                  .join(" ")}
-              </p>
+              <p>{[customer.first_name, customer.last_name].filter(Boolean).join(" ")}</p>
             </div>
             <div>
               <p className="text-xs text-grayscale-500 mb-1.5">Number</p>
@@ -95,9 +88,7 @@ export default async function AccountPersonalAndSecurityPage({
         {customer.addresses.length > 1 ? "Addresses" : "Address"}
       </h2>
       {customer.addresses.length === 0 && (
-        <p className="text-grayscale-500 mb-6">
-          You don&apos;t have any addresses saved yet.
-        </p>
+        <p className="text-grayscale-500 mb-6">You don&apos;t have any addresses saved yet.</p>
       )}
       {customer.addresses.length === 1 &&
         customer.addresses.map((address) => (
@@ -111,24 +102,14 @@ export default async function AccountPersonalAndSecurityPage({
         ))}
       {customer.addresses.length > 1 && (
         <>
-          <DefaultShippingAddressSelect
-            addresses={customer.addresses}
-            countries={countries}
-          />
-          <DefaultBillingAddressSelect
-            addresses={customer.addresses}
-            countries={countries}
-          />
+          <DefaultShippingAddressSelect addresses={customer.addresses} countries={countries} />
+          <DefaultBillingAddressSelect addresses={customer.addresses} countries={countries} />
           <UiRadioGroup
             className="flex flex-col sm:flex-row md:flex-col lg:flex-row sm:flex-wrap gap-x-6 gap-y-8 mb-6"
             aria-label="address"
           >
             {customer.addresses
-              .sort(
-                (a, b) =>
-                  new Date(b.created_at).getTime() -
-                  new Date(a.created_at).getTime()
-              )
+              .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
               .map((address) => (
                 <AddressMultiple
                   key={address.id}
@@ -162,8 +143,7 @@ export default async function AccountPersonalAndSecurityPage({
       </UiDialogTrigger>
       <h2 className="text-md font-normal mb-6 md:mb-4">Change password</h2>
       <p className="max-md:text-xs text-grayscale-500 mb-6">
-        To change your password, we&apos;ll send you an email. Just click on the
-        reset button below.
+        To change your password, we&apos;ll send you an email. Just click on the reset button below.
       </p>
       <RequestPasswordResetButton />
       <div className="mt-16 md:hidden">

@@ -11,9 +11,7 @@ const productSearchSchema = z.object({
   collection_ids: z.array(z.string()).optional(),
   category_ids: z.array(z.string()).optional(),
   type_ids: z.array(z.string()).optional(),
-  sort: z
-    .enum(["latest_arrivals", "lowest_price", "highest_price"])
-    .optional(),
+  sort: z.enum(["latest_arrivals", "lowest_price", "highest_price"]).optional(),
   limit: z.number().int().min(1).max(36).optional(),
 })
 
@@ -50,7 +48,7 @@ type ProductSearchItem = ProductSearchData["products"][number]
 
 export const productsSearch = async (
   rawInput: unknown,
-  context?: WebMCPToolContext
+  context?: WebMCPToolContext,
 ): Promise<WebMCPToolResult<ProductSearchData>> => {
   const parsed = productSearchSchema.safeParse(rawInput)
   if (!parsed.success) {
@@ -71,17 +69,14 @@ export const productsSearch = async (
       ok: false,
       error: {
         code: "INVALID_COUNTRY_CODE",
-        message:
-          "User must be on a localised page (e.g. /ng/store) to search products.",
+        message: "User must be on a localised page (e.g. /ng/store) to search products.",
       },
     }
   }
 
   try {
     const results = params.query
-      ? await searchClient
-          .index("products")
-          .search<MeiliSearchProductHit>(params.query)
+      ? await searchClient.index("products").search<MeiliSearchProductHit>(params.query)
       : null
 
     const queryParams: HttpTypes.StoreProductListParams = {
@@ -129,8 +124,7 @@ export const productsSearch = async (
             id: product.id,
             title: product.title,
             handle: product.handle,
-            category_ids:
-              product.categories?.map((category) => category.id) ?? [],
+            category_ids: product.categories?.map((category) => category.id) ?? [],
             collection_ids: product.collection ? [product.collection.id] : [],
             tags: product.tags?.map((tag) => tag.value) ?? [],
             ...withNonNullProp("thumbnail", product.thumbnail),
@@ -147,10 +141,7 @@ export const productsSearch = async (
                   variants: product.variants.map((variant) => ({
                     id: variant.id,
                     ...withNonNullProp("title", variant.title),
-                    ...withDefinedProp(
-                      "inventory_quantity",
-                      variant.inventory_quantity
-                    ),
+                    ...withDefinedProp("inventory_quantity", variant.inventory_quantity),
                   })),
                 }
               : {}),
@@ -177,8 +168,7 @@ export const productsSearch = async (
       meta: { tool: "products.search" },
     }
   } catch (error: unknown) {
-    const message =
-      error instanceof Error ? error.message : "Failed to search products"
+    const message = error instanceof Error ? error.message : "Failed to search products"
 
     return {
       ok: false,
@@ -187,10 +177,7 @@ export const productsSearch = async (
   }
 }
 
-export const productsSearchTool: WebMCPTool<
-  ProductSearchInput,
-  ProductSearchData
-> = {
+export const productsSearchTool: WebMCPTool<ProductSearchInput, ProductSearchData> = {
   name: "products.search",
   description:
     "Search and retrieve product information (price, variants, options, categories, tags) with optional filters and sorting.",
@@ -202,8 +189,7 @@ export const productsSearchTool: WebMCPTool<
     properties: {
       query: {
         type: "string",
-        description:
-          "Search query. Can be omitted to fetch products by filters only.",
+        description: "Search query. Can be omitted to fetch products by filters only.",
       },
       collection_ids: { type: "array", items: { type: "string" } },
       category_ids: { type: "array", items: { type: "string" } },

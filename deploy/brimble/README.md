@@ -11,10 +11,10 @@ live documentation when this was written. Confirm each item marked **Check**
 before relying on it, and run the [dev-stack trial](#dev-stack-trial) before
 moving production.
 
-| Environment | Branch | Backend | Redis | Storefront |
-| --- | --- | --- | --- | --- |
+| Environment | Branch    | Backend                | Redis                    | Storefront         |
+| ----------- | --------- | ---------------------- | ------------------------ | ------------------ |
 | Development | `develop` | `yournexthair-api-dev` | `yournexthair-redis-dev` | `yournexthair-dev` |
-| Production | `master` | `yournexthair-api` | `yournexthair-redis` | `yournexthair` |
+| Production  | `master`  | `yournexthair-api`     | `yournexthair-redis`     | `yournexthair`     |
 
 Keep every environment fully separate: its own Neon branch, Redis, bucket,
 secrets, Bachs keys and publishable key. Never point two environments at the
@@ -68,17 +68,17 @@ Development may skip AOF to save resources; jobs are then lost on restart.
 
 Create a project from `am-miracle/yournexthair` on the environment's branch.
 
-| Setting | Value |
-| --- | --- |
-| Root directory | `medusa` |
-| Node version | 24.x |
-| Install command | `corepack enable && pnpm install --frozen-lockfile --prod=false` |
-| Build command | `pnpm build && cp pnpm-lock.yaml .npmrc .medusa/server/ && cd .medusa/server && pnpm install --frozen-lockfile --prod` |
-| Start command | see below |
-| Port | `9000` |
-| Health check | `/health` |
-| Resources | 1 vCPU / 2 GB RAM minimum |
-| Auto deploy | off |
+| Setting         | Value                                                                                                                  |
+| --------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| Root directory  | `medusa`                                                                                                               |
+| Node version    | 24.x                                                                                                                   |
+| Install command | `corepack enable && pnpm install --frozen-lockfile --prod=false`                                                       |
+| Build command   | `pnpm build && cp pnpm-lock.yaml .npmrc .medusa/server/ && cd .medusa/server && pnpm install --frozen-lockfile --prod` |
+| Start command   | see below                                                                                                              |
+| Port            | `9000`                                                                                                                 |
+| Health check    | `/health`                                                                                                              |
+| Resources       | 1 vCPU / 2 GB RAM minimum                                                                                              |
+| Auto deploy     | off                                                                                                                    |
 
 Start commands (migrations run on start because no pre-deploy step is assumed):
 
@@ -98,27 +98,27 @@ it always on.
 
 ### Backend environment variables
 
-| Variable | Value |
-| --- | --- |
-| `NODE_ENV` | `production` |
-| `APP_ENV` | `production` or `development` |
-| `HOST` | `0.0.0.0` |
-| `PORT` | `9000` |
-| `MEDUSA_WORKER_MODE` | `shared` |
-| `DATABASE_URL` | Matching Neon connection string (direct endpoint, keep TLS params) |
-| `REDIS_URL` | Matching Brimble Redis connection string (private address) |
-| `BACKEND_URL` | Backend's public HTTPS URL |
-| `STOREFRONT_URL` | Storefront's stable public URL |
-| `JWT_SECRET`, `COOKIE_SECRET` | New random values per environment (`openssl rand -hex 32`) |
-| `STOREFRONT_REVALIDATE_SECRET` | New random value; copy to the matching storefront |
-| `S3_FILE_URL` | Public media origin |
-| `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`, `S3_BUCKET`, `S3_ENDPOINT` | Bucket credentials |
-| `S3_REGION` | `auto` for R2 |
-| `S3_FORCE_PATH_STYLE` | `true` |
-| `INITIAL_ADMIN_EMAIL`, `INITIAL_ADMIN_PASSWORD` | First deploy only; remove after signing in |
+| Variable                                                               | Value                                                              |
+| ---------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| `NODE_ENV`                                                             | `production`                                                       |
+| `APP_ENV`                                                              | `production` or `development`                                      |
+| `HOST`                                                                 | `0.0.0.0`                                                          |
+| `PORT`                                                                 | `9000`                                                             |
+| `MEDUSA_WORKER_MODE`                                                   | `shared`                                                           |
+| `DATABASE_URL`                                                         | Matching Neon connection string (direct endpoint, keep TLS params) |
+| `REDIS_URL`                                                            | Matching Brimble Redis connection string (private address)         |
+| `BACKEND_URL`                                                          | Backend's public HTTPS URL                                         |
+| `STOREFRONT_URL`                                                       | Storefront's stable public URL                                     |
+| `JWT_SECRET`, `COOKIE_SECRET`                                          | New random values per environment (`openssl rand -hex 32`)         |
+| `STOREFRONT_REVALIDATE_SECRET`                                         | New random value; copy to the matching storefront                  |
+| `S3_FILE_URL`                                                          | Public media origin                                                |
+| `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`, `S3_BUCKET`, `S3_ENDPOINT` | Bucket credentials                                                 |
+| `S3_REGION`                                                            | `auto` for R2                                                      |
+| `S3_FORCE_PATH_STYLE`                                                  | `true`                                                             |
+| `INITIAL_ADMIN_EMAIL`, `INITIAL_ADMIN_PASSWORD`                        | First deploy only; remove after signing in                         |
 
 `BACKEND_URL` is baked into the Admin at build time: redeploy after changing it.
-Do not set `DATABASE_SSL_MODE`. Optional integrations (Bachs, Resend, Terminal,
+Do not set `DATABASE_SSL_MODE`. Optional integrations (Bachs, Resend, DHL,
 Meilisearch, Sentry) use the same variables as in the
 [Render guide](../render/README.md#optional-integrations-configure-independently-in-each-backend).
 The Bachs webhook endpoint is `<backend>/hooks/payment/bachs_bachs`.
@@ -131,14 +131,14 @@ key attached to it.
 
 Create a second project from the same repository and branch.
 
-| Setting | Value |
-| --- | --- |
-| Root directory | `storefront` |
-| Framework | Next.js (server-rendered, not a static export) |
-| Node version | 24.x |
-| Install command | `pnpm install --frozen-lockfile` |
-| Build command | `pnpm build` |
-| Start command | `pnpm start` |
+| Setting         | Value                                          |
+| --------------- | ---------------------------------------------- |
+| Root directory  | `storefront`                                   |
+| Framework       | Next.js (server-rendered, not a static export) |
+| Node version    | 24.x                                           |
+| Install command | `pnpm install --frozen-lockfile`               |
+| Build command   | `pnpm build`                                   |
+| Start command   | `pnpm start`                                   |
 
 Use the storefront variables from the
 [Render guide's Vercel table](../render/README.md#create-the-storefronts-in-vercel),

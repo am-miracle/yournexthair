@@ -28,7 +28,7 @@ export default async function revalidateStorefrontProductsHandler({
 
   if (!storefrontUrl || !revalidateSecret) {
     logger.warn(
-      "Skipping storefront product revalidation because STOREFRONT_URL or STOREFRONT_REVALIDATE_SECRET is not configured."
+      "Skipping storefront product revalidation because STOREFRONT_URL or STOREFRONT_REVALIDATE_SECRET is not configured.",
     )
     return
   }
@@ -47,7 +47,7 @@ export default async function revalidateStorefrontProductsHandler({
     logger.error(
       `Failed to call storefront revalidation endpoint for ${event.name}: ${
         error instanceof Error ? error.message : "Unknown error"
-      }`
+      }`,
     )
     return null
   })
@@ -60,7 +60,7 @@ export default async function revalidateStorefrontProductsHandler({
     const body = await response.text().catch(() => "")
 
     logger.error(
-      `Storefront revalidation failed for ${event.name} with status ${response.status}.${body ? ` Response: ${body}` : ""}`
+      `Storefront revalidation failed for ${event.name} with status ${response.status}.${body ? ` Response: ${body}` : ""}`,
     )
     return
   }

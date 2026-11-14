@@ -67,8 +67,7 @@ export const UpsertAddressForm = ({
       {({ watch, formState }) => {
         const watchedValues = watch()
         const isDisabled =
-          !Object.values(watchedValues).some((value) => value) ||
-          !formState.isDirty
+          !Object.values(watchedValues).some((value) => value) || !formState.isDirty
         return (
           <>
             <h3 className="text-md mb-8 md:mb-10">
@@ -164,9 +163,7 @@ export const UpsertAddressForm = ({
                   className="flex-1"
                 />
               </div>
-              {!data?.success && (
-                <p className="text-red-primary">{data?.error}</p>
-              )}
+              {!data?.success && <p className="text-red-primary">{data?.error}</p>}
             </div>
             <div className="flex gap-6 justify-between">
               <SubmitButton isLoading={isPending} isDisabled={isDisabled}>

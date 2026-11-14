@@ -55,11 +55,11 @@ export default async function StorePage({ searchParams, params }: Params) {
       {...withDefinedProp("page", page)}
       {...withDefinedProp(
         "collection",
-        !collection ? undefined : Array.isArray(collection) ? collection : [collection]
+        !collection ? undefined : Array.isArray(collection) ? collection : [collection],
       )}
       {...withDefinedProp(
         "category",
-        !category ? undefined : Array.isArray(category) ? category : [category]
+        !category ? undefined : Array.isArray(category) ? category : [category],
       )}
       {...withDefinedProp("type", !type ? undefined : Array.isArray(type) ? type : [type])}
     />

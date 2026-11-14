@@ -15,9 +15,7 @@ export const RequestPasswordResetButton: React.FC = () => {
 
   return (
     <>
-      {errorMessage && (
-        <div className="text-sm text-red-primary">{errorMessage}</div>
-      )}
+      {errorMessage && <div className="text-sm text-red-primary">{errorMessage}</div>}
       <UiDialogTrigger
         isOpen={isModalOpen}
         onOpenChange={(isOpen) => {
@@ -53,13 +51,9 @@ export const RequestPasswordResetButton: React.FC = () => {
             <UiDialog>
               <p className="text-md mb-12">Reset password</p>
               <p className="text-grayscale-500">
-                We have sent an email with instructions on how to change the
-                password.
+                We have sent an email with instructions on how to change the password.
               </p>
-              <UiCloseButton
-                variant="ghost"
-                className="absolute top-4 right-6 p-0"
-              >
+              <UiCloseButton variant="ghost" className="absolute top-4 right-6 p-0">
                 <Icon name="close" className="w-6 h-6" />
               </UiCloseButton>
             </UiDialog>

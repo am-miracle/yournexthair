@@ -52,15 +52,15 @@ export default async function seedRegions({ container }: ExecArgs) {
     "hr",
   ]
 
-  const paymentProviders = process.env.BACHS_SECRET_KEY
-    ? ["pp_bachs_bachs"]
-    : ["pp_system_default"]
+  const paymentProviders = process.env.BACHS_SECRET_KEY ? ["pp_bachs_bachs"] : ["pp_system_default"]
   const desired = [
     { name: "Nigeria", currency_code: "ngn", countries: nigeriaCountries },
     { name: "International", currency_code: "usd", countries: usdCountries },
   ]
   const existing = await regions.listRegions({}, { relations: ["countries"], take: 1000 })
-  const assignedCountries = new Set(existing.flatMap((region) => region.countries?.map((country) => country.iso_2) ?? []))
+  const assignedCountries = new Set(
+    existing.flatMap((region) => region.countries?.map((country) => country.iso_2) ?? []),
+  )
   const missing = desired
     .filter((region) => !existing.some((current) => current.name === region.name))
     .map((region) => ({
@@ -74,7 +74,9 @@ export default async function seedRegions({ container }: ExecArgs) {
     ? (await createRegionsWorkflow(container).run({ input: { regions: missing } })).result
     : []
   const allRegions = [...existing, ...created]
-  const nigeria = allRegions.find((region) => region.countries?.some((country) => country.iso_2 === "ng"))
+  const nigeria = allRegions.find((region) =>
+    region.countries?.some((country) => country.iso_2 === "ng"),
+  )
   const [store] = await stores.listStores({}, { relations: ["supported_currencies"] })
   if (store) {
     const supported = (store.supported_currencies ?? []).map((currency) => ({

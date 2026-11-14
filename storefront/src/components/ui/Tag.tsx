@@ -8,9 +8,7 @@ type UiTagOwnProps = {
   iconPosition?: "start" | "end"
 }
 
-export const UiTag: React.FC<
-  React.ComponentPropsWithRef<"div"> & UiTagOwnProps
-> = ({
+export const UiTag: React.FC<React.ComponentPropsWithRef<"div"> & UiTagOwnProps> = ({
   isActive = false,
   iconName,
   iconPosition,
@@ -24,7 +22,7 @@ export const UiTag: React.FC<
       "inline-flex justify-center items-center gap-2 rounded-md px-4 py-1.5 max-h-6 text-xs bg-grayscale-50",
       isActive && "bg-red-primary text-white",
       iconPosition === "end" && "flex-row-reverse",
-      className
+      className,
     )}
   >
     {iconName && <Icon name={iconName} className="w-3 h-3" />}

@@ -64,9 +64,7 @@ const FieldRow: React.FC<{ field: FieldInfo; isMissing: boolean }> = ({ field, i
               size="small"
               className={clx(
                 "truncate",
-                isMissing
-                  ? "text-red-500"
-                  : "text-fg-muted dark:text-fg-muted-dark"
+                isMissing ? "text-red-500" : "text-fg-muted dark:text-fg-muted-dark",
               )}
             >
               {isMissing ? "required" : "not set"}
@@ -75,10 +73,10 @@ const FieldRow: React.FC<{ field: FieldInfo; isMissing: boolean }> = ({ field, i
           </>
         ) : (
           <>
-            <Text size="small" className="truncate">{formatDisplayValue(field)}</Text>
-            {field.rule === "required" && (
-              <CheckCircleSolid className="text-green-500 shrink-0" />
-            )}
+            <Text size="small" className="truncate">
+              {formatDisplayValue(field)}
+            </Text>
+            {field.rule === "required" && <CheckCircleSolid className="text-green-500 shrink-0" />}
           </>
         )}
       </div>
@@ -105,10 +103,7 @@ const FormField: React.FC<{
         <Text size="small" className="text-fg-subtle dark:text-fg-subtle-dark">
           {field.label}
         </Text>
-        <Switch
-          checked={Boolean(value)}
-          onCheckedChange={(checked) => onChange(checked)}
-        />
+        <Switch checked={Boolean(value)} onCheckedChange={(checked) => onChange(checked)} />
       </div>
     )
   }
@@ -258,7 +253,7 @@ const HairReadinessWidget = withQueryClient(({ data }: DetailWidgetProps<AdminPr
                       <span
                         className={clx(
                           "w-2 h-2 rounded-full shrink-0",
-                          f.value ? "bg-green-500" : "bg-grayscale-200"
+                          f.value ? "bg-green-500" : "bg-grayscale-200",
                         )}
                       />
                       <Text size="small" className="text-fg-subtle dark:text-fg-subtle-dark">
@@ -303,9 +298,7 @@ const HairReadinessWidget = withQueryClient(({ data }: DetailWidgetProps<AdminPr
                 ))}
               </div>
             )}
-            {saveError && (
-              <Text className="text-red-500 text-sm mt-1">{saveError}</Text>
-            )}
+            {saveError && <Text className="text-red-500 text-sm mt-1">{saveError}</Text>}
           </Drawer.Body>
           <Drawer.Footer>
             <Drawer.Close asChild>

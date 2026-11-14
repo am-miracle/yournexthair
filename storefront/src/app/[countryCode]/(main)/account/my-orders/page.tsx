@@ -40,7 +40,7 @@ const OrderStatus: React.FC<{
 type PageProps = {
   params: Promise<{ countryCode: string }>
   searchParams: Promise<{
-    page?: string
+    page?: string | string[]
   }>
 }
 
@@ -53,12 +53,27 @@ export default async function AccountMyOrdersPage({ params, searchParams }: Page
   const customer = await getCustomer().catch(() => null)
 
   if (!customer) {
-    redirect(`/${countryCode}/auth/login?redirect=${encodeURIComponent(`/${countryCode}/account/my-orders`)}`)
+    redirect(
+      `/${countryCode}/auth/login?redirect=${encodeURIComponent(`/${countryCode}/account/my-orders`)}`,
+    )
   }
 
-  const pageNumber = page ? parseInt(page, 10) : 1
-  const { orders, count } = await listOrders(ORDERS_PER_PAGE, (pageNumber - 1) * ORDERS_PER_PAGE)
-  const totalPages = Math.ceil(count / ORDERS_PER_PAGE)
+  const ordersPath = `/${countryCode}/account/my-orders`
+  const pageNumber =
+    page === undefined
+      ? 1
+      : typeof page === "string" && /^[1-9]\d*$/.test(page)
+        ? Number(page)
+        : NaN
+  const offset = (pageNumber - 1) * ORDERS_PER_PAGE
+  if (!Number.isSafeInteger(pageNumber) || !Number.isSafeInteger(offset)) {
+    redirect(`${ordersPath}?page=1`)
+  }
+  const { orders, count } = await listOrders(ORDERS_PER_PAGE, offset)
+  const totalPages = Math.max(1, Math.ceil(count / ORDERS_PER_PAGE))
+  if (pageNumber > totalPages) {
+    redirect(`${ordersPath}?page=${totalPages}`)
+  }
 
   return (
     <>
@@ -124,11 +139,19 @@ export default async function AccountMyOrdersPage({ params, searchParams }: Page
               </div>
             ))}
           </div>
-          {totalPages > 1 && <Pagination page={pageNumber} totalPages={totalPages} />}
         </div>
-      ) : (
+      ) : count === 0 ? (
         <p className="text-md mt-16">You haven&apos;t ordered anything yet</p>
+      ) : (
+        <p className="text-md mt-16">
+          We couldn&apos;t load orders on this page.{" "}
+          <LocalizedLink href="/account/my-orders?page=1" className="underline">
+            Return to the first page
+          </LocalizedLink>{" "}
+          to try again.
+        </p>
       )}
+      {count > 0 && totalPages > 1 && <Pagination page={pageNumber} totalPages={totalPages} />}
     </>
   )
 }

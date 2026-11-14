@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest"
-import { formatAddressLines, formatOrderDate, getOrderStage, isValidReturnPath } from "../order-format"
+import {
+  formatAddressLines,
+  formatOrderDate,
+  getOrderStage,
+  isValidReturnPath,
+} from "../order-format"
 
 describe("formatOrderDate", () => {
   it("uses day-first dates in Lagos time regardless of the server locale", () => {
@@ -9,12 +14,16 @@ describe("formatOrderDate", () => {
 
 describe("getOrderStage", () => {
   it("treats a cancelled order as cancelled even when nothing was fulfilled", () => {
-    expect(getOrderStage({ status: "canceled", fulfillment_status: "not_fulfilled" })).toBe("canceled")
+    expect(getOrderStage({ status: "canceled", fulfillment_status: "not_fulfilled" })).toBe(
+      "canceled",
+    )
   })
 
   it("maps fulfillment progress", () => {
     expect(getOrderStage({ status: "pending", fulfillment_status: "delivered" })).toBe("delivered")
-    expect(getOrderStage({ status: "pending", fulfillment_status: "partially_shipped" })).toBe("shipped")
+    expect(getOrderStage({ status: "pending", fulfillment_status: "partially_shipped" })).toBe(
+      "shipped",
+    )
     expect(getOrderStage({ status: "pending", fulfillment_status: "shipped" })).toBe("shipped")
     expect(getOrderStage({ status: "pending", fulfillment_status: "fulfilled" })).toBe("processing")
     expect(getOrderStage({ status: "pending" })).toBe("processing")
@@ -35,8 +44,15 @@ describe("formatAddressLines", () => {
         postal_code: "500272",
         phone: "+2348030000000",
         country: { display_name: "Nigeria" },
-      })
-    ).toEqual(["Ada Obi", "15 Aba Road", "Flat 2", "Port Harcourt, Rivers 500272", "Nigeria", "+2348030000000"])
+      }),
+    ).toEqual([
+      "Ada Obi",
+      "15 Aba Road",
+      "Flat 2",
+      "Port Harcourt, Rivers 500272",
+      "Nigeria",
+      "+2348030000000",
+    ])
   })
 
   it("returns nothing for a missing address", () => {

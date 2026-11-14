@@ -15,12 +15,7 @@ import {
 import { listCartShippingMethods } from "@lib/data/fulfillment"
 import { listCartPaymentMethods } from "@lib/data/payment"
 import { HttpTypes } from "@medusajs/types"
-import {
-  useMutation,
-  UseMutationOptions,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query"
+import { useMutation, UseMutationOptions, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useCallback, useEffect, useRef, useState } from "react"
 import { z } from "zod"
 
@@ -71,7 +66,7 @@ type UpdateLineItemContext = {
 }
 
 const coerceMutationContext = (
-  context: UpdateLineItemContext | void | unknown
+  context: UpdateLineItemContext | void | unknown,
 ): UpdateLineItemContext => {
   if (context && typeof context === "object") {
     return context as UpdateLineItemContext
@@ -85,7 +80,7 @@ export const useUpdateLineItem = (
     Error,
     { lineId: string; quantity: number },
     UpdateLineItemContext
-  >
+  >,
 ) => {
   const queryClient = useQueryClient()
   return useMutation({
@@ -101,34 +96,25 @@ export const useUpdateLineItem = (
     onMutate: async ({ lineId, quantity, ...rest }, ...restArgs) => {
       await queryClient.cancelQueries({ queryKey: ["cart"] })
 
-      const userContext = await options?.onMutate?.(
-        { lineId, quantity, ...rest },
-        ...restArgs
-      )
+      const userContext = await options?.onMutate?.({ lineId, quantity, ...rest }, ...restArgs)
 
-      const previousCart = queryClient.getQueryData<HttpTypes.StoreCart | null>(
-        ["cart"]
-      )
+      const previousCart = queryClient.getQueryData<HttpTypes.StoreCart | null>(["cart"])
 
-      queryClient.setQueryData(
-        ["cart"],
-        (old: HttpTypes.StoreCart | null | undefined) => {
-          if (!old) return old
-          return {
-            ...old,
-            items: (old.items ?? []).map((cartItem) =>
-              cartItem.id === lineId ? { ...cartItem, quantity } : cartItem
-            ),
-          }
+      queryClient.setQueryData(["cart"], (old: HttpTypes.StoreCart | null | undefined) => {
+        if (!old) return old
+        return {
+          ...old,
+          items: (old.items ?? []).map((cartItem) =>
+            cartItem.id === lineId ? { ...cartItem, quantity } : cartItem,
+          ),
         }
-      )
+      })
 
       const previousItem = previousCart?.items?.find((i) => i.id === lineId)
       if (previousItem) {
         const delta = quantity - previousItem.quantity
-        queryClient.setQueryData(
-          ["cart", "cart-quantity"],
-          (old: number | undefined) => Math.max(0, (old ?? 0) + delta)
+        queryClient.setQueryData(["cart", "cart-quantity"], (old: number | undefined) =>
+          Math.max(0, (old ?? 0) + delta),
         )
       }
 
@@ -139,7 +125,7 @@ export const useUpdateLineItem = (
         queryClient.setQueryData(["cart"], onMutateResult.previousCart)
         const total = (onMutateResult.previousCart.items ?? []).reduce(
           (acc, i) => acc + i.quantity,
-          0
+          0,
         )
         queryClient.setQueryData(["cart", "cart-quantity"], total)
       }
@@ -204,10 +190,7 @@ export const useLineItemQuantityUpdater = ({
   const flushQuantityUpdate = useCallback(async () => {
     if (inFlightRef.current) return
     const quantityToCommit = queuedQuantityRef.current
-    if (
-      quantityToCommit === null ||
-      quantityToCommit === lastCommittedRef.current
-    ) {
+    if (quantityToCommit === null || quantityToCommit === lastCommittedRef.current) {
       return
     }
 
@@ -233,7 +216,7 @@ export const useLineItemQuantityUpdater = ({
         void flushQuantityUpdate()
       }, 350)
     },
-    [flushQuantityUpdate]
+    [flushQuantityUpdate],
   )
 
   const onQuantityChange = useCallback(
@@ -241,7 +224,7 @@ export const useLineItemQuantityUpdater = ({
       setQuantity(newQuantity)
       scheduleQuantityUpdate(newQuantity)
     },
-    [scheduleQuantityUpdate]
+    [scheduleQuantityUpdate],
   )
 
   const onQuantityCommit = useCallback(
@@ -253,7 +236,7 @@ export const useLineItemQuantityUpdater = ({
       }
       void flushQuantityUpdate()
     },
-    [flushQuantityUpdate]
+    [flushQuantityUpdate],
   )
 
   const onQuantityFocus = useCallback(() => {
@@ -279,12 +262,7 @@ type DeleteLineItemContext = {
 }
 
 export const useDeleteLineItem = (
-  options?: UseMutationOptions<
-    void,
-    Error,
-    { lineId: string },
-    DeleteLineItemContext
-  >
+  options?: UseMutationOptions<void, Error, { lineId: string }, DeleteLineItemContext>,
 ) => {
   const queryClient = useQueryClient()
 
@@ -299,29 +277,20 @@ export const useDeleteLineItem = (
     onMutate: async ({ lineId }) => {
       await queryClient.cancelQueries({ queryKey: ["cart"] })
 
-      const previousCart = queryClient.getQueryData<HttpTypes.StoreCart | null>(
-        ["cart"]
-      )
+      const previousCart = queryClient.getQueryData<HttpTypes.StoreCart | null>(["cart"])
 
-      queryClient.setQueryData(
-        ["cart"],
-        (old: HttpTypes.StoreCart | null | undefined) => {
-          if (!old) return old
-          return {
-            ...old,
-            items: (old.items ?? []).filter((item) => item.id !== lineId),
-          }
+      queryClient.setQueryData(["cart"], (old: HttpTypes.StoreCart | null | undefined) => {
+        if (!old) return old
+        return {
+          ...old,
+          items: (old.items ?? []).filter((item) => item.id !== lineId),
         }
-      )
+      })
 
-      const removedItem = previousCart?.items?.find(
-        (item) => item.id === lineId
-      )
+      const removedItem = previousCart?.items?.find((item) => item.id === lineId)
       if (removedItem) {
-        queryClient.setQueryData(
-          ["cart", "cart-quantity"],
-          (old: number | undefined) =>
-            Math.max(0, (old ?? 0) - removedItem.quantity)
+        queryClient.setQueryData(["cart", "cart-quantity"], (old: number | undefined) =>
+          Math.max(0, (old ?? 0) - removedItem.quantity),
         )
       }
 
@@ -332,7 +301,7 @@ export const useDeleteLineItem = (
         queryClient.setQueryData(["cart"], onMutateResult.previousCart)
         const total = (onMutateResult.previousCart.items ?? []).reduce(
           (acc, item) => acc + item.quantity,
-          0
+          0,
         )
         queryClient.setQueryData(["cart", "cart-quantity"], total)
       }
@@ -356,7 +325,7 @@ export const useAddLineItem = (
     Error,
     { variantId: string; quantity: number; countryCode: string | undefined },
     unknown
-  >
+  >,
 ) => {
   const queryClient = useQueryClient()
 
@@ -385,12 +354,7 @@ export const useAddLineItem = (
 
 export const useSetShippingMethod = (
   { cartId }: { cartId: string },
-  options?: UseMutationOptions<
-    void,
-    Error,
-    { shippingMethodId: string },
-    unknown
-  >
+  options?: UseMutationOptions<void, Error, { shippingMethodId: string }, unknown>,
 ) => {
   const queryClient = useQueryClient()
   return useMutation({
@@ -453,7 +417,7 @@ export const addressesFormSchema = z
           phone: z.string().optional(),
         }),
       }),
-    ])
+    ]),
   )
 
 export type AddressesFormValues = z.infer<typeof addressesFormSchema>
@@ -464,7 +428,7 @@ export const useSetShippingAddress = (
     Error,
     AddressesFormValues,
     unknown
-  >
+  >,
 ) => {
   const queryClient = useQueryClient()
 
@@ -492,7 +456,7 @@ export const useSetEmail = (
     Error,
     { email: string; country_code: string },
     unknown
-  >
+  >,
 ) => {
   const queryClient = useQueryClient()
 
@@ -522,7 +486,7 @@ export const useInitiatePaymentSession = (
       providerId: string
     },
     unknown
-  >
+  >,
 ) => {
   const queryClient = useQueryClient()
   return useMutation({
@@ -544,7 +508,6 @@ export const useInitiatePaymentSession = (
   })
 }
 
-
 export const usePlaceOrder = (
   options?: UseMutationOptions<
     | {
@@ -564,7 +527,7 @@ export const usePlaceOrder = (
     Error,
     null,
     unknown
-  >
+  >,
 ) => {
   const queryClient = useQueryClient()
   return useMutation({
@@ -586,7 +549,7 @@ export const usePlaceOrder = (
 }
 
 export const useApplyPromotions = (
-  options?: UseMutationOptions<void, Error, string[], unknown>
+  options?: UseMutationOptions<void, Error, string[], unknown>,
 ) => {
   const queryClient = useQueryClient()
   return useMutation({
@@ -609,12 +572,7 @@ export const useApplyPromotions = (
 }
 
 export const useUpdateRegion = (
-  options?: UseMutationOptions<
-    void,
-    Error,
-    { countryCode: string; currentPath: string },
-    unknown
-  >
+  options?: UseMutationOptions<void, Error, { countryCode: string; currentPath: string }, unknown>,
 ) => {
   const queryClient = useQueryClient()
   return useMutation({

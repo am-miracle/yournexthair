@@ -18,15 +18,11 @@ export const AddressSingle: React.FC<{
     <div
       className={twMerge(
         "w-full border border-grayscale-200 rounded-xs p-4 flex flex-wrap gap-8 max-lg:flex-col",
-        className
+        className,
       )}
     >
       <div className="flex flex-1 sm:gap-3">
-        <Icon
-          name="user"
-          className="w-6 h-6"
-          wrapperClassName="max-sm:hidden"
-        />
+        <Icon name="user" className="w-6 h-6" wrapperClassName="max-sm:hidden" />
         <div className="flex flex-col gap-8 flex-1">
           <div className="flex flex-wrap justify-between gap-6">
             <div className="sm:grow sm:basis-0">
@@ -36,17 +32,14 @@ export const AddressSingle: React.FC<{
             <div className="sm:grow sm:basis-0">
               <p className="text-xs text-grayscale-500 mb-1.5">Country</p>
               <p>
-                {countries.find(
-                  (country) => country.iso_2 === address.country_code
-                )?.display_name || address.country_code}
+                {countries.find((country) => country.iso_2 === address.country_code)
+                  ?.display_name || address.country_code}
               </p>
             </div>
           </div>
           {Boolean(address.address_2) && (
             <div>
-              <p className="text-xs text-grayscale-500 mb-1.5">
-                Apartment, suite, etc.
-              </p>
+              <p className="text-xs text-grayscale-500 mb-1.5">Apartment, suite, etc.</p>
               <p>{address.address_2}</p>
             </div>
           )}
@@ -74,14 +67,9 @@ export const AddressSingle: React.FC<{
           <UiModalOverlay>
             <UiModal>
               <UiDialog className="text-center">
-                <p className="text-md mb-8">
-                  Do you want to delete this address?
-                </p>
+                <p className="text-md mb-8">Do you want to delete this address?</p>
                 <div className="flex gap-6 justify-center">
-                  <DeleteAddressButton
-                    addressId={address.id}
-                    className="max-w-42 w-full"
-                  >
+                  <DeleteAddressButton addressId={address.id} className="max-w-42 w-full">
                     Confirm
                   </DeleteAddressButton>
                   <UiCloseButton variant="outline" className="max-w-42 w-full">

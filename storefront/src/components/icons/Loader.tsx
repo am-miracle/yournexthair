@@ -1,14 +1,7 @@
 import * as React from "react"
 
-export const Loader: React.FC<React.ComponentPropsWithoutRef<"svg">> = (
-  props
-) => (
-  <svg
-    {...props}
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 25 25"
-    fill="none"
-  >
+export const Loader: React.FC<React.ComponentPropsWithoutRef<"svg">> = (props) => (
+  <svg {...props} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25" fill="none">
     <path
       d="M25 12.5C25 19.4036 19.4036 25 12.5 25C5.59644 25 0 19.4036 0 12.5C0 5.59644 5.59644 0 12.5 0C19.4036 0 25 5.59644 25 12.5ZM3.125 12.5C3.125 17.6777 7.32233 21.875 12.5 21.875C17.6777 21.875 21.875 17.6777 21.875 12.5C21.875 7.32233 17.6777 3.125 12.5 3.125C7.32233 3.125 3.125 7.32233 3.125 12.5Z"
       opacity="0.3"

@@ -233,8 +233,16 @@ export default async function seedDemoData({ container }: ExecArgs) {
     : []
 
   const regionResult = [...existingRegions, ...createdRegions]
-  const nigeriaRegion = requireFound(regionResult, (region) => region.name === "Nigeria", 'Expected "Nigeria" region to exist while seeding demo data.')
-  requireFound(regionResult, (region) => region.name === "International", 'Expected "International" region to exist while seeding demo data.')
+  const nigeriaRegion = requireFound(
+    regionResult,
+    (region) => region.name === "Nigeria",
+    'Expected "Nigeria" region to exist while seeding demo data.',
+  )
+  requireFound(
+    regionResult,
+    (region) => region.name === "International",
+    'Expected "International" region to exist while seeding demo data.',
+  )
   logger.info("Finished seeding regions.")
 
   await updateStoresWorkflow(container).run({

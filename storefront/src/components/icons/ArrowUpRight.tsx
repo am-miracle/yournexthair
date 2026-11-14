@@ -1,25 +1,14 @@
 import * as React from "react"
 
-export const ArrowUpRight: React.FC<React.ComponentPropsWithoutRef<"svg">> = (
-  props
-) => (
-  <svg
-    {...props}
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-  >
+export const ArrowUpRight: React.FC<React.ComponentPropsWithoutRef<"svg">> = (props) => (
+  <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
     <mask id="a" fill="#fff">
       <path
         fillRule="evenodd"
         d="M5.785 17.12 16.038 6.867l1.06 1.06L6.847 18.182l-1.06-1.06Z"
         clipRule="evenodd"
       />
-      <path
-        fillRule="evenodd"
-        d="M6.096 6.47h11.4v11.4h-1.5v-9.9h-9.9v-1.5Z"
-        clipRule="evenodd"
-      />
+      <path fillRule="evenodd" d="M6.096 6.47h11.4v11.4h-1.5v-9.9h-9.9v-1.5Z" clipRule="evenodd" />
     </mask>
     <path
       fill="currentColor"

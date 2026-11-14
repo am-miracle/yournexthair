@@ -16,11 +16,7 @@ const CartTemplate = () => {
     <Layout className="py-26 md:pb-36 md:pt-39">
       {cart?.items?.length ? (
         <>
-          <LayoutColumn
-            start={1}
-            end={{ base: 13, lg: 9, xl: 10 }}
-            className="mb-8 lg:mb-0"
-          >
+          <LayoutColumn start={1} end={{ base: 13, lg: 9, xl: 10 }} className="mb-8 lg:mb-0">
             <ItemsTemplate items={cart?.items} />
           </LayoutColumn>
           <LayoutColumn start={{ base: 1, lg: 9, xl: 10 }} end={13}>

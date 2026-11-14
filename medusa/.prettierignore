@@ -11,3 +11,10 @@ pnpm-lock.yaml
 *.snap
 *.min.js
 *.min.css
+
+# Local data and generated files
+static/
+uploads/
+.env*
+*.sql
+*.tsbuildinfo

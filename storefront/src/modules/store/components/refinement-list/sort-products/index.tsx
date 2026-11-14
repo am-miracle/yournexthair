@@ -37,13 +37,9 @@ const SortProducts = ({ sortBy, setQueryParams }: SortProductsProps) => {
       </UiSelectButton>
       <ReactAria.Popover className="w-60" placement="bottom right">
         <UiSelectListBox>
-          <UiSelectListBoxItem id="created_at">
-            Latest Arrivals
-          </UiSelectListBoxItem>
+          <UiSelectListBoxItem id="created_at">Latest Arrivals</UiSelectListBoxItem>
           <UiSelectListBoxItem id="price_asc">Lowest price</UiSelectListBoxItem>
-          <UiSelectListBoxItem id="price_desc">
-            Highest price
-          </UiSelectListBoxItem>
+          <UiSelectListBoxItem id="price_desc">Highest price</UiSelectListBoxItem>
         </UiSelectListBox>
       </ReactAria.Popover>
     </ReactAria.Select>

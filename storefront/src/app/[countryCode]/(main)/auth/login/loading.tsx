@@ -52,11 +52,7 @@ export default async function LoginLoadingPage() {
         </form>
         <p className="text-grayscale-500">
           New here? You can{" "}
-          <LocalizedLink
-            href="/auth/register"
-            variant="underline"
-            className="text-black md:pb-0.5"
-          >
+          <LocalizedLink href="/auth/register" variant="underline" className="text-black md:pb-0.5">
             create your account here
           </LocalizedLink>
           .

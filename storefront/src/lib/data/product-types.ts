@@ -4,7 +4,7 @@ import { HttpTypes, PaginatedResponse } from "@medusajs/types"
 export const getProductTypesList = async function (
   offset: number = 0,
   limit: number = 100,
-  fields?: (keyof HttpTypes.StoreProductType)[]
+  fields?: (keyof HttpTypes.StoreProductType)[],
 ): Promise<{ productTypes: HttpTypes.StoreProductType[]; count: number }> {
   return sdk.client
     .fetch<
@@ -24,7 +24,7 @@ export const getProductTypesList = async function (
 }
 
 export const getProductTypeByHandle = async function (
-  handle: string
+  handle: string,
 ): Promise<HttpTypes.StoreProductType> {
   return sdk.client
     .fetch<

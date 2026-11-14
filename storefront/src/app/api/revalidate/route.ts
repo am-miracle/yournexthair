@@ -59,7 +59,17 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  if (tags.some((tag) => [PRODUCTS_CACHE_TAG, "collections", "product-types", "product-categories", "regions"].includes(tag))) {
+  if (
+    tags.some((tag) =>
+      [
+        PRODUCTS_CACHE_TAG,
+        "collections",
+        "product-types",
+        "product-categories",
+        "regions",
+      ].includes(tag),
+    )
+  ) {
     revalidatePath("/[countryCode]/(main)", "page")
   }
 

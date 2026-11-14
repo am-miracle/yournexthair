@@ -9,42 +9,16 @@ import { OrderDelivery } from "@modules/order/components/OrderDelivery"
 import PaymentDetails from "@modules/order/components/payment-details"
 import { PrintReceiptButton } from "@modules/order/components/PrintReceiptButton"
 import { getCustomer } from "@lib/data/customer"
-import { getOrderAccessIds } from "@lib/data/cookies"
 
 type OrderCompletedTemplateProps = {
   order: HttpTypes.StoreOrder
   countryCode: string
 }
 
-export default async function OrderCompletedTemplate({ order, countryCode }: OrderCompletedTemplateProps) {
+export default async function OrderCompletedTemplate({ order }: OrderCompletedTemplateProps) {
   const customer = await getCustomer().catch(() => null)
   const ownsOrder = Boolean(customer && order.customer_id === customer.id)
-  // The store API returns any order by ID, so only show personal details to the placing browser or its owner.
-  const canView = ownsOrder || (await getOrderAccessIds()).includes(order.id)
-
-  if (!canView) {
-    return (
-      <Layout className="py-26 md:pt-39 md:pb-36">
-        <LayoutColumn start={{ base: 1, lg: 3, xl: 4 }} end={{ base: 13, lg: 11, xl: 10 }}>
-          <h1 className="text-md md:text-2xl mb-8">Order #{order.display_id} is confirmed</h1>
-          <p className="mb-8 text-grayscale-500">
-            For your privacy, order details are only shown on the device used to place the order, or
-            when you&apos;re signed in. Your confirmation email has everything you need.
-          </p>
-          <div className="flex gap-x-6 gap-y-4 max-sm:flex-col">
-            <LocalizedButtonLink
-              href={`/auth/login?redirect=${encodeURIComponent(`/${countryCode}/account/my-orders/${order.id}`)}`}
-            >
-              Sign in to view
-            </LocalizedButtonLink>
-            <LocalizedButtonLink href="/store" variant="outline">
-              Continue shopping
-            </LocalizedButtonLink>
-          </div>
-        </LayoutColumn>
-      </Layout>
-    )
-  }
+  // Order retrieval has already been authorized by Medusa.
 
   return (
     <Layout className="py-26 md:pt-39 md:pb-36">
@@ -54,12 +28,14 @@ export default async function OrderCompletedTemplate({ order, countryCode }: Ord
           Your order is confirmed. We&apos;ll let you know when it&apos;s on its way.
         </p>
         <p className="mb-8">
-          Your order number is <strong>#{order.display_id}</strong>. We&apos;ve emailed your receipt to{" "}
-          <strong>{order.email}</strong>.
+          Your order number is <strong>#{order.display_id}</strong>. We&apos;ve emailed your receipt
+          to <strong>{order.email}</strong>.
         </p>
         <div className="flex gap-x-6 gap-y-4 max-sm:flex-col mb-16 print:hidden">
           {ownsOrder && (
-            <LocalizedButtonLink href={`/account/my-orders/${order.id}`}>View in my account</LocalizedButtonLink>
+            <LocalizedButtonLink href={`/account/my-orders/${order.id}`}>
+              View in my account
+            </LocalizedButtonLink>
           )}
           <LocalizedButtonLink href="/store" variant="outline">
             Continue shopping
@@ -70,8 +46,8 @@ export default async function OrderCompletedTemplate({ order, countryCode }: Ord
           <div className="rounded-xs border border-grayscale-200 bg-grayscale-50 p-4 mb-5 print:hidden">
             <p className="font-semibold mb-2">Track this order with an account</p>
             <p className="text-grayscale-500 mb-4">
-              Create an account with <strong className="text-black">{order.email}</strong> and we&apos;ll
-              email you a link to add this order to your order history.
+              Create an account with <strong className="text-black">{order.email}</strong> and
+              we&apos;ll email you a link to add this order to your order history.
             </p>
             <LocalizedButtonLink href="/auth/register" variant="outline">
               Create an account

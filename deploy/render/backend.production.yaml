@@ -7,7 +7,7 @@ services:
     region: frankfurt
     plan: free
     rootDir: medusa
-    autoDeployTrigger: 'off'
+    autoDeployTrigger: "off"
     buildCommand: >-
       corepack enable && pnpm install --frozen-lockfile --prod=false && pnpm build && cp pnpm-lock.yaml .npmrc
       .medusa/server/ && cd .medusa/server && pnpm install --frozen-lockfile --prod
@@ -23,7 +23,7 @@ services:
       - key: APP_ENV
         value: production
       - key: PORT
-        value: '9000'
+        value: "9000"
       - key: HOST
         value: 0.0.0.0
       - key: MEDUSA_WORKER_MODE
@@ -58,7 +58,7 @@ services:
       - key: S3_ENDPOINT
         sync: false
       - key: S3_FORCE_PATH_STYLE
-        value: 'true'
+        value: "true"
       - key: INITIAL_ADMIN_EMAIL
         sync: false
       - key: INITIAL_ADMIN_PASSWORD
@@ -67,7 +67,13 @@ services:
         sync: false
       - key: BACHS_WEBHOOK_SECRET
         sync: false
-      - key: TERMINAL_SECRET_KEY
+      - key: DHL_API_USERNAME
         sync: false
-      - key: TERMINAL_ENVIRONMENT
+      - key: DHL_API_PASSWORD
         sync: false
+      - key: DHL_ACCOUNT_NUMBER
+        sync: false
+      - key: DHL_ENVIRONMENT
+        sync: false
+      - key: DHL_AUTO_BOOKING
+        value: "false"

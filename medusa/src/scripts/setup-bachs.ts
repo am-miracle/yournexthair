@@ -11,7 +11,9 @@ export default async function setupBachs({ container }: ExecArgs) {
 
   const [provider] = await payment.listPaymentProviders({ id: BACHS_PROVIDER_ID, is_enabled: true })
   if (!provider) {
-    throw new Error(`${BACHS_PROVIDER_ID} is not enabled. Set BACHS_SECRET_KEY and BACHS_WEBHOOK_SECRET first.`)
+    throw new Error(
+      `${BACHS_PROVIDER_ID} is not enabled. Set BACHS_SECRET_KEY and BACHS_WEBHOOK_SECRET first.`,
+    )
   }
 
   const { data: regions } = await query.graph({
@@ -26,7 +28,10 @@ export default async function setupBachs({ container }: ExecArgs) {
       continue
     }
     await updateRegionsWorkflow(container).run({
-      input: { selector: { id: region.id }, update: { payment_providers: [...current, BACHS_PROVIDER_ID] } },
+      input: {
+        selector: { id: region.id },
+        update: { payment_providers: [...current, BACHS_PROVIDER_ID] },
+      },
     })
     logger.info(`${region.name}: enabled Bachs.`)
   }

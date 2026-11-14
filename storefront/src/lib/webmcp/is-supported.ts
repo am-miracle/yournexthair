@@ -19,10 +19,7 @@ export const isWebMCPSupported = (): boolean => {
   }
 
   return (
-    !!doc.modelContext &&
-    typeof doc.modelContext.registerTool === "function"
-  ) || (
-    !!nav.modelContext &&
-    typeof nav.modelContext.registerTool === "function"
+    (!!doc.modelContext && typeof doc.modelContext.registerTool === "function") ||
+    (!!nav.modelContext && typeof nav.modelContext.registerTool === "function")
   )
 }

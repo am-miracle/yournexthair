@@ -31,7 +31,7 @@ const Payment = ({ cart }: { cart: StoreCart }) => {
       params.set(name, value)
       return params.toString()
     },
-    [searchParams]
+    [searchParams],
   )
 
   const handleEdit = () => {
@@ -47,27 +47,20 @@ const Payment = ({ cart }: { cart: StoreCart }) => {
   }
 
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(
-    getReviewPaymentSession(cart?.payment_collection?.payment_sessions)?.provider_id ?? ""
+    getReviewPaymentSession(cart?.payment_collection?.payment_sessions)?.provider_id ?? "",
   )
-  const { data: availablePaymentMethods } = useCartPaymentMethods(
-    cart?.region?.id ?? ""
-  )
+  const { data: availablePaymentMethods } = useCartPaymentMethods(cart?.region?.id ?? "")
   const currentPaymentMethod =
     selectedPaymentMethod ||
     getReviewPaymentSession(cart?.payment_collection?.payment_sessions)?.provider_id ||
     availablePaymentMethods?.[0]?.id ||
     ""
   const activeSession = isOpen
-    ? getReviewPaymentSession(
-        cart?.payment_collection?.payment_sessions,
-        currentPaymentMethod
-      )
+    ? getReviewPaymentSession(cart?.payment_collection?.payment_sessions, currentPaymentMethod)
     : getReviewPaymentSession(cart?.payment_collection?.payment_sessions)
 
   const paymentReady =
-    activeSession &&
-    cart?.shipping_methods &&
-    cart?.shipping_methods.length !== 0
+    activeSession && cart?.shipping_methods && cart?.shipping_methods.length !== 0
 
   if (!cart) {
     return null
@@ -77,21 +70,12 @@ const Payment = ({ cart }: { cart: StoreCart }) => {
     <>
       <div className="flex justify-between mb-6 md:mb-8 border-t border-grayscale-200 pt-8 mt-8">
         <div>
-          <h2
-            className={twJoin(
-              "transition-[font-weight] duration-75",
-              isOpen && "font-semibold"
-            )}
-          >
+          <h2 className={twJoin("transition-[font-weight] duration-75", isOpen && "font-semibold")}>
             4. Payment
           </h2>
         </div>
         {!isOpen && paymentReady && (
-          <Button
-            variant="link"
-            onPress={handleEdit}
-            data-testid="edit-payment-button"
-          >
+          <Button variant="link" onPress={handleEdit} data-testid="edit-payment-button">
             Change
           </Button>
         )}
@@ -116,10 +100,7 @@ const Payment = ({ cart }: { cart: StoreCart }) => {
           </UiRadioGroup>
         )}
 
-        <ErrorMessage
-          error={error}
-          data-testid="payment-method-error-message"
-        />
+        <ErrorMessage error={error} data-testid="payment-method-error-message" />
 
         <PaymentCardButton
           setError={setError}
@@ -135,22 +116,15 @@ const Payment = ({ cart }: { cart: StoreCart }) => {
         {cart && paymentReady && activeSession ? (
           <div className="flex flex-col gap-4">
             <div className="grid gap-2 md:grid-cols-[minmax(0,10rem)_1fr] md:gap-4">
-              <div
-                className="text-grayscale-500"
-                data-testid="payment-method-summary"
-              >
+              <div className="text-grayscale-500" data-testid="payment-method-summary">
                 Payment method
               </div>
               <div className="text-grayscale-600">
-                {paymentInfoMap[activeSession.provider_id]?.title ||
-                  activeSession.provider_id}
+                {paymentInfoMap[activeSession.provider_id]?.title || activeSession.provider_id}
               </div>
             </div>
             <div className="grid gap-2 md:grid-cols-[minmax(0,10rem)_1fr] md:gap-4">
-              <div
-                className="text-grayscale-500"
-                data-testid="payment-details-summary"
-              >
+              <div className="text-grayscale-500" data-testid="payment-details-summary">
                 Payment details
               </div>
               <div className="text-grayscale-600">

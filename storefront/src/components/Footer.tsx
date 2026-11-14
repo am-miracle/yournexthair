@@ -15,7 +15,12 @@ export const Footer: React.FC = () => {
   const isAuthPage = currentPath === "/register" || currentPath === "/login"
 
   return (
-    <footer className={twMerge("print:hidden border-t border-accent/15 bg-accent-soft py-10 text-grayscale-800 md:py-20 [&_a]:transition-colors [&_a:hover]:text-accent [&_a:focus-visible]:outline-accent", isAuthPage && "hidden")}>
+    <footer
+      className={twMerge(
+        "print:hidden border-t border-accent/15 bg-accent-soft py-10 text-grayscale-800 md:py-20 [&_a]:transition-colors [&_a:hover]:text-accent [&_a:focus-visible]:outline-accent",
+        isAuthPage && "hidden",
+      )}
+    >
       <Layout>
         <LayoutColumn className="col-span-13">
           <div className="flex max-lg:flex-col justify-between md:gap-20 max-md:px-4">

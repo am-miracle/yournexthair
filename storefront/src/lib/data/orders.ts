@@ -4,9 +4,9 @@ import { cache } from "react"
 import { updateTag } from "next/cache"
 import { sdk } from "@lib/config"
 import medusaError from "@lib/util/medusa-error"
-import { enrichLineItems } from "@lib/util/enrich-line-items"
-import { getAuthHeaders } from "@lib/data/cookies"
+import { getAuthHeaders, getReceiptHeaders } from "@lib/data/cookies"
 import { HttpTypes } from "@medusajs/types"
+import type { ClaimResult } from "@lib/util/claim-orders"
 
 export const retrieveOrder = cache(async (id: unknown) => {
   if (typeof id !== "string") {
@@ -15,24 +15,20 @@ export const retrieveOrder = cache(async (id: unknown) => {
 
   const order = await sdk.client
     .fetch<HttpTypes.StoreOrderResponse>(`/store/orders/${id}`, {
-      query: { fields: "*payment_collections.payments,+customer_id,+fulfillment_status,+payment_status,*fulfillments,*fulfillments.labels" },
-      next: { tags: ["orders"] },
-      headers: { ...(await getAuthHeaders()) },
+      query: {
+        fields:
+          "-items.variant,-items.product,*payment_collections.payments,*payment_collections.payments.captures,*payment_collections.payments.refunds,+customer_id,+fulfillment_status,+payment_status,*fulfillments,*fulfillments.labels",
+      },
+      cache: "no-store",
+      headers: { ...(await getAuthHeaders()), ...(await getReceiptHeaders(id)) },
     })
     .then(({ order }) => order)
     .catch((err) => medusaError(err))
 
-  if (order.items?.length && order.region_id) {
-    order.items = await enrichLineItems(order.items, order.region_id)
-  }
-
   return order
 })
 
-export const listOrders = async function (
-  limit: number = 10,
-  offset: number = 0
-) {
+export const listOrders = async function (limit: number = 10, offset: number = 0) {
   if (
     typeof limit !== "number" ||
     typeof offset !== "number" ||
@@ -46,28 +42,46 @@ export const listOrders = async function (
 
   return sdk.client
     .fetch<HttpTypes.StoreOrderListResponse>(`/store/orders`, {
-      query: { limit, offset, order: "-created_at", fields: "*items,+fulfillment_status,+payment_status" },
+      query: {
+        limit,
+        offset,
+        order: "-created_at",
+        fields: "*items,+fulfillment_status,+payment_status",
+      },
       next: { tags: ["orders"] },
       headers: { ...(await getAuthHeaders()) },
     })
     .catch((err) => medusaError(err))
 }
 
-export async function acceptOrderTransfer(orderId: unknown, token: unknown) {
+export async function acceptOrderTransfer(orderId: unknown, token: unknown): Promise<ClaimResult> {
   if (
     typeof orderId !== "string" ||
     !/^order_[A-Za-z0-9]+$/.test(orderId) ||
     typeof token !== "string" ||
     !/^[A-Za-z0-9-]+$/.test(token)
   ) {
-    return { ok: false as const }
+    return { ok: false, reason: "invalid_claim" }
+  }
+
+  const headers = await getAuthHeaders()
+  if (!("authorization" in headers)) {
+    return { ok: false, reason: "authentication_required" }
   }
 
   try {
-    await sdk.store.order.acceptTransfer(orderId, { token }, {}, await getAuthHeaders())
-    updateTag("orders")
-    return { ok: true as const }
-  } catch {
-    return { ok: false as const }
+    // The transfer token is not a substitute for a verified customer session.
+    await sdk.client.fetch("/store/customers/me", { headers, cache: "no-store" })
+    await sdk.store.order.acceptTransfer(orderId, { token }, {}, headers)
+  } catch (error) {
+    const status =
+      error && typeof error === "object" && "status" in error ? error.status : undefined
+    if (status === 401) return { ok: false, reason: "authentication_required" }
+    if ([400, 403, 404, 409, 410, 422].includes(Number(status))) {
+      return { ok: false, reason: "invalid_claim" }
+    }
+    return { ok: false, reason: "retryable" }
   }
+  updateTag("orders")
+  return { ok: true }
 }

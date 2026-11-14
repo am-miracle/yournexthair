@@ -1,8 +1,4 @@
-import {
-  StoreCart,
-  StoreCartLineItem,
-  StoreCartPromotion,
-} from "@medusajs/types"
+import { StoreCart, StoreCartLineItem, StoreCartPromotion } from "@medusajs/types"
 
 export const mapCartToResult = (cart: StoreCart) => {
   return {

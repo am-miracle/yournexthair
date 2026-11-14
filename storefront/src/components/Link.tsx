@@ -11,9 +11,8 @@ export const getLinkClassNames = ({ variant }: LinkOwnProps): string =>
     variant !== "unstyled" && "text-accent hover:text-accent-hover transition-colors",
     (variant === "underline" || variant === "hover:underline") &&
       "border-b border-current pb-0.5 md:pb-1",
-    variant === "hover:underline" &&
-      "border-transparent hover:border-current transition-colors",
-    variant === "underline" && "hover:border-transparent"
+    variant === "hover:underline" && "border-transparent hover:border-current transition-colors",
+    variant === "underline" && "hover:border-transparent",
   )
 
 export const Link = <RouteInferType,>({
@@ -21,20 +20,18 @@ export const Link = <RouteInferType,>({
   className,
   children,
   ...rest
-}: React.ComponentPropsWithoutRef<"a"> &
-  NextLinkProps<RouteInferType> &
-  LinkOwnProps) => (
-  <NextLink
-    {...rest}
-    className={twMerge(getLinkClassNames({ variant }), className)}
-  >
+}: React.ComponentPropsWithoutRef<"a"> & NextLinkProps<RouteInferType> & LinkOwnProps) => (
+  <NextLink {...rest} className={twMerge(getLinkClassNames({ variant }), className)}>
     {children}
   </NextLink>
 )
 
-export const Anchor: React.FC<
-  React.ComponentPropsWithoutRef<"a"> & LinkOwnProps
-> = ({ variant = "unstyled", className, children, ...rest }) => (
+export const Anchor: React.FC<React.ComponentPropsWithoutRef<"a"> & LinkOwnProps> = ({
+  variant = "unstyled",
+  className,
+  children,
+  ...rest
+}) => (
   <a {...rest} className={twMerge(getLinkClassNames({ variant }), className)}>
     {children}
   </a>

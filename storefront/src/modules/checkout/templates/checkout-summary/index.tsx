@@ -9,14 +9,9 @@ import { LocalizedButtonLink, LocalizedLink } from "@/components/LocalizedLink"
 const ItemPrice: React.FC<{
   item: HttpTypes.StoreCartLineItem | HttpTypes.StoreOrderLineItem
 }> = ({ item }) => {
-  const {
-    original_price,
-    calculated_price,
-    original_price_number,
-    calculated_price_number,
-  } = item.variant ? (getPricesForVariant(item.variant) ?? {}) : {}
-  const hasReducedPrice =
-    (calculated_price_number ?? 0) < (original_price_number ?? 0)
+  const { original_price, calculated_price, original_price_number, calculated_price_number } =
+    item.variant ? (getPricesForVariant(item.variant) ?? {}) : {}
+  const hasReducedPrice = (calculated_price_number ?? 0) < (original_price_number ?? 0)
 
   return (
     <div>
@@ -81,8 +76,7 @@ const CheckoutSummary = ({ cart }: { cart: HttpTypes.StoreCart }) => {
                 <div className="flex flex-col gap-1.5 text-xs md:text-sm">
                   {item.variant?.title && (
                     <p>
-                      Variant:{" "}
-                      <span className="ml-1">{item.variant.title}</span>
+                      Variant: <span className="ml-1">{item.variant.title}</span>
                     </p>
                   )}
                   <p>

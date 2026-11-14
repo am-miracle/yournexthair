@@ -5,10 +5,7 @@ import type { HttpTypes } from "@medusajs/framework/types"
 import EmailLayout, { type EmailLayoutProps } from "./components/EmailLayout"
 
 export type OrderPlacedEmailProps = {
-  order: Pick<
-    HttpTypes.AdminOrder,
-    "currency_code" | "email" | "item_subtotal" | "total"
-  > & {
+  order: Pick<HttpTypes.AdminOrder, "currency_code" | "email" | "item_subtotal" | "total"> & {
     discount_amount: number
     shipping_amount: number
     shipping_includes_vat: boolean
@@ -69,7 +66,10 @@ export default function OrderPlacedEmail({ order, ...emailLayoutProps }: OrderPl
       <Heading className="text-2xl font-medium mt-0 mb-10">Order confirmation</Heading>
       <Text className="text-md mb-6!">
         We are pleased to confirm that your order has been successfully placed and will be processed
-        shortly.{order.display_id !== null && order.display_id !== undefined && <> Your order number is #{order.display_id}.</>}
+        shortly.
+        {order.display_id !== null && order.display_id !== undefined && (
+          <> Your order number is #{order.display_id}.</>
+        )}
       </Text>
       <Text className="text-md mb-6!">
         You&apos;ll receive another update once your order is shipped. For any questions, feel free
@@ -193,14 +193,18 @@ export default function OrderPlacedEmail({ order, ...emailLayoutProps }: OrderPl
               <Row className="mb-2">
                 <Column className="flex">
                   <Text className="text-grayscale-500 m-0 text-base">Subtotal</Text>
-                  <Text className="m-0 text-base ml-auto">{formatter.format(order.item_subtotal)}</Text>
+                  <Text className="m-0 text-base ml-auto">
+                    {formatter.format(order.item_subtotal)}
+                  </Text>
                 </Column>
               </Row>
               {order.discount_amount > 0 && (
                 <Row className="mb-2">
                   <Column className="flex">
                     <Text className="text-grayscale-500 m-0 text-base">Discount</Text>
-                    <Text className="m-0 text-base ml-auto">-{formatter.format(order.discount_amount)}</Text>
+                    <Text className="m-0 text-base ml-auto">
+                      -{formatter.format(order.discount_amount)}
+                    </Text>
                   </Column>
                 </Row>
               )}
@@ -218,7 +222,9 @@ export default function OrderPlacedEmail({ order, ...emailLayoutProps }: OrderPl
                 <Row className="mb-2">
                   <Column className="flex">
                     <Text className="text-grayscale-500 m-0 text-base">VAT</Text>
-                    <Text className="m-0 text-base ml-auto">{formatter.format(order.vat_amount)}</Text>
+                    <Text className="m-0 text-base ml-auto">
+                      {formatter.format(order.vat_amount)}
+                    </Text>
                   </Column>
                 </Row>
               )}

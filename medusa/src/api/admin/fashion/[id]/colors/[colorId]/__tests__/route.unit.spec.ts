@@ -69,14 +69,10 @@ describe("fashion color route", () => {
 
     await POST(req as never, res as never)
 
-    expect(req.service.updateColorForMaterial).toHaveBeenCalledWith(
-      "material_123",
-      "color_123",
-      {
-        name: "Blue",
-        hex_code: "#AABBCC",
-      },
-    )
+    expect(req.service.updateColorForMaterial).toHaveBeenCalledWith("material_123", "color_123", {
+      name: "Blue",
+      hex_code: "#AABBCC",
+    })
     expect(res.status).toHaveBeenCalledWith(200)
     expect(res.json).toHaveBeenCalledWith({ id: "color_123" })
   })

@@ -1,8 +1,6 @@
 import * as React from "react"
 
-export const ArrowRight: React.FC<React.ComponentPropsWithoutRef<"svg">> = (
-  props
-) => (
+export const ArrowRight: React.FC<React.ComponentPropsWithoutRef<"svg">> = (props) => (
   <svg
     {...props}
     xmlns="http://www.w3.org/2000/svg"

@@ -50,10 +50,7 @@ export const RegionSwitcher = ({
       {...withDefinedProp("className", className)}
       aria-label="Select country"
     >
-      <UiSelectButton
-        variant="ghost"
-        {...withDefinedProp("className", selectButtonClassName)}
-      >
+      <UiSelectButton variant="ghost" {...withDefinedProp("className", selectButtonClassName)}>
         <UiSelectValue className="min-w-[2ch] overflow-visible text-center">
           {(item) => {
             if (selectedCountryCode) {
@@ -61,9 +58,9 @@ export const RegionSwitcher = ({
             }
 
             return typeof item.selectedItems[0] === "object" &&
-            item.selectedItems[0] !== null &&
-            "country" in item.selectedItems[0] &&
-            typeof item.selectedItems[0].country === "string"
+              item.selectedItems[0] !== null &&
+              "country" in item.selectedItems[0] &&
+              typeof item.selectedItems[0].country === "string"
               ? item.selectedItems[0].country.toUpperCase()
               : item.defaultChildren
           }}

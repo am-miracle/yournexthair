@@ -1,4 +1,9 @@
-import type { ExecArgs, IAuthModuleService, IStoreModuleService, IUserModuleService } from "@medusajs/framework/types"
+import type {
+  ExecArgs,
+  IAuthModuleService,
+  IStoreModuleService,
+  IUserModuleService,
+} from "@medusajs/framework/types"
 import { ContainerRegistrationKeys, Modules } from "@medusajs/framework/utils"
 import { createUsersWorkflow } from "@medusajs/medusa/core-flows"
 import seedRegions from "./seed-regions"
@@ -23,14 +28,19 @@ export default async function bootstrapRenderFree(args: ExecArgs) {
       const user = result[0]
       if (!user) throw new Error("Could not create the initial Admin user.")
       try {
-        const { authIdentity, error } = await auth.register("emailpass", { body: { email, password } })
-        if (error || !authIdentity) throw new Error("Could not register the initial Admin credentials.")
+        const { authIdentity, error } = await auth.register("emailpass", {
+          body: { email, password },
+        })
+        if (error || !authIdentity)
+          throw new Error("Could not register the initial Admin credentials.")
         await auth.updateAuthIdentities({ id: authIdentity.id, app_metadata: { user_id: user.id } })
       } catch (error) {
         await users.deleteUsers([user.id])
         throw error
       }
-      logger.info("Initial Admin created. Remove INITIAL_ADMIN_EMAIL and INITIAL_ADMIN_PASSWORD from Render after signing in.")
+      logger.info(
+        "Initial Admin created. Remove INITIAL_ADMIN_EMAIL and INITIAL_ADMIN_PASSWORD from Render after signing in.",
+      )
     }
   } else if (email || password) {
     throw new Error("Provide both initial Admin variables, or remove both after setup.")
@@ -42,7 +52,9 @@ export default async function bootstrapRenderFree(args: ExecArgs) {
     const [store] = await stores.listStores()
     if (store && !store.metadata?.bachs_regions_enabled) {
       await setupBachs(args)
-      await stores.updateStores(store.id, { metadata: { ...store.metadata, bachs_regions_enabled: true } })
+      await stores.updateStores(store.id, {
+        metadata: { ...store.metadata, bachs_regions_enabled: true },
+      })
     }
   }
 }

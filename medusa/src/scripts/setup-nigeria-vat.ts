@@ -1,7 +1,6 @@
 import type { ExecArgs } from "@medusajs/framework/types"
 import { ContainerRegistrationKeys, Modules } from "@medusajs/framework/utils"
 
-
 export const NIGERIA_VAT = { name: "VAT", code: "VAT", rate: 0 }
 
 export default async function setupNigeriaVat({ container }: ExecArgs) {

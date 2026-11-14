@@ -19,7 +19,7 @@ export const metadata: Metadata = {
 
 export default async function OrderConfirmedPage({ params }: Props) {
   const { id, countryCode } = await params
-  const order = await retrieveOrder(id)
+  const order = await retrieveOrder(id).catch(() => null)
   if (!order) {
     return notFound()
   }

@@ -6,12 +6,7 @@ import { HttpTypes } from "@medusajs/types"
 import type { AuthLoginResponse } from "@medusajs/js-sdk"
 
 import { sdk } from "@lib/config"
-import {
-  getAuthHeaders,
-  setAuthToken,
-  removeAuthToken,
-  getCartId,
-} from "@lib/data/cookies"
+import { getAuthHeaders, setAuthToken, removeAuthToken, getCartId } from "@lib/data/cookies"
 import {
   customerAddressSchema,
   loginFormSchema,
@@ -22,12 +17,11 @@ import {
 const normalizePhone = (phone: string | null | undefined): string | null =>
   phone?.trim() ? phone : null
 
-const getAuthToken = (
-  response: AuthLoginResponse
-): string | null => (typeof response === "string" ? response : null)
+const getAuthToken = (response: AuthLoginResponse): string | null =>
+  typeof response === "string" ? response : null
 
 const hasLocation = (
-  response: AuthLoginResponse
+  response: AuthLoginResponse,
 ): response is Extract<AuthLoginResponse, { location: string }> =>
   typeof response === "object" &&
   response !== null &&
@@ -35,7 +29,7 @@ const hasLocation = (
   typeof response.location === "string"
 
 const normalizeCustomerAddress = (
-  formData: z.infer<typeof customerAddressSchema>
+  formData: z.infer<typeof customerAddressSchema>,
 ): HttpTypes.StoreAddAddress => ({
   first_name: formData.first_name,
   last_name: formData.last_name,
@@ -61,10 +55,8 @@ export const getCustomer = async function () {
 }
 
 export const updateCustomer = async function (
-  formData: z.infer<typeof updateCustomerFormSchema>
-): Promise<
-  { state: "initial" | "success" } | { state: "error"; error: string }
-> {
+  formData: z.infer<typeof updateCustomerFormSchema>,
+): Promise<{ state: "initial" | "success" } | { state: "error"; error: string }> {
   return sdk.store.customer
     .update(
       {
@@ -73,7 +65,7 @@ export const updateCustomer = async function (
         phone: normalizePhone(formData.phone),
       },
       {},
-      await getAuthHeaders()
+      await getAuthHeaders(),
     )
     .then(() => {
       return {
@@ -105,7 +97,7 @@ export async function signup(formData: z.infer<typeof signupFormSchema>) {
         phone: normalizePhone(formData.phone),
       },
       {},
-      customHeaders
+      customHeaders,
     )
 
     const loginToken = await sdk.auth.login("customer", "emailpass", {
@@ -190,15 +182,9 @@ export async function signout(countryCode: string) {
   return countryCode
 }
 
-export const addCustomerAddress = async (
-  formData: z.infer<typeof customerAddressSchema>
-) => {
+export const addCustomerAddress = async (formData: z.infer<typeof customerAddressSchema>) => {
   return sdk.store.customer
-    .createAddress(
-      normalizeCustomerAddress(formData),
-      {},
-      await getAuthHeaders()
-    )
+    .createAddress(normalizeCustomerAddress(formData), {}, await getAuthHeaders())
     .then(({ customer }) => {
       const createdAddress = customer.addresses.at(-1)
 
@@ -221,9 +207,7 @@ export const addCustomerAddress = async (
     })
 }
 
-export const deleteCustomerAddress = async (
-  addressId: unknown
-): Promise<void> => {
+export const deleteCustomerAddress = async (addressId: unknown): Promise<void> => {
   if (typeof addressId !== "string") {
     throw new Error("Invalid input data")
   }
@@ -240,19 +224,14 @@ export const deleteCustomerAddress = async (
 
 export const updateCustomerAddress = async (
   addressId: string,
-  formData: z.infer<typeof customerAddressSchema>
+  formData: z.infer<typeof customerAddressSchema>,
 ) => {
   if (!addressId) {
     throw new Error("Invalid input data")
   }
 
   return sdk.store.customer
-    .updateAddress(
-      addressId,
-      normalizeCustomerAddress(formData),
-      {},
-      await getAuthHeaders()
-    )
+    .updateAddress(addressId, normalizeCustomerAddress(formData), {}, await getAuthHeaders())
     .then(() => {
       return { addressId, success: true, error: null }
     })
@@ -296,14 +275,11 @@ const forgotPasswordSchema = z.object({
   new_password: z.string().min(6),
   confirm_new_password: z.string().min(6),
 })
-const baseSchema = z.discriminatedUnion("type", [
-  resetPasswordFormSchema,
-  forgotPasswordSchema,
-])
+const baseSchema = z.discriminatedUnion("type", [resetPasswordFormSchema, forgotPasswordSchema])
 
 export async function resetPassword(
   currentState: unknown,
-  formData: z.infer<typeof baseSchema>
+  formData: z.infer<typeof baseSchema>,
 ): Promise<
   z.infer<typeof resetPasswordStateSchema> &
     ({ state: "initial" | "success" } | { state: "error"; error: string })
@@ -331,7 +307,7 @@ export async function resetPassword(
         email: validatedState.email,
         password: formData.new_password,
       },
-      validatedState.token
+      validatedState.token,
     )
     .then(() => {
       return {
@@ -354,10 +330,8 @@ const forgotPasswordFormSchema = z.object({
 
 export async function forgotPassword(
   _currentState: unknown,
-  formData: z.infer<typeof forgotPasswordFormSchema>
-): Promise<
-  { state: "initial" | "success" } | { state: "error"; error: string }
-> {
+  formData: z.infer<typeof forgotPasswordFormSchema>,
+): Promise<{ state: "initial" | "success" } | { state: "error"; error: string }> {
   return sdk.auth
     .resetPassword("customer", "emailpass", {
       identifier: formData.email,
@@ -387,7 +361,7 @@ export async function updateDefaultShippingAddress(addressId: string) {
         is_default_shipping: true,
       },
       {},
-      await getAuthHeaders()
+      await getAuthHeaders(),
     )
     .then(() => {
       return { success: true, error: null }
@@ -409,7 +383,7 @@ export async function updateDefaultBillingAddress(addressId: string) {
         is_default_billing: true,
       },
       {},
-      await getAuthHeaders()
+      await getAuthHeaders(),
     )
     .then(() => {
       return { success: true, error: null }

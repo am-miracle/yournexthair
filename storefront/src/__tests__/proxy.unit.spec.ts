@@ -7,9 +7,12 @@ afterEach(() => {
 })
 
 it("reports missing regions instead of redirecting to the same URL", async () => {
-  vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
-    json: async () => ({ regions: [] }),
-  }))
+  vi.stubGlobal(
+    "fetch",
+    vi.fn().mockResolvedValue({
+      json: async () => ({ regions: [] }),
+    }),
+  )
   const { proxy } = await import("../proxy")
   const response = await proxy(new NextRequest("http://localhost:8000/"))
   expect(response.status).toBe(503)

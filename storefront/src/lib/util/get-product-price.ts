@@ -22,7 +22,7 @@ export const getPricesForVariant = (variant: HttpTypes.StoreProductVariant) => {
     price_type: variant.calculated_price.calculated_price?.price_list_type,
     percentage_diff: getPercentageDiff(
       variant.calculated_price.original_amount ?? 0,
-      variant.calculated_price.calculated_amount
+      variant.calculated_price.calculated_amount,
     ),
   }
 }
@@ -45,10 +45,16 @@ export function getProductPrice({
   let maxVariant: HttpTypes.StoreProductVariant | undefined
   for (const v of pricedVariants) {
     const amount = v.calculated_price?.calculated_amount ?? 0
-    if (minVariant === undefined || amount < (minVariant.calculated_price?.calculated_amount ?? 0)) {
+    if (
+      minVariant === undefined ||
+      amount < (minVariant.calculated_price?.calculated_amount ?? 0)
+    ) {
       minVariant = v
     }
-    if (maxVariant === undefined || amount > (maxVariant.calculated_price?.calculated_amount ?? 0)) {
+    if (
+      maxVariant === undefined ||
+      amount > (maxVariant.calculated_price?.calculated_amount ?? 0)
+    ) {
       maxVariant = v
     }
   }

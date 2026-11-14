@@ -17,14 +17,9 @@ export default async function cleanupOrphanedImages({ container }: ExecArgs) {
   logger.info(`Found ${allFiles.length} total files.`)
 
   logger.info("Fetching all product images...")
-  const products = await productModuleService.listProducts(
-    {},
-    { relations: ["images"] }
-  )
+  const products = await productModuleService.listProducts({}, { relations: ["images"] })
 
-  const referencedUrls = new Set(
-    products.flatMap((p) => p.images?.map((img) => img.url) ?? [])
-  )
+  const referencedUrls = new Set(products.flatMap((p) => p.images?.map((img) => img.url) ?? []))
 
   logger.info(`Found ${referencedUrls.size} images referenced by products.`)
 

@@ -3,10 +3,7 @@
 import { cache } from "react"
 import { sdk } from "@lib/config"
 import { HttpTypes } from "@medusajs/types"
-import {
-  PRODUCTS_CACHE_TAG,
-  PRODUCTS_REVALIDATE_SECONDS,
-} from "@lib/data/cache"
+import { PRODUCTS_CACHE_TAG, PRODUCTS_REVALIDATE_SECONDS } from "@lib/data/cache"
 import { getRegion } from "@lib/data/regions"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import { sortProducts } from "@lib/util/sort-products"
@@ -97,23 +94,20 @@ export const getProductsList = async function ({
     }
   }
   return sdk.client
-    .fetch<{ products: HttpTypes.StoreProduct[]; count: number }>(
-      `/store/products`,
-      {
-        query: {
-          limit,
-          offset,
-          region_id: region.id,
-          fields: "*variants.calculated_price",
-          ...queryParams,
-        } satisfies HttpTypes.StoreProductListParams,
-        next: {
-          tags: [PRODUCTS_CACHE_TAG],
-          revalidate: PRODUCTS_REVALIDATE_SECONDS,
-        },
-        cache: "force-cache",
-      }
-    )
+    .fetch<{ products: HttpTypes.StoreProduct[]; count: number }>(`/store/products`, {
+      query: {
+        limit,
+        offset,
+        region_id: region.id,
+        fields: "*variants.calculated_price",
+        ...queryParams,
+      } satisfies HttpTypes.StoreProductListParams,
+      next: {
+        tags: [PRODUCTS_CACHE_TAG],
+        revalidate: PRODUCTS_REVALIDATE_SECONDS,
+      },
+      cache: "force-cache",
+    })
     .then(({ products, count }) => {
       const nextPage = count > offset + limit ? page + 1 : null
 

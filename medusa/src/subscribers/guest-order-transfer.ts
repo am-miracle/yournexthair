@@ -25,7 +25,10 @@ const escapeLike = (value: string) => value.replace(/[\\%_]/g, (char) => `\\${ch
 
 // Medusa's transfer flow requires the original order email to approve via a one-time token,
 // so signing up with someone else's address never exposes their orders.
-export default async function requestGuestOrderTransfers({ event: { data }, container }: SubscriberArgs<{ id: string }>) {
+export default async function requestGuestOrderTransfers({
+  event: { data },
+  container,
+}: SubscriberArgs<{ id: string }>) {
   const query = container.resolve(ContainerRegistrationKeys.QUERY)
   const logger = container.resolve(ContainerRegistrationKeys.LOGGER)
 
@@ -46,12 +49,28 @@ export default async function requestGuestOrderTransfers({ event: { data }, cont
   const email = customer.email.toLowerCase()
   const { data: candidates } = (await query.graph({
     entity: "order",
-    fields: ["id", "display_id", "email", "status", "created_at", "currency_code", "total", "customer.id", "customer.has_account", "shipping_address.country_code"],
+    fields: [
+      "id",
+      "display_id",
+      "email",
+      "status",
+      "created_at",
+      "currency_code",
+      "total",
+      "customer.id",
+      "customer.has_account",
+      "shipping_address.country_code",
+    ],
     filters: { email: { $ilike: escapeLike(email) } },
   })) as unknown as { data: GuestOrder[] }
 
   const guestOrders = candidates
-    .filter((order) => order.email?.toLowerCase() === email && order.status !== "canceled" && order.customer?.has_account !== true)
+    .filter(
+      (order) =>
+        order.email?.toLowerCase() === email &&
+        order.status !== "canceled" &&
+        order.customer?.has_account !== true,
+    )
     .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
     .slice(0, MAX_ORDERS)
   if (!guestOrders.length) return
@@ -67,19 +86,27 @@ export default async function requestGuestOrderTransfers({ event: { data }, cont
         },
       })
     } catch (error) {
-      logger.warn(`Could not request transfer of order ${order.id} to ${customer.id}: ${error instanceof Error ? error.message : String(error)}`)
+      logger.warn(
+        `Could not request transfer of order ${order.id} to ${customer.id}: ${error instanceof Error ? error.message : String(error)}`,
+      )
     }
   }
 
   const { data: changes } = (await query.graph({
     entity: "order_change",
     fields: ["order_id", "actions.action", "actions.reference_id", "actions.details"],
-    filters: { order_id: guestOrders.map((order) => order.id), status: "requested", change_type: "transfer" },
+    filters: {
+      order_id: guestOrders.map((order) => order.id),
+      status: "requested",
+      change_type: "transfer",
+    },
   })) as unknown as { data: TransferChange[] }
 
   const tokens = new Map<string, string>()
   for (const change of changes) {
-    const action = change.actions?.find((entry) => entry.action === "TRANSFER_CUSTOMER" && entry.reference_id === customer.id)
+    const action = change.actions?.find(
+      (entry) => entry.action === "TRANSFER_CUSTOMER" && entry.reference_id === customer.id,
+    )
     const token = action?.details?.token
     if (typeof token === "string" && token) tokens.set(change.order_id, token)
   }
@@ -105,7 +132,9 @@ export default async function requestGuestOrderTransfers({ event: { data }, cont
       claim_url: `${storefrontUrl}/${countryCode}/claim-orders#c=${fragment}`,
     },
   })
-  logger.info(`Requested transfer of ${claimable.length} guest order(s) to customer ${customer.id}.`)
+  logger.info(
+    `Requested transfer of ${claimable.length} guest order(s) to customer ${customer.id}.`,
+  )
 }
 
 export const config: SubscriberConfig = {

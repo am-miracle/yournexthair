@@ -17,7 +17,7 @@ export const AddressMultiple: React.FC<{
     <div
       className={twMerge(
         "border border-grayscale-200 rounded-xs py-4 px-6 flex flex-col gap-8 break-all",
-        className
+        className,
       )}
     >
       <div className="flex flex-wrap justify-between gap-8">
@@ -28,16 +28,14 @@ export const AddressMultiple: React.FC<{
         <div>
           <p className="text-xs text-grayscale-500 mb-1.5">Country</p>
           <p>
-            {countries.find((country) => country.iso_2 === address.country_code)
-              ?.display_name || address.country_code}
+            {countries.find((country) => country.iso_2 === address.country_code)?.display_name ||
+              address.country_code}
           </p>
         </div>
       </div>
       {Boolean(address.address_2) && (
         <div>
-          <p className="text-xs text-grayscale-500 mb-1.5">
-            Apartment, suite, etc.
-          </p>
+          <p className="text-xs text-grayscale-500 mb-1.5">Apartment, suite, etc.</p>
           <p>{address.address_2}</p>
         </div>
       )}
@@ -63,13 +61,9 @@ export const AddressMultiple: React.FC<{
           <UiModalOverlay>
             <UiModal>
               <UiDialog className="text-center">
-                <p className="text-md mb-8">
-                  Do you want to delete this address?
-                </p>
+                <p className="text-md mb-8">Do you want to delete this address?</p>
                 <div className="flex gap-6 justify-center">
-                  <DeleteAddressButton addressId={address.id}>
-                    Confirm
-                  </DeleteAddressButton>
+                  <DeleteAddressButton addressId={address.id}>Confirm</DeleteAddressButton>
                   <UiCloseButton variant="outline">Cancel</UiCloseButton>
                 </div>
               </UiDialog>

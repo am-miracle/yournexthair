@@ -1,25 +1,25 @@
-import * as React from 'react';
-import { defineWidgetConfig } from '@medusajs/admin-sdk';
-import type { DetailWidgetProps, AdminCollection } from '@medusajs/framework/types';
-import { Container, Heading, Button, Drawer, Text } from '@medusajs/ui';
-import { PencilSquare } from '@medusajs/icons';
-import { z } from 'zod';
-import { ImageField, imageFieldSchema } from '../components/Form/ImageField';
-import { Form } from '../components/Form/Form';
-import { withQueryClient } from '../components/QueryClientProvider';
+import * as React from "react"
+import { defineWidgetConfig } from "@medusajs/admin-sdk"
+import type { DetailWidgetProps, AdminCollection } from "@medusajs/framework/types"
+import { Container, Heading, Button, Drawer, Text } from "@medusajs/ui"
+import { PencilSquare } from "@medusajs/icons"
+import { z } from "zod"
+import { ImageField, imageFieldSchema } from "../components/Form/ImageField"
+import { Form } from "../components/Form/Form"
+import { withQueryClient } from "../components/QueryClientProvider"
 
 const detailsFormSchema = z.object({
   image: imageFieldSchema().optional(),
-});
+})
 
 const UpdateDetailsDrawer: React.FC<{
-  children: React.ReactNode;
-  isOpen: boolean;
-  onOpenChange: (open: boolean) => void;
-  id: string;
-  title: React.ReactNode;
-  initialValue: z.infer<typeof detailsFormSchema>;
-  onSave: (values: z.infer<typeof detailsFormSchema>) => void;
+  children: React.ReactNode
+  isOpen: boolean
+  onOpenChange: (open: boolean) => void
+  id: string
+  title: React.ReactNode
+  initialValue: z.infer<typeof detailsFormSchema>
+  onSave: (values: z.infer<typeof detailsFormSchema>) => void
 }> = ({ children, isOpen, onOpenChange, id, title, initialValue, onSave }) => {
   return (
     <Drawer open={isOpen} onOpenChange={onOpenChange}>
@@ -33,12 +33,12 @@ const UpdateDetailsDrawer: React.FC<{
             schema={detailsFormSchema}
             onSubmit={async (values) => {
               await fetch(`/admin/custom/product-types/${id}/details`, {
-                method: 'POST',
+                method: "POST",
                 body: JSON.stringify(values),
-                credentials: 'include',
-              });
+                credentials: "include",
+              })
 
-              onSave(values);
+              onSave(values)
             }}
             defaultValues={initialValue}
             formProps={{
@@ -46,11 +46,7 @@ const UpdateDetailsDrawer: React.FC<{
             }}
           >
             <div className="flex flex-col gap-4">
-              <ImageField
-                name="image"
-                label="Image"
-                dropzoneRootClassName="h-60"
-              />
+              <ImageField name="image" label="Image" dropzoneRootClassName="h-60" />
             </div>
           </Form>
         </Drawer.Body>
@@ -64,29 +60,25 @@ const UpdateDetailsDrawer: React.FC<{
         </Drawer.Footer>
       </Drawer.Content>
     </Drawer>
-  );
-};
+  )
+}
 
-const ProductTypeDetailsWidget = ({
-  data,
-}: DetailWidgetProps<AdminCollection>) => {
-  const [isEditModalOpen, setIsModalOpen] = React.useState(false);
-  const [details, setDetails] = React.useState<z.infer<
-    typeof detailsFormSchema
-  > | null>(null);
+const ProductTypeDetailsWidget = ({ data }: DetailWidgetProps<AdminCollection>) => {
+  const [isEditModalOpen, setIsModalOpen] = React.useState(false)
+  const [details, setDetails] = React.useState<z.infer<typeof detailsFormSchema> | null>(null)
 
   React.useEffect(() => {
     fetch(`/admin/custom/product-types/${data.id}/details`, {
-      credentials: 'include',
+      credentials: "include",
     })
       .then((res) => res.json() as Promise<unknown>)
       .then((json: unknown) => {
-        setDetails(json as z.infer<typeof detailsFormSchema>);
+        setDetails(json as z.infer<typeof detailsFormSchema>)
       })
       .catch((e) => {
-        console.error(e);
-      });
-  }, [data.id]);
+        console.error(e)
+      })
+  }, [data.id])
 
   return (
     <Container className="divide-y p-0">
@@ -100,8 +92,8 @@ const ProductTypeDetailsWidget = ({
             id={data.id}
             initialValue={details}
             onSave={(value) => {
-              setDetails(value);
-              setIsModalOpen(false);
+              setDetails(value)
+              setIsModalOpen(false)
             }}
           >
             <Button
@@ -109,8 +101,8 @@ const ProductTypeDetailsWidget = ({
               size="small"
               className="text-fg-muted dark:text-fg-muted-dark hover:text-fg-subtle dark:hover:text-fg-subtle-dark"
               onClick={(event) => {
-                event.preventDefault();
-                setIsModalOpen(true);
+                event.preventDefault()
+                setIsModalOpen(true)
               }}
             >
               <PencilSquare /> Edit
@@ -123,12 +115,9 @@ const ProductTypeDetailsWidget = ({
           <Text>Loading...</Text>
         ) : (
           <div className="flex flex-col gap-2">
-            {typeof details.image?.url === 'string' ? (
+            {typeof details.image?.url === "string" ? (
               <div>
-                <img
-                  src={details.image.url}
-                  className="max-h-60 max-w-none w-auto"
-                />
+                <img src={details.image.url} className="max-h-60 max-w-none w-auto" />
               </div>
             ) : (
               <Text>No image</Text>
@@ -137,11 +126,11 @@ const ProductTypeDetailsWidget = ({
         )}
       </div>
     </Container>
-  );
-};
+  )
+}
 
 export const config = defineWidgetConfig({
-  zone: 'product_type.details.after',
-});
+  zone: "product_type.details.after",
+})
 
-export default withQueryClient(ProductTypeDetailsWidget);
+export default withQueryClient(ProductTypeDetailsWidget)

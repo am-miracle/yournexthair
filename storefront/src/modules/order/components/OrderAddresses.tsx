@@ -3,7 +3,15 @@ import { HttpTypes } from "@medusajs/types"
 import { Icon } from "@/components/Icon"
 import { formatAddressLines } from "@lib/util/order-format"
 
-const AddressCard = ({ title, icon, lines }: { title: string; icon: "map-pin" | "receipt"; lines: string[] }) => (
+const AddressCard = ({
+  title,
+  icon,
+  lines,
+}: {
+  title: string
+  icon: "map-pin" | "receipt"
+  lines: string[]
+}) => (
   <div className="flex-1 overflow-hidden rounded-xs border border-grayscale-200 p-4">
     <div className="flex gap-4 items-center mb-8">
       <Icon name={icon} />

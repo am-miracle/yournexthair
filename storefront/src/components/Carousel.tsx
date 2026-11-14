@@ -30,14 +30,8 @@ export const Carousel: React.FC<CarouselProps> = ({
   const prevBtnDisabled = emblaApi ? !emblaApi.canScrollPrev() : true
   const nextBtnDisabled = emblaApi ? !emblaApi.canScrollNext() : true
 
-  const scrollPrev = React.useCallback(
-    () => emblaApi && emblaApi.scrollPrev(),
-    [emblaApi]
-  )
-  const scrollNext = React.useCallback(
-    () => emblaApi && emblaApi.scrollNext(),
-    [emblaApi]
-  )
+  const scrollPrev = React.useCallback(() => emblaApi && emblaApi.scrollPrev(), [emblaApi])
+  const scrollNext = React.useCallback(() => emblaApi && emblaApi.scrollNext(), [emblaApi])
 
   React.useEffect(() => {
     if (!emblaApi) return
@@ -69,15 +63,12 @@ export const Carousel: React.FC<CarouselProps> = ({
                       disabled={prevBtnDisabled}
                       className={twJoin(
                         "max-md:hidden transition-opacity",
-                        prevBtnDisabled && "opacity-50"
+                        prevBtnDisabled && "opacity-50",
                       )}
                       aria-label="Previous"
                     >
                       <IconCircle>
-                        <Icon
-                          name="arrow-left"
-                          className="w-6 h-6 text-black"
-                        />
+                        <Icon name="arrow-left" className="w-6 h-6 text-black" />
                       </IconCircle>
                     </button>
                     <button
@@ -86,15 +77,12 @@ export const Carousel: React.FC<CarouselProps> = ({
                       disabled={nextBtnDisabled}
                       className={twJoin(
                         "max-md:hidden transition-opacity",
-                        nextBtnDisabled && "opacity-50"
+                        nextBtnDisabled && "opacity-50",
                       )}
                       aria-label="Next"
                     >
                       <IconCircle>
-                        <Icon
-                          name="arrow-right"
-                          className="w-6 h-6 text-black"
-                        />
+                        <Icon name="arrow-right" className="w-6 h-6 text-black" />
                       </IconCircle>
                     </button>
                   </div>

@@ -10,9 +10,7 @@ export const LocalizedLink = <RouteInferType,>({
   children,
   href,
   ...props
-}: React.ComponentPropsWithoutRef<"a"> &
-  LinkProps<RouteInferType> &
-  LinkOwnProps) => {
+}: React.ComponentPropsWithoutRef<"a"> & LinkProps<RouteInferType> & LinkOwnProps) => {
   const countryCode = useCountryCode()
 
   return (

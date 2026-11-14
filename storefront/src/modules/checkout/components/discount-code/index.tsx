@@ -20,9 +20,7 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
     if (!values.code) {
       return
     }
-    const codes = promotions
-      .filter((p) => p.code === undefined)
-      .map((p) => p.code!)
+    const codes = promotions.filter((p) => p.code === undefined).map((p) => p.code!)
     codes.push(values.code)
 
     await applyPromotions.mutateAsync(codes)
@@ -37,9 +35,7 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
           placeholder="Discount code"
           className="flex-1"
         />
-        <SubmitButton className="lg:h-auto max-h-14 grow-0 h-12">
-          Apply
-        </SubmitButton>
+        <SubmitButton className="lg:h-auto max-h-14 grow-0 h-12">Apply</SubmitButton>
       </div>
     </Form>
   )

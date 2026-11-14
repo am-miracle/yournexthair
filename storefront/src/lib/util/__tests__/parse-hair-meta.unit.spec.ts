@@ -126,9 +126,9 @@ describe("parseHairMeta", () => {
     it("silently drops malformed fields and still returns partial valid data", () => {
       const raw = {
         hair_origin: { nested: "bad" }, // malformed object
-        texture: "Straight",            // valid
-        length_in_inches: "not a num",  // malformed string
-        density: 130,                   // valid
+        texture: "Straight", // valid
+        length_in_inches: "not a num", // malformed string
+        density: 130, // valid
       }
       const result = parseHairMeta(raw)
       expect(result).not.toBeNull()

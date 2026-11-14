@@ -1,16 +1,16 @@
-import { model } from '@medusajs/framework/utils';
-import type { InferTypeOf } from '@medusajs/framework/types';
-import Material from './material';
+import { model } from "@medusajs/framework/utils"
+import type { InferTypeOf } from "@medusajs/framework/types"
+import Material from "./material"
 
-const Color = model.define('color', {
+const Color = model.define("color", {
   id: model.id().primaryKey(),
   name: model.text(),
   hex_code: model.text(),
   material: model.belongsTo(() => Material, {
-    mappedBy: 'colors',
+    mappedBy: "colors",
   }),
-});
+})
 
-export type ColorModelType = InferTypeOf<typeof Color>;
+export type ColorModelType = InferTypeOf<typeof Color>
 
-export default Color;
+export default Color

@@ -2,30 +2,28 @@ import {
   createSelectParams,
   createFindParams,
   createOperatorMap,
-} from '@medusajs/medusa/api/utils/validators';
-import { z } from '@medusajs/framework/zod';
+} from "@medusajs/medusa/api/utils/validators"
+import { z } from "@medusajs/framework/zod"
 
-export type AdminGetProductTypeParamsType = z.infer<
-  typeof AdminGetProductTypeParams
->;
-export const AdminGetProductTypeParams = createSelectParams();
+export type AdminGetProductTypeParamsType = z.infer<typeof AdminGetProductTypeParams>
+export const AdminGetProductTypeParams = createSelectParams()
 
 interface AdminGetProductTypesParamsShape {
-  limit?: number | undefined;
-  offset?: number | undefined;
-  fields?: string | undefined;
-  order?: string | undefined;
-  q?: string | undefined;
-  id?: string | string[] | undefined;
-  value?: string | string[] | undefined;
-  created_at?: Record<string, unknown> | undefined;
-  updated_at?: Record<string, unknown> | undefined;
-  deleted_at?: Record<string, unknown> | undefined;
-  $and?: AdminGetProductTypesParamsShape[] | undefined;
-  $or?: AdminGetProductTypesParamsShape[] | undefined;
+  limit?: number | undefined
+  offset?: number | undefined
+  fields?: string | undefined
+  order?: string | undefined
+  q?: string | undefined
+  id?: string | string[] | undefined
+  value?: string | string[] | undefined
+  created_at?: Record<string, unknown> | undefined
+  updated_at?: Record<string, unknown> | undefined
+  deleted_at?: Record<string, unknown> | undefined
+  $and?: AdminGetProductTypesParamsShape[] | undefined
+  $or?: AdminGetProductTypesParamsShape[] | undefined
 }
 
-export type AdminGetProductTypesParamsType = AdminGetProductTypesParamsShape;
+export type AdminGetProductTypesParamsType = AdminGetProductTypesParamsShape
 
 export const AdminGetProductTypesParams: z.ZodType<AdminGetProductTypesParamsShape> =
   createFindParams({
@@ -42,4 +40,4 @@ export const AdminGetProductTypesParams: z.ZodType<AdminGetProductTypesParamsSha
     deleted_at: createOperatorMap().optional(),
     $and: z.lazy(() => AdminGetProductTypesParams.array()).optional(),
     $or: z.lazy(() => AdminGetProductTypesParams.array()).optional(),
-  });
+  })

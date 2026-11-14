@@ -13,7 +13,7 @@ interface MinPricedProduct extends HttpTypes.StoreProduct {
  */
 export function sortProducts(
   products: HttpTypes.StoreProduct[],
-  sortBy: SortOptions
+  sortBy: SortOptions,
 ): HttpTypes.StoreProduct[] {
   const sortedProducts = products as MinPricedProduct[]
 
@@ -22,9 +22,7 @@ export function sortProducts(
     sortedProducts.forEach((product) => {
       if (product.variants && product.variants.length > 0) {
         product._minPrice = Math.min(
-          ...product.variants.map(
-            (variant) => variant?.calculated_price?.calculated_amount || 0
-          )
+          ...product.variants.map((variant) => variant?.calculated_price?.calculated_amount || 0),
         )
       } else {
         product._minPrice = Infinity
@@ -40,9 +38,7 @@ export function sortProducts(
 
   if (sortBy === "created_at") {
     sortedProducts.sort((a, b) => {
-      return (
-        new Date(b.created_at!).getTime() - new Date(a.created_at!).getTime()
-      )
+      return new Date(b.created_at!).getTime() - new Date(a.created_at!).getTime()
     })
   }
 

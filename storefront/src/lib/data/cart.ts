@@ -1,5 +1,7 @@
 "use server"
 
+import { getCheckoutKey } from "@lib/util/checkout-key"
+
 import { HttpTypes } from "@medusajs/types"
 import { revalidateTag, updateTag } from "next/cache"
 import { redirect } from "next/navigation"
@@ -19,7 +21,7 @@ import { getRegion } from "@lib/data/regions"
 import { addressesFormSchema } from "@/hooks/cart"
 
 const normalizeAddress = (
-  address: z.infer<typeof addressesFormSchema>["shipping_address"]
+  address: z.infer<typeof addressesFormSchema>["shipping_address"],
 ): HttpTypes.StoreAddAddress => ({
   first_name: address.first_name,
   last_name: address.last_name,
@@ -89,7 +91,7 @@ export async function getOrSetCart(input: unknown) {
     const cartResp = await sdk.store.cart.create(
       { region_id: region.id },
       {},
-      await getAuthHeaders()
+      await getAuthHeaders(),
     )
     cart = cartResp.cart
 
@@ -97,12 +99,7 @@ export async function getOrSetCart(input: unknown) {
   }
 
   if (cart && cart?.region_id !== region.id) {
-    await sdk.store.cart.update(
-      cart.id,
-      { region_id: region.id },
-      {},
-      await getAuthHeaders()
-    )
+    await sdk.store.cart.update(cart.id, { region_id: region.id }, {}, await getAuthHeaders())
   }
 
   return cart
@@ -135,11 +132,7 @@ export async function addToCart({
     throw new Error("Missing variant ID when adding to cart")
   }
 
-  if (
-    typeof quantity !== "number" ||
-    quantity < 1 ||
-    !Number.isSafeInteger(quantity)
-  ) {
+  if (typeof quantity !== "number" || quantity < 1 || !Number.isSafeInteger(quantity)) {
     throw new Error("Missing quantity when adding to cart")
   }
 
@@ -160,29 +153,18 @@ export async function addToCart({
         quantity,
       },
       {},
-      await getAuthHeaders()
+      await getAuthHeaders(),
     )
-    .then(() => {
-    })
+    .then(() => {})
     .catch(medusaError)
 }
 
-export async function updateLineItem({
-  lineId,
-  quantity,
-}: {
-  lineId: unknown
-  quantity: unknown
-}) {
+export async function updateLineItem({ lineId, quantity }: { lineId: unknown; quantity: unknown }) {
   if (typeof lineId !== "string") {
     throw new Error("Missing lineItem ID when updating line item")
   }
 
-  if (
-    typeof quantity !== "number" ||
-    quantity < 1 ||
-    !Number.isSafeInteger(quantity)
-  ) {
+  if (typeof quantity !== "number" || quantity < 1 || !Number.isSafeInteger(quantity)) {
     throw new Error("Missing quantity when updating line item")
   }
 
@@ -193,8 +175,7 @@ export async function updateLineItem({
 
   await sdk.store.cart
     .updateLineItem(cartId, lineId, { quantity }, {}, await getAuthHeaders())
-    .then(() => {
-    })
+    .then(() => {})
     .catch(medusaError)
 }
 
@@ -210,8 +191,7 @@ export async function deleteLineItem(lineId: unknown) {
 
   await sdk.store.cart
     .deleteLineItem(cartId, lineId, undefined, await getAuthHeaders())
-    .then(() => {
-    })
+    .then(() => {})
     .catch(medusaError)
 }
 
@@ -231,12 +211,7 @@ export async function setShippingMethod({
   }
 
   return sdk.store.cart
-    .addShippingMethod(
-      cartId,
-      { option_id: shippingMethodId },
-      {},
-      await getAuthHeaders()
-    )
+    .addShippingMethod(cartId, { option_id: shippingMethodId }, {}, await getAuthHeaders())
     .then(() => {})
     .catch(medusaError)
 }
@@ -253,9 +228,7 @@ export async function initiatePaymentSession(provider_id: unknown) {
   }
 
   const address = cart.billing_address ?? cart.shipping_address
-  const customerName = [address?.first_name, address?.last_name]
-    .filter(Boolean)
-    .join(" ")
+  const customerName = [address?.first_name, address?.last_name].filter(Boolean).join(" ")
 
   return sdk.store.payment
     .initiatePaymentSession(
@@ -269,7 +242,7 @@ export async function initiatePaymentSession(provider_id: unknown) {
         },
       },
       {},
-      await getAuthHeaders()
+      await getAuthHeaders(),
     )
     .then((resp) => resp)
     .catch(medusaError)
@@ -310,13 +283,7 @@ export async function removePromotions(codes: string[]) {
     .catch(medusaError)
 }
 
-export async function setEmail({
-  email,
-  country_code,
-}: {
-  email: string
-  country_code: string
-}) {
+export async function setEmail({ email, country_code }: { email: string; country_code: string }) {
   try {
     const cartId = await getCartId()
     if (!cartId) {
@@ -339,9 +306,7 @@ export async function setEmail({
   return { success: true, error: null }
 }
 
-export async function setAddresses(
-  formData: z.infer<typeof addressesFormSchema>
-) {
+export async function setAddresses(formData: z.infer<typeof addressesFormSchema>) {
   try {
     if (!formData) {
       throw new Error("No form data found when setting addresses")
@@ -375,7 +340,11 @@ export async function placeOrder() {
   }
 
   const cartRes = await sdk.store.cart
-    .complete(cartId, {}, await getAuthHeaders())
+    .complete(
+      cartId,
+      {},
+      { ...(await getAuthHeaders()), "x-storefront-checkout-key": getCheckoutKey() },
+    )
     .then((cartRes) => {
       updateTag("orders")
       return cartRes
@@ -383,8 +352,10 @@ export async function placeOrder() {
     .catch(medusaError)
 
   if (cartRes?.type === "order") {
+    const receiptToken = (cartRes as typeof cartRes & { receipt_token?: string }).receipt_token
+    if (!receiptToken) throw new Error("Checkout did not return a receipt credential")
+    await rememberOrderAccess(cartRes.order.id, receiptToken)
     await removeCartId()
-    await rememberOrderAccess(cartRes.order.id)
     const countryCode =
       cartRes.order.shipping_address?.country_code?.toLowerCase() ??
       process.env.NEXT_PUBLIC_DEFAULT_REGION ??

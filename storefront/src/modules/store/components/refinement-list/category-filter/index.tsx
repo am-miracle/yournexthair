@@ -1,11 +1,7 @@
 "use client"
 
 import * as ReactAria from "react-aria-components"
-import {
-  UiSelectButton,
-  UiSelectDialog,
-  UiSelectIcon,
-} from "@/components/ui/Select"
+import { UiSelectButton, UiSelectDialog, UiSelectIcon } from "@/components/ui/Select"
 import {
   UiCheckbox,
   UiCheckboxBox,

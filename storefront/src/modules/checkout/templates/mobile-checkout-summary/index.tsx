@@ -10,9 +10,7 @@ import { convertToLocale } from "@lib/util/money"
 const MobileCheckoutSummary = ({ cart }: { cart: HttpTypes.StoreCart }) => {
   const { currency_code, total } = cart
   const wrapperRef = React.useRef<HTMLDivElement>(null)
-  const onClickHandler = React.useCallback<
-    React.MouseEventHandler<HTMLButtonElement>
-  >((event) => {
+  const onClickHandler = React.useCallback<React.MouseEventHandler<HTMLButtonElement>>((event) => {
     event.preventDefault()
 
     const button = event.currentTarget
@@ -44,7 +42,9 @@ const MobileCheckoutSummary = ({ cart }: { cart: HttpTypes.StoreCart }) => {
       >
         <p className="font-medium">Order summary</p>
         <div className="flex shrink-0 items-center gap-3">
-          <span className="font-medium">{convertToLocale({ amount: total ?? 0, currency_code })}</span>
+          <span className="font-medium">
+            {convertToLocale({ amount: total ?? 0, currency_code })}
+          </span>
           <Icon
             name="chevron-down"
             className="w-6 group-data-[open=yes]:rotate-180 transition-transform"

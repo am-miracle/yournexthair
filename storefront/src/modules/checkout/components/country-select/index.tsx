@@ -29,19 +29,18 @@ const CountrySelect: React.FC<CountrySelectProps> = ({
     }
 
     return (
-      region.countries
-        ?.flatMap((country) => {
-          if (!country?.iso_2 || !country.display_name) {
-            return []
-          }
+      region.countries?.flatMap((country) => {
+        if (!country?.iso_2 || !country.display_name) {
+          return []
+        }
 
-          return [
-            {
-              value: country.iso_2,
-              label: country.display_name,
-            },
-          ]
-        }) ?? []
+        return [
+          {
+            value: country.iso_2,
+            label: country.display_name,
+          },
+        ]
+      }) ?? []
     )
   }, [region])
 

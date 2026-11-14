@@ -35,10 +35,7 @@ export interface WebMCPTool<TInput, TData> {
   annotations?: {
     readOnlyHint?: boolean
   }
-  handler: (
-    input: TInput,
-    context?: WebMCPToolContext
-  ) => Promise<WebMCPToolResult<TData>>
+  handler: (input: TInput, context?: WebMCPToolContext) => Promise<WebMCPToolResult<TData>>
 }
 
 export interface CartSnapshot {

@@ -9,9 +9,7 @@ import { CategoryFilter } from "@modules/store/components/refinement-list/catego
 import { CollectionFilter } from "@modules/store/components/refinement-list/collection-filter"
 import { MobileFilters } from "@modules/store/components/refinement-list/mobile-filters"
 import { MobileSort } from "@modules/store/components/refinement-list/mobile-sort"
-import SortProducts, {
-  SortOptions,
-} from "@modules/store/components/refinement-list/sort-products"
+import SortProducts, { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import { TypeFilter } from "@modules/store/components/refinement-list/type-filter"
 
 type RefinementListProps = {
@@ -54,7 +52,7 @@ const RefinementList = ({
 
       router.push(`${pathname}?${query.toString()}`, { scroll: false })
     },
-    [pathname, router, searchParams]
+    [pathname, router, searchParams],
   )
 
   const setMultipleQueryParams = useCallback(
@@ -72,7 +70,7 @@ const RefinementList = ({
 
       router.push(`${pathname}?${query.toString()}`, { scroll: false })
     },
-    [searchParams, pathname, router]
+    [searchParams, pathname, router],
   )
 
   return (
@@ -115,11 +113,7 @@ const RefinementList = ({
               />
             )}
           </div>
-          <SortProducts
-            sortBy={sortBy}
-            setQueryParams={setQueryParams}
-            data-testid={dataTestId}
-          />
+          <SortProducts sortBy={sortBy} setQueryParams={setQueryParams} data-testid={dataTestId} />
         </div>
       </LayoutColumn>
     </Layout>

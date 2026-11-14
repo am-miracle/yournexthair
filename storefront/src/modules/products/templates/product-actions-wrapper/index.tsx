@@ -31,7 +31,5 @@ export default async function ProductActionsWrapper({
     return null
   }
 
-  return (
-    <ProductActions product={product} materials={materials} region={region} />
-  )
+  return <ProductActions product={product} materials={materials} region={region} />
 }

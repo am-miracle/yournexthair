@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient, type UseMutationOptions } from '@tanstack/react-query';
+import { useMutation, useQueryClient, type UseMutationOptions } from "@tanstack/react-query"
 
 export const useCreateMaterialMutation = (
   options:
@@ -7,76 +7,71 @@ export const useCreateMaterialMutation = (
           unknown,
           Error,
           {
-            name: string;
+            name: string
           },
           unknown
         >,
-        'mutationKey' | 'mutationFn'
+        "mutationKey" | "mutationFn"
       >
     | undefined = undefined,
 ) => {
-  const queryClient = useQueryClient();
+  const queryClient = useQueryClient()
 
   return useMutation({
-    mutationKey: ['fashion', 'create'],
+    mutationKey: ["fashion", "create"],
     mutationFn: async (values: { name: string }) => {
-      return fetch('/admin/fashion', {
-        method: 'POST',
+      return fetch("/admin/fashion", {
+        method: "POST",
         body: JSON.stringify(values),
-        credentials: 'include',
-      }).then((res) => res.json() as Promise<unknown>);
+        credentials: "include",
+      }).then((res) => res.json() as Promise<unknown>)
     },
     ...options,
     onSuccess: async (...args) => {
       await queryClient.invalidateQueries({
-        predicate: (query) => query.queryKey[0] === 'fashion',
-      });
+        predicate: (query) => query.queryKey[0] === "fashion",
+      })
 
       if (options?.onSuccess) {
-        return options.onSuccess(...args);
+        return options.onSuccess(...args)
       }
 
-      return undefined;
+      return undefined
     },
-  });
-};
+  })
+}
 
 export const useCreateColorMutation = (
   material_id: string,
   options:
     | Omit<
-        UseMutationOptions<
-          unknown,
-          Error,
-          { name: string; hex_code: string },
-          unknown
-        >,
-        'mutationKey' | 'mutationFn'
+        UseMutationOptions<unknown, Error, { name: string; hex_code: string }, unknown>,
+        "mutationKey" | "mutationFn"
       >
     | undefined = undefined,
 ) => {
-  const queryClient = useQueryClient();
+  const queryClient = useQueryClient()
 
   return useMutation({
-    mutationKey: ['fashion', material_id, 'colors', 'create'],
+    mutationKey: ["fashion", material_id, "colors", "create"],
     mutationFn: async (values: { name: string; hex_code: string }) => {
       return fetch(`/admin/fashion/${material_id}/colors`, {
-        method: 'POST',
+        method: "POST",
         body: JSON.stringify(values),
-        credentials: 'include',
-      }).then((res) => res.json() as Promise<unknown>);
+        credentials: "include",
+      }).then((res) => res.json() as Promise<unknown>)
     },
     ...options,
     onSuccess: async (...args) => {
       await queryClient.invalidateQueries({
-        predicate: (query) => query.queryKey[0] === 'fashion',
-      });
+        predicate: (query) => query.queryKey[0] === "fashion",
+      })
 
       if (options?.onSuccess) {
-        return options.onSuccess(...args);
+        return options.onSuccess(...args)
       }
 
-      return undefined;
+      return undefined
     },
-  });
-};
+  })
+}

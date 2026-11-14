@@ -89,16 +89,16 @@ const ShippingAddress = ({
 
   const countriesInRegion = useMemo(
     () => cart?.region?.countries?.map((c) => c.iso_2),
-    [cart?.region]
+    [cart?.region],
   )
 
   // check if customer has saved addresses that are in the current region
   const addressesInRegion = useMemo(
     () =>
       customer?.addresses.filter(
-        (a) => a.country_code && countriesInRegion?.includes(a.country_code)
+        (a) => a.country_code && countriesInRegion?.includes(a.country_code),
       ),
-    [customer?.addresses, countriesInRegion]
+    [customer?.addresses, countriesInRegion],
   )
 
   const populateShippingAddress = (address?: CheckoutAddressFields) => {
@@ -131,8 +131,7 @@ const ShippingAddress = ({
         isShippingAddressEmpty(formData)
       ) {
         const defaultShippingAddress =
-          addressesInRegion.find((a) => a.is_default_shipping) ||
-          addressesInRegion[0]!
+          addressesInRegion.find((a) => a.is_default_shipping) || addressesInRegion[0]!
 
         populateShippingAddress({
           first_name: defaultShippingAddress.first_name ?? "",
@@ -153,9 +152,7 @@ const ShippingAddress = ({
 
   return (
     <>
-      {customer &&
-      (addressesInRegion?.length || 0) > 0 &&
-      !isShippingAddressEmpty(formData) ? (
+      {customer && (addressesInRegion?.length || 0) > 0 && !isShippingAddressEmpty(formData) ? (
         <div className="w-full border border-grayscale-200 rounded-xs p-4 flex flex-wrap gap-8 max-lg:flex-col mb-8">
           <div className="flex flex-1 gap-8">
             <Icon name="user" className="w-6 h-6 mt-2.5" />
@@ -165,7 +162,7 @@ const ShippingAddress = ({
                   <p className="text-xs text-grayscale-500 mb-1.5">Country</p>
                   <p>
                     {cart?.region?.countries?.find(
-                      (c) => c.iso_2 === currentShippingAddress.country_code
+                      (c) => c.iso_2 === currentShippingAddress.country_code,
                     )?.display_name || currentShippingAddress.country_code}
                   </p>
                 </div>
@@ -184,9 +181,7 @@ const ShippingAddress = ({
               )}
               <div className="flex flex-wrap justify-between gap-6">
                 <div className="grow basis-0">
-                  <p className="text-xs text-grayscale-500 mb-1.5">
-                    Postal Code
-                  </p>
+                  <p className="text-xs text-grayscale-500 mb-1.5">Postal Code</p>
                   <p>{currentShippingAddress.postal_code}</p>
                 </div>
                 <div className="grow basis-0">
@@ -208,9 +203,7 @@ const ShippingAddress = ({
                     className="flex flex-col gap-4 mb-10"
                     aria-label="Saved shipping addresses"
                     onChange={(value) => {
-                      const selectedAddress = addressesInRegion?.find(
-                        (a) => a.id === value
-                      )
+                      const selectedAddress = addressesInRegion?.find((a) => a.id === value)
                       if (selectedAddress) {
                         populateShippingAddress({
                           address_1: selectedAddress.address_1 ?? "",
@@ -252,8 +245,8 @@ const ShippingAddress = ({
                             country_code: currentShippingAddress.country_code ?? "",
                             province: currentShippingAddress.province ?? "",
                             phone: currentShippingAddress.phone ?? "",
-                          }
-                        )
+                          },
+                        ),
                       )?.id ?? null
                     }
                   >
@@ -267,20 +260,15 @@ const ShippingAddress = ({
                       >
                         <UiRadioBox />
                         <UiRadioLabel>
-                          {[address.first_name, address.last_name]
-                            .filter(Boolean)
-                            .join(" ")}
+                          {[address.first_name, address.last_name].filter(Boolean).join(" ")}
                         </UiRadioLabel>
                         <UiRadioLabel className="ml-auto text-grayscale-500 group-data-[selected=true]:font-normal">
                           {[
                             address.address_1,
                             address.address_2,
-                            [address.postal_code, address.city]
-                              .filter(Boolean)
-                              .join(" "),
-                            cart?.region?.countries?.find(
-                              (c) => c.iso_2 === address.country_code
-                            )?.display_name || address.country_code,
+                            [address.postal_code, address.city].filter(Boolean).join(" "),
+                            cart?.region?.countries?.find((c) => c.iso_2 === address.country_code)
+                              ?.display_name || address.country_code,
                           ]
                             .filter(Boolean)
                             .join(", ")}
@@ -362,7 +350,10 @@ const ShippingAddress = ({
           <InputField
             placeholder="State / Province"
             name="shipping_address.province"
-            inputProps={{ autoComplete: "address-level1", "aria-label": "Shipping state or province" }}
+            inputProps={{
+              autoComplete: "address-level1",
+              "aria-label": "Shipping state or province",
+            }}
             data-testid="shipping-province-input"
           />
           <InputField
@@ -374,11 +365,7 @@ const ShippingAddress = ({
         </div>
       )}
       <div>
-        <input
-          type="hidden"
-          name="same_as_billing"
-          value={checked ? "on" : "off"}
-        />
+        <input type="hidden" name="same_as_billing" value={checked ? "on" : "off"} />
         <UiCheckbox
           name="same_as_billing"
           isSelected={checked}
@@ -391,9 +378,7 @@ const ShippingAddress = ({
           <UiCheckboxBox>
             <UiCheckboxIcon />
           </UiCheckboxBox>
-          <UiCheckboxLabel>
-            Billing address same as shipping address
-          </UiCheckboxLabel>
+          <UiCheckboxLabel>Billing address same as shipping address</UiCheckboxLabel>
         </UiCheckbox>
       </div>
     </>

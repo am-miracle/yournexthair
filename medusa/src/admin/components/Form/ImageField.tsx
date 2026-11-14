@@ -44,10 +44,10 @@ export const ImageField: React.FC<ImageFieldProps> = ({
   }>({ name: name as "__name__" })
   const uploadFileMutation = useAdminUploadImage({
     onSuccess: (data) => {
-      const uploadedFile = data.files[0];
+      const uploadedFile = data.files[0]
 
       if (!uploadedFile) {
-        return;
+        return
       }
 
       field.onChange({

@@ -10,9 +10,9 @@ profiles. Existing matching options are preserved on subsequent runs.
 
 Delivery is labeled **Test delivery (sample rate)**: NGN 15,000 or USD 10.
 These are development fixtures, not real courier prices. The warehouse address
-is also a fixture. No product data, inventory quantities, or Terminal settings
+is also a fixture. No product data, inventory quantities, or DHL settings
 are changed. Production checkout requires real warehouse details, delivery
-pricing, and (for Terminal) measured parcels and variant dimensions.
+pricing, and (for DHL) measured parcels and variant dimensions.
 
 ## Nigeria VAT
 
@@ -21,9 +21,8 @@ threshold. Startup (and `pnpm setup:nigeria-vat`) creates the Nigeria tax
 region with a 0% default "VAT" rate if it is missing, and never changes an
 existing rate. Checkout hides the VAT line while it is zero.
 
-To start charging VAT once registered, set the rate to 7.5% (Nigeria Tax Act
-2025) in Admin → Settings → Tax Regions → Nigeria. No deploy is needed. Prices
-are then VAT-exclusive, so VAT is added at checkout; Terminal shipping quotes are
+To start charging VAT once registered, set the rate to 7.5% (Nigeria Tax Act 2025) in Admin → Settings → Tax Regions → Nigeria. No deploy is needed. Prices
+are then VAT-exclusive, so VAT is added at checkout; DHL shipping quotes are
 treated as VAT-inclusive. International carts have no tax rate.
 
 ## International shipping
@@ -43,17 +42,11 @@ To create a custom CLI script, create a TypeScript or JavaScript file under the 
 For example, create the file `src/scripts/my-script.ts` with the following content:
 
 ```ts title="src/scripts/my-script.ts"
-import { 
-  ExecArgs,
-  IProductModuleService
-} from "@medusajs/framework/types"
+import { ExecArgs, IProductModuleService } from "@medusajs/framework/types"
 import { Modules } from "@medusajs/framework/utils"
 
-export default async function myScript ({
-  container
-}: ExecArgs) {
-  const productModuleService: IProductModuleService = 
-    container.resolve(Modules.PRODUCT)
+export default async function myScript({ container }: ExecArgs) {
+  const productModuleService: IProductModuleService = container.resolve(Modules.PRODUCT)
 
   const [, count] = await productModuleService.listAndCount()
 
@@ -84,9 +77,7 @@ For example:
 ```ts
 import { ExecArgs } from "@medusajs/framework/types"
 
-export default async function myScript ({
-  args
-}: ExecArgs) {
+export default async function myScript({ args }: ExecArgs) {
   console.log(`The arguments you passed: ${args}`)
 }
 ```
@@ -96,6 +87,7 @@ Then, pass the arguments in the `exec` command after the file path:
 ```bash
 npx medusa exec ./src/scripts/my-script.ts arg1 arg2
 ```
+
 ## Seed the local storefront catalog
 
 From `medusa`, run `pnpm seed:catalog`. This ensures regions, categories,

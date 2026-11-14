@@ -1,18 +1,8 @@
 import * as React from "react"
 
-export const Trash: React.FC<React.ComponentPropsWithoutRef<"svg">> = (
-  props
-) => (
-  <svg
-    {...props}
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-  >
-    <path
-      fill="currentColor"
-      d="M10.75 17.75v-7.5h-1.5v7.5h1.5ZM14.75 17.75h-1.5v-7.5h1.5v7.5Z"
-    />
+export const Trash: React.FC<React.ComponentPropsWithoutRef<"svg">> = (props) => (
+  <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+    <path fill="currentColor" d="M10.75 17.75v-7.5h-1.5v7.5h1.5ZM14.75 17.75h-1.5v-7.5h1.5v7.5Z" />
     <path
       fill="currentColor"
       fillRule="evenodd"

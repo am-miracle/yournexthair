@@ -5,7 +5,7 @@ export const useCountryCode = (
     country: string
     region: string
     label: string
-  }[]
+  }[],
 ): string | undefined => {
   const pathName = usePathname()
   const params = useParams()
@@ -20,9 +20,7 @@ export const useCountryCode = (
     const firstPathPart = pathParts[0]
 
     if (pathParts.length > 1 && firstPathPart) {
-      const country = countryOptions.find(
-        (country) => country.country === firstPathPart
-      )
+      const country = countryOptions.find((country) => country.country === firstPathPart)
 
       if (country) {
         return country.country

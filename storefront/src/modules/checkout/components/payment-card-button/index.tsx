@@ -38,17 +38,14 @@ const PaymentCardButton: React.FC<Props> = ({
       { providerId: selectedPaymentMethod },
       {
         onSuccess: () => {
-          router.push(
-            pathname + "?" + createQueryString("step", "review"),
-            { scroll: false }
-          )
+          router.push(pathname + "?" + createQueryString("step", "review"), { scroll: false })
           setIsLoading(false)
         },
         onError: (err) => {
           setError(err instanceof Error ? err.message : String(err))
           setIsLoading(false)
         },
-      }
+      },
     )
   }
 

@@ -1,9 +1,4 @@
-export const defaultAdminProductTypeFields = [
-  "id",
-  "value",
-  "created_at",
-  "updated_at",
-]
+export const defaultAdminProductTypeFields = ["id", "value", "created_at", "updated_at"]
 
 export const retrieveProductTypeTransformQueryConfig = {
   defaults: defaultAdminProductTypeFields,

@@ -19,15 +19,7 @@ export const MobileFilters: React.FC<{
   types?: Record<string, string>
   type?: string[]
   setMultipleQueryParams: (params: Record<string, string | string[]>) => void
-}> = ({
-  collections,
-  collection,
-  categories,
-  category,
-  types,
-  type,
-  setMultipleQueryParams,
-}) => {
+}> = ({ collections, collection, categories, category, types, type, setMultipleQueryParams }) => {
   return (
     <UiDialogTrigger>
       <Button
@@ -40,25 +32,16 @@ export const MobileFilters: React.FC<{
         Filter
       </Button>
       <UiModalOverlay className="p-0">
-        <UiModal
-          animateFrom="bottom"
-          className="top-36 w-full pb-26 max-w-full"
-        >
+        <UiModal animateFrom="bottom" className="top-36 w-full pb-26 max-w-full">
           <UiDialog aria-label="Filter products">
             {({ close }) => (
               <form
                 onSubmit={(event) => {
                   const formData = new FormData(event.currentTarget)
 
-                  const collection = formData
-                    .getAll("collection")
-                    .map((value) => value.toString())
-                  const category = formData
-                    .getAll("category")
-                    .map((value) => value.toString())
-                  const type = formData
-                    .getAll("type")
-                    .map((value) => value.toString())
+                  const collection = formData.getAll("collection").map((value) => value.toString())
+                  const category = formData.getAll("category").map((value) => value.toString())
+                  const type = formData.getAll("type").map((value) => value.toString())
 
                   setMultipleQueryParams({
                     collection,
@@ -75,15 +58,14 @@ export const MobileFilters: React.FC<{
                     name="collection"
                     defaultValue={collection ?? []}
                   >
-                    <ReactAria.Label id="mobile-filter-collections" className="block text-md font-semibold mb-3">
+                    <ReactAria.Label
+                      id="mobile-filter-collections"
+                      className="block text-md font-semibold mb-3"
+                    >
                       Collections
                     </ReactAria.Label>
                     {Object.entries(collections).map(([key, value]) => (
-                      <UiCheckbox
-                        key={key}
-                        value={key}
-                        className="justify-between py-3"
-                      >
+                      <UiCheckbox key={key} value={key} className="justify-between py-3">
                         <UiCheckboxLabel>{value}</UiCheckboxLabel>
                         <UiCheckboxBox>
                           <UiCheckboxIcon />
@@ -104,15 +86,14 @@ export const MobileFilters: React.FC<{
                     name="category"
                     defaultValue={category ?? []}
                   >
-                    <ReactAria.Label id="mobile-filter-categories" className="block text-md font-semibold mb-3">
+                    <ReactAria.Label
+                      id="mobile-filter-categories"
+                      className="block text-md font-semibold mb-3"
+                    >
                       Categories
                     </ReactAria.Label>
                     {Object.entries(categories).map(([key, value]) => (
-                      <UiCheckbox
-                        key={key}
-                        value={key}
-                        className="justify-between py-3"
-                      >
+                      <UiCheckbox key={key} value={key} className="justify-between py-3">
                         <UiCheckboxLabel>{value}</UiCheckboxLabel>
                         <UiCheckboxBox>
                           <UiCheckboxIcon />
@@ -124,24 +105,21 @@ export const MobileFilters: React.FC<{
                 {categories &&
                   Object.keys(categories).length > 0 &&
                   types &&
-                  Object.keys(types).length > 0 && (
-                    <hr className="my-3 text-grayscale-200" />
-                  )}
+                  Object.keys(types).length > 0 && <hr className="my-3 text-grayscale-200" />}
                 {types && Object.keys(types).length > 0 && (
                   <ReactAria.CheckboxGroup
                     className="flex flex-col"
                     name="type"
                     defaultValue={type ?? []}
                   >
-                    <ReactAria.Label id="mobile-filter-types" className="block text-md font-semibold mb-3">
+                    <ReactAria.Label
+                      id="mobile-filter-types"
+                      className="block text-md font-semibold mb-3"
+                    >
                       Types
                     </ReactAria.Label>
                     {Object.entries(types).map(([key, value]) => (
-                      <UiCheckbox
-                        key={key}
-                        value={key}
-                        className="justify-between py-3"
-                      >
+                      <UiCheckbox key={key} value={key} className="justify-between py-3">
                         <UiCheckboxLabel>{value}</UiCheckboxLabel>
                         <UiCheckboxBox>
                           <UiCheckboxIcon />

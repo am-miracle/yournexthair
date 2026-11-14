@@ -1,16 +1,16 @@
-import { Textarea, Label, clx } from '@medusajs/ui';
-import { useController, type ControllerRenderProps } from 'react-hook-form';
+import { Textarea, Label, clx } from "@medusajs/ui"
+import { useController, type ControllerRenderProps } from "react-hook-form"
 
 export interface TextareaFieldProps {
-  className?: string;
-  name: string;
-  label?: string;
-  labelProps?: React.ComponentProps<typeof Label>;
+  className?: string
+  name: string
+  label?: string
+  labelProps?: React.ComponentProps<typeof Label>
   textareaProps?: Omit<
     React.ComponentProps<typeof Textarea>,
-    'name' | 'id' | 'type' | keyof ControllerRenderProps
-  >;
-  isRequired?: boolean;
+    "name" | "id" | "type" | keyof ControllerRenderProps
+  >
+  isRequired?: boolean
 }
 
 export const TextareaField: React.FC<TextareaFieldProps> = ({
@@ -21,34 +21,28 @@ export const TextareaField: React.FC<TextareaFieldProps> = ({
   textareaProps,
   isRequired,
 }) => {
-  const { field, fieldState } = useController<{ __name__: string }, '__name__'>(
-    { name: name as '__name__' },
-  );
+  const { field, fieldState } = useController<{ __name__: string }, "__name__">({
+    name: name as "__name__",
+  })
 
   return (
     <div className={className}>
-      {typeof label !== 'undefined' && (
-        <Label
-          {...labelProps}
-          htmlFor={name}
-          className={clx('block mb-1', labelProps?.className)}
-        >
+      {typeof label !== "undefined" && (
+        <Label {...labelProps} htmlFor={name} className={clx("block mb-1", labelProps?.className)}>
           {label}
-          {isRequired ? <span className="text-red-primary">*</span> : ''}
+          {isRequired ? <span className="text-red-primary">*</span> : ""}
         </Label>
       )}
       <Textarea
         {...textareaProps}
         {...field}
-        value={field.value ?? ''}
+        value={field.value ?? ""}
         id={name}
         aria-invalid={Boolean(fieldState.error)}
       />
       {fieldState.error && (
-        <div className="text-red-primary text-sm mt-1">
-          {fieldState.error.message}
-        </div>
+        <div className="text-red-primary text-sm mt-1">{fieldState.error.message}</div>
       )}
     </div>
-  );
-};
+  )
+}

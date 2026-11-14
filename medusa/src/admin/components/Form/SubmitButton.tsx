@@ -1,10 +1,8 @@
-import { Button } from '@medusajs/ui';
-import { useFormState } from 'react-hook-form';
+import { Button } from "@medusajs/ui"
+import { useFormState } from "react-hook-form"
 
-export const SubmitButton: React.FC<React.ComponentProps<typeof Button>> = (
-  props
-) => {
-  const { isSubmitting } = useFormState();
+export const SubmitButton: React.FC<React.ComponentProps<typeof Button>> = (props) => {
+  const { isSubmitting } = useFormState()
   return (
     <Button
       {...props}
@@ -12,5 +10,5 @@ export const SubmitButton: React.FC<React.ComponentProps<typeof Button>> = (
       isLoading={Boolean(isSubmitting || props.isLoading)}
       disabled={Boolean(isSubmitting || props.disabled)}
     />
-  );
-};
+  )
+}

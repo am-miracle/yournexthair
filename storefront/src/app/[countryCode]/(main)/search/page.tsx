@@ -27,9 +27,7 @@ export default async function SearchPage({ params, searchParams }: Props) {
 
   const pageNumber = page ? parseInt(page, 10) : 1
 
-  const results = await searchClient
-    .index("products")
-    .search<MeiliSearchProductHit>(query)
+  const results = await searchClient.index("products").search<MeiliSearchProductHit>(query)
   const region = await getRegion(countryCode)
 
   return (

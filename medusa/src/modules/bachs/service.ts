@@ -32,11 +32,7 @@ import type {
 
 import * as Sentry from "@sentry/node"
 
-import {
-  BachsClient,
-  type BachsCheckoutSession,
-  resolveBachsBaseUrl,
-} from "./client"
+import { BachsClient, type BachsCheckoutSession, resolveBachsBaseUrl } from "./client"
 import { verifiedBachsEvent } from "./webhook"
 
 export type BachsOptions = {
@@ -143,7 +139,11 @@ export class BachsPaymentService extends AbstractPaymentProvider<BachsOptions> {
     return { id: sessionData.checkout_id, data: sessionData }
   }
 
-  async updatePayment({ amount, currency_code, data }: UpdatePaymentInput): Promise<UpdatePaymentOutput> {
+  async updatePayment({
+    amount,
+    currency_code,
+    data,
+  }: UpdatePaymentInput): Promise<UpdatePaymentOutput> {
     const current = data as BachsSessionData
     const nextAmount = toDecimalString(amount)
     const nextCurrency = currency_code.toUpperCase()
@@ -203,7 +203,13 @@ export class BachsPaymentService extends AbstractPaymentProvider<BachsOptions> {
   async retrievePayment({ data }: RetrievePaymentInput): Promise<RetrievePaymentOutput> {
     const sessionData = data as BachsSessionData
     const checkout = await this.client.getCheckoutSession(sessionData.checkout_id)
-    return { data: { ...sessionData, bachs_status: checkout.status, bachs_payment_status: checkout.payment_status } }
+    return {
+      data: {
+        ...sessionData,
+        bachs_status: checkout.status,
+        bachs_payment_status: checkout.payment_status,
+      },
+    }
   }
 
   async refundPayment({ amount, data }: RefundPaymentInput): Promise<RefundPaymentOutput> {

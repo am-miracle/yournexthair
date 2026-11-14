@@ -27,12 +27,7 @@ const Review = ({ cart }: { cart: StoreCart }) => {
     <>
       <div className="flex justify-between mb-6 md:mb-8 border-t border-grayscale-200 pt-8 mt-8">
         <div>
-          <p
-              className={twJoin(
-                "transition-[font-weight] duration-75",
-                isOpen && "font-semibold"
-              )}
-          >
+          <p className={twJoin("transition-[font-weight] duration-75", isOpen && "font-semibold")}>
             5. Review
           </p>
         </div>
@@ -54,11 +49,19 @@ const Review = ({ cart }: { cart: StoreCart }) => {
       {isOpen && previousStepsCompleted && (
         <>
           <p className="mb-8">
-            By placing your order, you confirm that you have read, understand and
-            accept our <LocalizedLink href="/terms-of-use" variant="underline">Terms of Use</LocalizedLink>{" "}
-            and <LocalizedLink href="/refund-policy" variant="underline">Refund Policy</LocalizedLink>,
-            and acknowledge that you have read YourNextHair&apos;s{" "}
-            <LocalizedLink href="/privacy-policy" variant="underline">Privacy Policy</LocalizedLink>.
+            By placing your order, you confirm that you have read, understand and accept our{" "}
+            <LocalizedLink href="/terms-of-use" variant="underline">
+              Terms of Use
+            </LocalizedLink>{" "}
+            and{" "}
+            <LocalizedLink href="/refund-policy" variant="underline">
+              Refund Policy
+            </LocalizedLink>
+            , and acknowledge that you have read YourNextHair&apos;s{" "}
+            <LocalizedLink href="/privacy-policy" variant="underline">
+              Privacy Policy
+            </LocalizedLink>
+            .
           </p>
           <PaymentButton
             cart={cart}

@@ -1,228 +1,218 @@
-import type { SubscriberArgs, SubscriberConfig } from '@medusajs/medusa';
-import {
-  ContainerRegistrationKeys,
-  MathBN,
-  Modules,
-} from '@medusajs/framework/utils';
-import type { OrderPlacedEmailProps } from '../modules/resend/emails/order-placed';
+import type { SubscriberArgs, SubscriberConfig } from "@medusajs/medusa"
+import { ContainerRegistrationKeys, MathBN, Modules } from "@medusajs/framework/utils"
+import type { OrderPlacedEmailProps } from "../modules/resend/emails/order-placed"
 
 type Country = {
-  iso_2: string;
-  name: string;
-  display_name: string;
-};
+  iso_2: string
+  name: string
+  display_name: string
+}
 
-type OrderForEmail = OrderPlacedEmailProps['order'];
-type AddressForEmail = NonNullable<OrderForEmail['shipping_address']>;
+type OrderForEmail = OrderPlacedEmailProps["order"]
+type AddressForEmail = NonNullable<OrderForEmail["shipping_address"]>
 
-type MathBNInput = Parameters<typeof MathBN.convert>[0];
+type MathBNInput = Parameters<typeof MathBN.convert>[0]
 
 type QueryGraphResult<T> = {
-  data: T[];
-};
+  data: T[]
+}
 
 const toNumber = (value: MathBNInput | null | undefined): number =>
-  MathBN.convert(value ?? 0).toNumber();
+  MathBN.convert(value ?? 0).toNumber()
 
 const buildVariantOptionValues = (item: {
-  variant_option_values?: Record<string, unknown>;
-  variant?: { options?: unknown[] };
+  variant_option_values?: Record<string, unknown>
+  variant?: { options?: unknown[] }
 }): Record<string, string> => {
-  if (
-    item.variant_option_values &&
-    Object.keys(item.variant_option_values).length
-  ) {
-    return Object.entries(item.variant_option_values).reduce<
-      Record<string, string>
-    >((acc, [key, value]) => {
-      if (typeof value === 'string') {
-        acc[key] = value;
-      }
-      return acc;
-    }, {});
+  if (item.variant_option_values && Object.keys(item.variant_option_values).length) {
+    return Object.entries(item.variant_option_values).reduce<Record<string, string>>(
+      (acc, [key, value]) => {
+        if (typeof value === "string") {
+          acc[key] = value
+        }
+        return acc
+      },
+      {},
+    )
   }
 
   return (
     item.variant?.options?.reduce<Record<string, string>>((acc, option) => {
-      if (!option || typeof option !== 'object') {
-        return acc;
+      if (!option || typeof option !== "object") {
+        return acc
       }
 
-      const optionRecord = option as Record<string, unknown>;
-      const optionObject = optionRecord.option;
+      const optionRecord = option as Record<string, unknown>
+      const optionObject = optionRecord.option
       const optionTitle =
-        optionObject && typeof optionObject === 'object'
+        optionObject && typeof optionObject === "object"
           ? (optionObject as Record<string, unknown>).title
-          : undefined;
-      const optionValue = optionRecord.value;
+          : undefined
+      const optionValue = optionRecord.value
 
-      if (typeof optionTitle === 'string' && typeof optionValue === 'string') {
-        acc[optionTitle] = optionValue;
+      if (typeof optionTitle === "string" && typeof optionValue === "string") {
+        acc[optionTitle] = optionValue
       }
 
-      return acc;
+      return acc
     }, {}) ?? {}
-  );
-};
+  )
+}
 
 export default async function sendOrderConfirmationHandler({
   event: { data },
   container,
 }: SubscriberArgs<{ id: string }>) {
-  const query = container.resolve(ContainerRegistrationKeys.QUERY);
-  const notificationModuleService = container.resolve(Modules.NOTIFICATION);
+  const query = container.resolve(ContainerRegistrationKeys.QUERY)
+  const notificationModuleService = container.resolve(Modules.NOTIFICATION)
 
   const orderQueryResult = (await query.graph({
-    entity: 'order',
+    entity: "order",
     fields: [
-      'id',
-      'display_id',
-      'currency_code',
-      'total',
-      'subtotal',
-      'tax_total',
-      'discount_total',
-      'discount_tax_total',
-      'original_total',
-      'original_tax_total',
-      'item_total',
-      'item_subtotal',
-      'item_tax_total',
-      'original_item_total',
-      'original_item_subtotal',
-      'original_item_tax_total',
-      'shipping_total',
-      'shipping_subtotal',
-      'shipping_tax_total',
-      'original_shipping_tax_total',
-      'original_shipping_subtotal',
-      'original_shipping_total',
-      'email',
-      'shipping_address.*',
-      'billing_address.*',
-      'customer_id',
-      'items.*',
-      'items.variant.options.value',
-      'items.variant.options.option.title',
-      'summary.*',
+      "id",
+      "display_id",
+      "currency_code",
+      "total",
+      "subtotal",
+      "tax_total",
+      "discount_total",
+      "discount_tax_total",
+      "original_total",
+      "original_tax_total",
+      "item_total",
+      "item_subtotal",
+      "item_tax_total",
+      "original_item_total",
+      "original_item_subtotal",
+      "original_item_tax_total",
+      "shipping_total",
+      "shipping_subtotal",
+      "shipping_tax_total",
+      "original_shipping_tax_total",
+      "original_shipping_subtotal",
+      "original_shipping_total",
+      "email",
+      "shipping_address.*",
+      "billing_address.*",
+      "customer_id",
+      "items.*",
+      "items.variant.options.value",
+      "items.variant.options.option.title",
+      "summary.*",
     ],
     filters: { id: data.id },
   })) as QueryGraphResult<{
-    id: string;
-    display_id: string | null;
-    currency_code: string;
-    total: MathBNInput | null;
-    subtotal: MathBNInput | null;
-    item_subtotal: MathBNInput | null;
-    item_tax_total: MathBNInput | null;
-    discount_total: MathBNInput | null;
-    discount_tax_total: MathBNInput | null;
-    shipping_tax_total: MathBNInput | null;
-    tax_total: MathBNInput | null;
-    shipping_total: MathBNInput | null;
-    shipping_subtotal: MathBNInput | null;
-    email: string | null;
+    id: string
+    display_id: string | null
+    currency_code: string
+    total: MathBNInput | null
+    subtotal: MathBNInput | null
+    item_subtotal: MathBNInput | null
+    item_tax_total: MathBNInput | null
+    discount_total: MathBNInput | null
+    discount_tax_total: MathBNInput | null
+    shipping_tax_total: MathBNInput | null
+    tax_total: MathBNInput | null
+    shipping_total: MathBNInput | null
+    shipping_subtotal: MathBNInput | null
+    email: string | null
     shipping_address:
       | ({
-          country_code?: string | null;
+          country_code?: string | null
         } & Record<string, unknown>)
-      | null;
+      | null
     billing_address:
       | ({
-          country_code?: string | null;
+          country_code?: string | null
         } & Record<string, unknown>)
-      | null;
+      | null
     items: Array<{
-      id: string;
-      quantity: MathBNInput | null;
-      total: MathBNInput | null;
-      thumbnail?: string | null;
-      product_title?: string | null;
-      variant_title?: string | null;
-      variant_option_values?: Record<string, unknown>;
+      id: string
+      quantity: MathBNInput | null
+      total: MathBNInput | null
+      thumbnail?: string | null
+      product_title?: string | null
+      variant_title?: string | null
+      variant_option_values?: Record<string, unknown>
       product: {
-        thumbnail?: string | null;
-        images?: Array<{ url?: string | null }> | null;
-      };
-      variant?: { options?: unknown[] };
-    }>;
-  }>;
-  const order = orderQueryResult.data[0];
+        thumbnail?: string | null
+        images?: Array<{ url?: string | null }> | null
+      }
+      variant?: { options?: unknown[] }
+    }>
+  }>
+  const order = orderQueryResult.data[0]
 
   if (!order || !order.email) {
-    return;
+    return
   }
 
   const countryCodes = [
     order.shipping_address?.country_code,
     order.billing_address?.country_code,
-  ].filter(Boolean);
+  ].filter(Boolean)
 
-  const countryMap: Map<string, Country> = new Map();
+  const countryMap: Map<string, Country> = new Map()
 
   if (countryCodes.length > 0) {
     const countryQueryResult = (await query.graph({
-      entity: 'country',
-      fields: ['iso_2', 'name', 'display_name'],
+      entity: "country",
+      fields: ["iso_2", "name", "display_name"],
       filters: {
         iso_2: countryCodes.filter((c): c is string => !!c),
       },
-    })) as QueryGraphResult<Country>;
-    const { data: countries } = countryQueryResult;
+    })) as QueryGraphResult<Country>
+    const { data: countries } = countryQueryResult
 
     countries.forEach((country) => {
       countryMap.set(country.iso_2, {
         iso_2: country.iso_2,
         name: country.name,
         display_name: country.display_name,
-      });
-    });
+      })
+    })
   }
 
   const getFallbackCountry = (countryCode: string): Country => ({
     iso_2: countryCode,
     name: countryCode.toUpperCase(),
     display_name: countryCode.toUpperCase(),
-  });
+  })
 
   const withCountry = (
     address: (Record<string, unknown> & { country_code?: string | null }) | null,
   ): AddressForEmail | null => {
     if (!address) {
-      return null;
+      return null
     }
 
     const country = address.country_code
       ? (countryMap.get(address.country_code) ?? getFallbackCountry(address.country_code))
-      : undefined;
+      : undefined
 
     if (!country) {
-      return address as AddressForEmail;
+      return address as AddressForEmail
     }
 
     return {
       ...address,
       country,
-    };
-  };
+    }
+  }
 
-  const shippingAddressForEmail = withCountry(order.shipping_address);
+  const shippingAddressForEmail = withCountry(order.shipping_address)
 
-  const billingAddressForEmail = withCountry(order.billing_address);
+  const billingAddressForEmail = withCountry(order.billing_address)
 
   const transformedItems = order.items.map((item) => ({
     id: item.id,
     quantity: Math.trunc(toNumber(item.quantity)),
     total: toNumber(item.total),
-    thumbnail:
-      item.thumbnail ??
-      item.product.thumbnail ??
-      item.product.images?.[0]?.url ??
-      null,
-    product_title: item.product_title ?? '',
-    variant_title: item.variant_title ?? '',
+    thumbnail: item.thumbnail ?? item.product.thumbnail ?? item.product.images?.[0]?.url ?? null,
+    product_title: item.product_title ?? "",
+    variant_title: item.variant_title ?? "",
     variant_option_values: buildVariantOptionValues(item),
-  }));
+  }))
 
   const orderForEmail = {
     ...order,
@@ -236,16 +226,16 @@ export default async function sendOrderConfirmationHandler({
     shipping_address: shippingAddressForEmail,
     billing_address: billingAddressForEmail,
     items: transformedItems,
-  };
+  }
 
   await notificationModuleService.createNotifications({
     to: order.email,
-    channel: 'email',
-    template: 'order-placed',
+    channel: "email",
+    template: "order-placed",
     data: { order: orderForEmail } satisfies OrderPlacedEmailProps,
-  });
+  })
 }
 
 export const config: SubscriberConfig = {
-  event: 'order.placed',
-};
+  event: "order.placed",
+}

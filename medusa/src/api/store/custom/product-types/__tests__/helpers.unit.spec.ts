@@ -41,12 +41,7 @@ describe("product type helpers", () => {
     })
 
     await expect(
-      listProductTypes(
-        createScope(graph),
-        { q: "wig" },
-        ["id", "value"],
-        { limit: 20, offset: 0 },
-      ),
+      listProductTypes(createScope(graph), { q: "wig" }, ["id", "value"], { limit: 20, offset: 0 }),
     ).resolves.toEqual({
       productTypes: [{ id: "pt_123" }],
       metadata: { count: 1, skip: 0, take: 20 },

@@ -22,9 +22,7 @@ const PaymentContainer: React.FC<PaymentContainerProps> = ({
       className="gap-4"
     >
       <UiRadioBox />
-      <UiRadioLabel>
-        {paymentInfoMap[paymentProviderId]?.title || paymentProviderId}
-      </UiRadioLabel>
+      <UiRadioLabel>{paymentInfoMap[paymentProviderId]?.title || paymentProviderId}</UiRadioLabel>
       <span className="ml-auto group-data-[selected=true]:font-normal">
         {paymentInfoMap[paymentProviderId]?.icon}
       </span>

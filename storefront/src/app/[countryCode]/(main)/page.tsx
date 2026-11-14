@@ -34,10 +34,7 @@ const ProductTypesSection: React.FC = async () => {
         <div className="grid grid-cols-1 items-start gap-x-3 gap-y-8 sm:grid-cols-2 md:gap-x-10 md:gap-y-12 lg:grid-cols-4">
           {productTypes.productTypes.map((productType, index) => (
             <div key={productType.id} className="min-w-0">
-              <LocalizedLink
-                href={`/store?type=${productType.value}`}
-                className="group block"
-              >
+              <LocalizedLink href={`/store?type=${productType.value}`} className="group block">
                 {typeof productType.metadata?.image === "object" &&
                   productType.metadata.image &&
                   "url" in productType.metadata.image &&
@@ -79,7 +76,9 @@ const ProductTypesSection: React.FC = async () => {
 }
 
 async function ProductsSection({ countryCode }: { countryCode: string }) {
-  const { response: { products } } = await getProductsList({
+  const {
+    response: { products },
+  } = await getProductsList({
     countryCode,
     queryParams: { limit: 6 },
   })
@@ -91,7 +90,9 @@ async function ProductsSection({ countryCode }: { countryCode: string }) {
       <LayoutColumn className="col-span-full">
         <div className="flex items-center justify-between gap-4">
           <h2 className="text-md md:text-2xl">Shop our hair</h2>
-          <LocalizedLink href="/store" variant="underline">View all</LocalizedLink>
+          <LocalizedLink href="/store" variant="underline">
+            View all
+          </LocalizedLink>
         </div>
       </LayoutColumn>
       {products.map((product) => (
@@ -132,9 +133,9 @@ export default async function Home({ params }: { params: Promise<{ countryCode: 
             Welcome to YourNextHair.
           </h1>
           <p className="mt-4 max-w-2xl text-sm leading-relaxed text-white/95 sm:text-base md:mt-6 md:text-md">
-            We offer our clients high end exclusive raw hair and premium virgin hair extensions and wigs.
-            Our commitment to sourcing the best quality of hair is unwavering and known to last for years
-            with proper maintenance.
+            We offer our clients high end exclusive raw hair and premium virgin hair extensions and
+            wigs. Our commitment to sourcing the best quality of hair is unwavering and known to
+            last for years with proper maintenance.
           </p>
           <LocalizedLink
             href="/store"
@@ -161,16 +162,20 @@ export default async function Home({ params }: { params: Promise<{ countryCode: 
           </LayoutColumn>
           <LayoutColumn start={1} end={{ base: 13, md: 7 }}>
             <h2 className="text-md md:text-2xl">
-              At YourNextHair, we believe every woman deserves to look and feel like the queen she is.
+              At YourNextHair, we believe every woman deserves to look and feel like the queen she
+              is.
             </h2>
           </LayoutColumn>
           <LayoutColumn start={{ base: 1, md: 8 }} end={13} className="mt-6 md:mt-19">
             <div className="md:text-md">
               <p className="mb-5 md:mb-9">
                 Our extensions are meticulously made by skillful artisans for durability, comfort,
-                and flexibility — so you can switch up your style with ease, and enjoy ultimate luxury.
+                and flexibility — so you can switch up your style with ease, and enjoy ultimate
+                luxury.
               </p>
-              <p className="mb-5 md:mb-3">Because for us, hair isn&apos;t just hair. It&apos;s how you show up.</p>
+              <p className="mb-5 md:mb-3">
+                Because for us, hair isn&apos;t just hair. It&apos;s how you show up.
+              </p>
               <LocalizedLink href="/about" variant="underline">
                 Learn more about YourNextHair
               </LocalizedLink>
@@ -198,8 +203,8 @@ export default async function Home({ params }: { params: Promise<{ countryCode: 
                 <h3 className="mb-3 text-sm font-medium">In-stock orders</h3>
                 <p className="mb-4 text-md font-semibold text-accent">10 business days</p>
                 <p className="text-base leading-relaxed text-grayscale-700">
-                  When an extension or wig is purchased, this allows our team to create your wig
-                  or wash your bundles.
+                  When an extension or wig is purchased, this allows our team to create your wig or
+                  wash your bundles.
                 </p>
               </div>
               <div className="rounded-2xl border border-accent/15 bg-white/80 p-6 md:p-8">

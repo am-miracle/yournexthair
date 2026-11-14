@@ -54,12 +54,7 @@ const Addresses = ({ cart }: { cart: StoreCart }) => {
     <>
       <div className="flex justify-between mb-6 md:mb-8 border-t border-grayscale-200 pt-8 mt-8">
         <div>
-          <h2
-              className={twJoin(
-                "transition-[font-weight] duration-75",
-                isOpen && "font-semibold"
-              )}
-          >
+          <h2 className={twJoin("transition-[font-weight] duration-75", isOpen && "font-semibold")}>
             2. Delivery details
           </h2>
         </div>
@@ -130,8 +125,7 @@ const Addresses = ({ cart }: { cart: StoreCart }) => {
           {({ watch }) => {
             const shippingData = watch("shipping_address")
             const isDisabled =
-              !customer?.addresses?.length &&
-              !Object.values(shippingData).some((value) => value)
+              !customer?.addresses?.length && !Object.values(shippingData).some((value) => value)
             return (
               <>
                 <ShippingAddress
@@ -141,15 +135,9 @@ const Addresses = ({ cart }: { cart: StoreCart }) => {
                   cart={cart}
                 />
 
-                {!sameAsBilling && (
-                  <BillingAddress cart={cart} customer={customer || null} />
-                )}
+                {!sameAsBilling && <BillingAddress cart={cart} customer={customer || null} />}
 
-                <SubmitButton
-                  className="mt-8"
-                  isLoading={isPending}
-                  isDisabled={isDisabled}
-                >
+                <SubmitButton className="mt-8" isLoading={isPending} isDisabled={isDisabled}>
                   Next
                 </SubmitButton>
                 <ErrorMessage {...withDefinedProp("error", data?.error)} />
@@ -162,17 +150,11 @@ const Addresses = ({ cart }: { cart: StoreCart }) => {
           <div className="grid gap-2 md:grid-cols-[minmax(0,10rem)_1fr] md:gap-4">
             <div className="text-grayscale-500">Shipping address</div>
             <div className="text-grayscale-600">
-              {[
-                cart.shipping_address.first_name,
-                cart.shipping_address.last_name,
-              ]
+              {[cart.shipping_address.first_name, cart.shipping_address.last_name]
                 .filter(Boolean)
                 .join(" ")}
               <br />
-              {[
-                cart.shipping_address.address_1,
-                cart.shipping_address.address_2,
-              ]
+              {[cart.shipping_address.address_1, cart.shipping_address.address_2]
                 .filter(Boolean)
                 .join(" ")}
               <br />
@@ -193,24 +175,15 @@ const Addresses = ({ cart }: { cart: StoreCart }) => {
                   "Same as shipping address"
                 ) : (
                   <>
-                    {[
-                      cart.billing_address?.first_name,
-                      cart.billing_address?.last_name,
-                    ]
+                    {[cart.billing_address?.first_name, cart.billing_address?.last_name]
                       .filter(Boolean)
                       .join(" ")}
                     <br />
-                    {[
-                      cart.billing_address?.address_1,
-                      cart.billing_address?.address_2,
-                    ]
+                    {[cart.billing_address?.address_1, cart.billing_address?.address_2]
                       .filter(Boolean)
                       .join(" ")}
                     <br />
-                    {[
-                      cart.billing_address?.postal_code,
-                      cart.billing_address?.city,
-                    ]
+                    {[cart.billing_address?.postal_code, cart.billing_address?.city]
                       .filter(Boolean)
                       .join(" ")}
                     <br />
