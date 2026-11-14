@@ -62,7 +62,7 @@ jobs:
     steps:
       - name: Generate test secrets
         run: |
-          for name in JWT_SECRET COOKIE_SECRET STOREFRONT_REVALIDATE_SECRET; do
+          for name in JWT_SECRET COOKIE_SECRET STOREFRONT_REVALIDATE_SECRET RECEIPT_ACCESS_SECRET; do
             value=$(openssl rand -hex 32)
             echo "::add-mask::$value"
             echo "$name=$value" >> "$GITHUB_ENV"
