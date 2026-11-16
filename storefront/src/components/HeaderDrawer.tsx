@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { HAIR_CONSULTATION_WHATSAPP_URL } from "@lib/consultation"
 import { Button } from "@/components/Button"
 import { Icon } from "@/components/Icon"
 import { Drawer } from "@/components/Drawer"
@@ -61,27 +62,16 @@ export const HeaderDrawer: React.FC<{
                 >
                   Shop
                 </LocalizedLink>
-                <LocalizedLink
-                  href="/inspiration"
+                <a
+                  href={HAIR_CONSULTATION_WHATSAPP_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Book a hair consultation on WhatsApp (opens in a new tab)"
                   className="border-b border-grayscale-200 py-5"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  Hair Guide
-                </LocalizedLink>
-                <LocalizedLink
-                  href="/services"
-                  className="border-b border-grayscale-200 py-5"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Services
-                </LocalizedLink>
-                <LocalizedLink
-                  href="/about"
-                  className="border-b border-grayscale-200 py-5"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  About
-                </LocalizedLink>
+                  Book a hair consultation
+                </a>
               </div>
               <div className="mt-auto border-t border-grayscale-200 px-6 py-5">
                 <RegionSwitcher

@@ -230,6 +230,7 @@ repository change does not delete cloud resources.
   Changing env vars alone does not add it to existing regions. Remove manual/test
   payment providers from production regions before accepting customer orders.
 - Email: `RESEND_API_KEY`, `RESEND_FROM` using your client's verified sender.
+- Custom-order alerts: `CUSTOM_REQUEST_NOTIFY_EMAIL` (comma-separated). Without it, new requests only appear under **Custom orders** in Admin.
   Without a key, notifications use the local logging provider, not real email.
 - Shipping: `DHL_API_USERNAME`, `DHL_API_PASSWORD`, `DHL_ACCOUNT_NUMBER`, then follow
   `medusa/src/modules/dhl-shipping/README.md`. There are no invented weights.

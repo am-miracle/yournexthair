@@ -11,6 +11,15 @@ const storefrontUrl = process.env.NEXT_PUBLIC_BASE_URL
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  redirects() {
+    return Promise.resolve([
+      {
+        source: "/:countryCode/services",
+        destination: "/:countryCode#hair-consultation",
+        permanent: true,
+      },
+    ])
+  },
   experimental: {
     staticGenerationRetryCount: 3,
   },

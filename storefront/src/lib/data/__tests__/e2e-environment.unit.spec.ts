@@ -33,7 +33,7 @@ it("generates a shared receipt credential that lets the E2E guest create a cart"
   try {
     const envFile = join(directory, "github-env")
     execFileSync("bash", ["-e", "-c", script], {
-      env: { PATH: process.env.PATH, GITHUB_ENV: envFile },
+      env: { NODE_ENV: "test", PATH: process.env.PATH, GITHUB_ENV: envFile },
       stdio: "pipe",
     })
     const generated = Object.fromEntries(

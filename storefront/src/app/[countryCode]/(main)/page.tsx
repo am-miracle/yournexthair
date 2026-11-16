@@ -6,9 +6,10 @@ import { getProductsList } from "@lib/data/products"
 import ProductPreview from "@modules/products/components/product-preview"
 import { SITE_DESCRIPTION, getCanonicalPath } from "@lib/util/seo"
 import { Layout, LayoutColumn } from "@/components/Layout"
-import { LocalizedLink } from "@/components/LocalizedLink"
+import { LocalizedButtonLink, LocalizedLink } from "@/components/LocalizedLink"
 import { CollectionsSection } from "@/components/CollectionsSection"
 import { Icon } from "@/components/Icon"
+import { HairConsultation } from "@/components/HairConsultation"
 
 export const metadata: Metadata = {
   title: "Raw & Virgin Hair Extensions and Wigs",
@@ -130,7 +131,7 @@ export default async function Home({ params }: { params: Promise<{ countryCode: 
         <div className="absolute inset-0 bg-linear-to-t from-black/75 via-black/30 to-transparent" />
         <div className="absolute bottom-8 left-0 right-0 px-4 sm:px-6 md:bottom-10 md:px-16 lg:px-24">
           <h1 className="max-w-2xl text-3xl font-medium leading-tight text-white sm:text-4xl md:text-5xl lg:text-6xl">
-            Welcome to YourNextHair.
+            Welcome to Your Next Hair.
           </h1>
           <p className="mt-4 max-w-2xl text-sm leading-relaxed text-white/95 sm:text-base md:mt-6 md:text-md">
             We offer our clients high end exclusive raw hair and premium virgin hair extensions and
@@ -145,13 +146,14 @@ export default async function Home({ params }: { params: Promise<{ countryCode: 
           </LocalizedLink>
         </div>
       </div>
+      <HairConsultation />
       <div className="pt-8 pb-26 md:pt-26 md:pb-36">
         <ProductTypesSection />
         <ProductsSection countryCode={countryCode} />
         <CollectionsSection className="mb-22 md:mb-36" />
         <Layout>
           <LayoutColumn className="col-span-full">
-            <h3 className="text-md md:text-2xl mb-8 md:mb-16">About YourNextHair</h3>
+            <h3 className="text-md md:text-2xl mb-8 md:mb-16">About Your Next Hair</h3>
             <Image
               src="/images/content/wigstore.jpg"
               width={2496}
@@ -162,7 +164,7 @@ export default async function Home({ params }: { params: Promise<{ countryCode: 
           </LayoutColumn>
           <LayoutColumn start={1} end={{ base: 13, md: 7 }}>
             <h2 className="text-md md:text-2xl">
-              At YourNextHair, we believe every woman deserves to look and feel like the queen she
+              At Your Next Hair, we believe every woman deserves to look and feel like the queen she
               is.
             </h2>
           </LayoutColumn>
@@ -176,9 +178,6 @@ export default async function Home({ params }: { params: Promise<{ countryCode: 
               <p className="mb-5 md:mb-3">
                 Because for us, hair isn&apos;t just hair. It&apos;s how you show up.
               </p>
-              <LocalizedLink href="/about" variant="underline">
-                Learn more about YourNextHair
-              </LocalizedLink>
             </div>
           </LayoutColumn>
         </Layout>
@@ -200,27 +199,36 @@ export default async function Home({ params }: { params: Promise<{ countryCode: 
             </p>
             <div className="grid gap-5 md:grid-cols-3 md:gap-8">
               <div className="rounded-2xl border border-accent/15 bg-white/80 p-6 md:p-8">
-                <h3 className="mb-3 text-sm font-medium">In-stock orders</h3>
-                <p className="mb-4 text-md font-semibold text-accent">10 business days</p>
+                <h3 className="mb-3 text-sm font-medium">In stock</h3>
                 <p className="text-base leading-relaxed text-grayscale-700">
-                  When an extension or wig is purchased, this allows our team to create your wig or
-                  wash your bundles.
+                  Your next hair Wig is made to order with the purpose of fulfilling the
+                  customer&apos;s requirements. When a product is purchased it will follow our
+                  standard time frame of 10 - 15 Business Days allowing our team create your wig for
+                  you.
                 </p>
               </div>
               <div className="rounded-2xl border border-accent/15 bg-white/80 p-6 md:p-8">
                 <h3 className="mb-3 text-sm font-medium">Custom premium virgin hair</h3>
-                <p className="mb-4 text-md font-semibold text-accent">6 weeks</p>
                 <p className="text-base leading-relaxed text-grayscale-700">
-                  Time to source your premium virgin hair and customize it to your specifications.
+                  Custom order for our premium virgin hair will follow our standard time frame of
+                  6-7 weeks allowing our team create your custom wig for you.
                 </p>
               </div>
               <div className="rounded-2xl border border-accent/15 bg-white/80 p-6 md:p-8">
                 <h3 className="mb-3 text-sm font-medium">Custom raw hair</h3>
-                <p className="mb-4 text-md font-semibold text-accent">9–12 weeks</p>
                 <p className="text-base leading-relaxed text-grayscale-700">
-                  Time to source your raw hair and customize it to your specifications.
+                  Custom order for our Raw hair will follow our standard time frame of 9 -12 weeks
+                  allowing our team create your custom wig for you.
                 </p>
               </div>
+            </div>
+            <div className="mt-10 flex flex-col items-center gap-3 text-center md:mt-14">
+              <LocalizedButtonLink href="/custom-order" className="w-full rounded-full sm:w-auto">
+                Request a custom order
+              </LocalizedButtonLink>
+              <p className="text-xs text-grayscale-600">
+                Tell us what you want and we’ll send you a quote on WhatsApp.
+              </p>
             </div>
           </LayoutColumn>
         </Layout>

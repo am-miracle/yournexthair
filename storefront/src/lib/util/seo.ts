@@ -1,6 +1,6 @@
 import { getBaseURL } from "@lib/util/env"
 
-export const SITE_NAME = "YourNextHair"
+export const SITE_NAME = "Your Next Hair"
 export const SITE_DESCRIPTION =
   "Raw and virgin donor hair extensions and wigs shipped nationwide and worldwide."
 export const PRIMARY_COUNTRY_CODE = "ng"

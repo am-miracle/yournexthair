@@ -9,12 +9,7 @@ export const HeaderWrapper: React.FC<{ children?: React.ReactNode }> = ({ childr
   const countryCode = useCountryCode()
   const currentPath = countryCode ? (pathName.split(`/${countryCode}`)[1] ?? "/") : pathName
   const isPageWithHeroImage =
-    !currentPath ||
-    currentPath === "/" ||
-    currentPath === "/about" ||
-    currentPath === "/inspiration" ||
-    currentPath === "/services" ||
-    currentPath.startsWith("/collections")
+    !currentPath || currentPath === "/" || currentPath.startsWith("/collections")
   const isAlwaysSticky = currentPath.startsWith("/auth") || currentPath.startsWith("/account")
 
   React.useEffect(() => {

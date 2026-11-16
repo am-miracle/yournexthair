@@ -32,11 +32,11 @@ export default async function RegisterPage({
         src="/images/content/short-wig.jpg"
         width={1440}
         height={1632}
-        alt="YourNextHair"
+        alt="Your Next Hair"
         className="max-lg:hidden lg:w-1/2 shrink-0 object-cover"
       />
       <div className="shrink-0 max-w-100 lg:max-w-96 w-full mx-auto pt-30 lg:pt-37 pb-16 max-sm:px-4">
-        <h1 className="text-xl md:text-2xl mb-10 md:mb-16">Hey, welcome to YourNextHair!</h1>
+        <h1 className="text-xl md:text-2xl mb-10 md:mb-16">Hey, welcome to Your Next Hair!</h1>
         <SignUpForm />
         <p className="text-grayscale-500">
           Already have an account? No worries, just{" "}

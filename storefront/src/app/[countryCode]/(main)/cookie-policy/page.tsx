@@ -5,7 +5,7 @@ import { getCanonicalPath } from "@lib/util/seo"
 
 export const metadata: Metadata = {
   title: "Cookie Policy",
-  description: "Learn how YourNextHair uses cookies and similar technologies.",
+  description: "Learn how Your Next Hair uses cookies and similar technologies.",
   alternates: {
     canonical: getCanonicalPath("/cookie-policy"),
   },
@@ -25,7 +25,7 @@ export default function CookiePolicyPage() {
   return (
     <Layout className="pt-30 pb-20 md:pt-47 md:pb-32">
       <LayoutColumn start={{ base: 1, lg: 2, xl: 3 }} end={{ base: 13, lg: 11, xl: 10 }}>
-        <h1 className="text-lg md:text-2xl mb-16 md:mb-25">Cookie Policy for YourNextHair</h1>
+        <h1 className="text-lg md:text-2xl mb-16 md:mb-25">Cookie Policy for Your Next Hair</h1>
       </LayoutColumn>
       <LayoutColumn
         start={{ base: 1, lg: 2, xl: 3 }}
@@ -58,8 +58,8 @@ export default function CookiePolicyPage() {
           </ol>
         </nav>
         <p>
-          This Cookie Policy explains how YourNextHair uses cookies and similar technologies on our
-          website. By using our website, you consent to the use of cookies as described in this
+          This Cookie Policy explains how Your Next Hair uses cookies and similar technologies on
+          our website. By using our website, you consent to the use of cookies as described in this
           policy.
         </p>
         <h2 id="cookie-what">1. What Are Cookies</h2>
@@ -131,7 +131,7 @@ export default function CookiePolicyPage() {
               href="https://api.whatsapp.com/send?phone=2348156197614"
               target="_blank"
               rel="noopener noreferrer"
-              aria-label="Chat with YourNextHair on WhatsApp (opens in a new tab)"
+              aria-label="Chat with Your Next Hair on WhatsApp (opens in a new tab)"
             >
               +234 815 619 7614
             </a>

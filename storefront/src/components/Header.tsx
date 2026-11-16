@@ -1,4 +1,5 @@
 import * as React from "react"
+import { HAIR_CONSULTATION_WHATSAPP_URL } from "@lib/consultation"
 import { BrandLogo } from "@/components/BrandLogo"
 import { listRegions } from "@lib/data/regions"
 import { SearchField } from "@/components/SearchField"
@@ -52,15 +53,15 @@ export const Header: React.FC = async () => {
                 aria-label="Primary"
                 className="hidden items-center rounded-full border border-transparent bg-white/0 p-1 transition-colors md:flex group-data-[light=true]:md:border-white/25 group-data-[light=true]:md:bg-white/10 group-data-[sticky=true]:md:border-grayscale-200 group-data-[sticky=true]:md:bg-grayscale-50"
               >
-                <LocalizedLink href="/about" className={navLinkClass}>
-                  About
-                </LocalizedLink>
-                <LocalizedLink href="/inspiration" className={navLinkClass}>
-                  Hair Guide
-                </LocalizedLink>
-                <LocalizedLink href="/services" className={navLinkClass}>
-                  Services
-                </LocalizedLink>
+                <a
+                  href={HAIR_CONSULTATION_WHATSAPP_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Book a hair consultation on WhatsApp (opens in a new tab)"
+                  className={navLinkClass}
+                >
+                  Consultation
+                </a>
                 <LocalizedLink href="/store" className={navLinkClass}>
                   Shop
                 </LocalizedLink>

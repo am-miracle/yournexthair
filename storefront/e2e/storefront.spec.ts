@@ -6,7 +6,7 @@ import { addFirstProductToCart, COUNTRY } from "./helpers"
 
 test("home and store pages load", async ({ page }) => {
   await page.goto(`/${COUNTRY}`)
-  await expect(page.getByRole("link", { name: "YourNextHair" }).first()).toBeVisible()
+  await expect(page.getByRole("link", { name: "Your Next Hair" }).first()).toBeVisible()
 
   await page.goto(`/${COUNTRY}/store`)
   await expect(page.locator(`a[href*="/${COUNTRY}/products/"]`).first()).toBeVisible()

@@ -30,7 +30,7 @@ export async function validatePublishHairFields(
   if (!productForm) return next()
 
   // Merge incoming metadata with current so a same-request metadata + publish works
-  const currentMeta = (product.metadata ?? {}) as Record<string, unknown>
+  const currentMeta = product.metadata ?? {}
   const incomingMeta =
     typeof body.metadata === "object" && body.metadata !== null
       ? (body.metadata as Record<string, unknown>)

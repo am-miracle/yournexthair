@@ -24,7 +24,7 @@ export default function PrivacyPolicyPage() {
   return (
     <Layout className="pt-30 pb-20 md:pt-47 md:pb-32">
       <LayoutColumn start={{ base: 1, lg: 2, xl: 3 }} end={{ base: 13, lg: 11, xl: 10 }}>
-        <h1 className="text-lg md:text-2xl mb-16 md:mb-25">Privacy Policy for YourNextHair</h1>
+        <h1 className="text-lg md:text-2xl mb-16 md:mb-25">Privacy Policy for Your Next Hair</h1>
       </LayoutColumn>
       <LayoutColumn
         start={{ base: 1, lg: 2, xl: 3 }}
@@ -66,7 +66,7 @@ export default function PrivacyPolicyPage() {
           </ol>
         </nav>
         <p>
-          At YourNextHair, we value your privacy and are committed to protecting your personal
+          At Your Next Hair, we value your privacy and are committed to protecting your personal
           information. This Privacy Policy outlines how we collect, use, disclose, and safeguard
           your data when you interact with our website, services, and products. By using our
           platform, you consent to the practices described in this policy.
@@ -166,7 +166,7 @@ export default function PrivacyPolicyPage() {
               href="https://api.whatsapp.com/send?phone=2348156197614"
               target="_blank"
               rel="noopener noreferrer"
-              aria-label="Chat with YourNextHair on WhatsApp (opens in a new tab)"
+              aria-label="Chat with Your Next Hair on WhatsApp (opens in a new tab)"
             >
               +234 815 619 7614
             </a>

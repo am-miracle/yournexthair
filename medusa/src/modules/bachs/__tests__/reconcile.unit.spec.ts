@@ -37,7 +37,7 @@ function setup() {
     metadata: { keep: "existing" },
   } as unknown as PaymentSessionDTO
   const retrievePaymentSession = jest.fn().mockImplementation(() => Promise.resolve(session))
-  const updatePaymentSession = jest.fn().mockImplementation((update: UpdatePaymentSessionDTO) => {
+  const updatePaymentSession = jest.fn((update: UpdatePaymentSessionDTO) => {
     session = {
       ...session,
       ...(update.status ? { status: update.status } : {}),
@@ -168,7 +168,7 @@ describe("Bachs outcome reconciliation", () => {
       test.setSession({ status: "captured" })
       test.getRefund.mockResolvedValue({ refund_id: "ref_1", charge_id: "pay_1", status })
       await test.run(signed("refund.paid", { refund_id: "ref_1" }))
-      const update = test.updatePaymentSession.mock.calls[0]![0] as UpdatePaymentSessionDTO
+      const update = test.updatePaymentSession.mock.calls[0]![0]
       expect(update.status).toBe("captured")
       expect(update.metadata?.bachs_refunds).toMatchObject({
         ref_1: { refund_id: "ref_1", status },
@@ -206,7 +206,7 @@ describe("Bachs outcome reconciliation", () => {
     await test.run(signed("refund.paid", { refund_id: "ref_1" }))
     test.getRefund.mockResolvedValue({ refund_id: "ref_2", charge_id: "pay_1", status: "failed" })
     await test.run(signed("refund.failed", { refund_id: "ref_2" }))
-    const update = test.updatePaymentSession.mock.calls[1]![0] as UpdatePaymentSessionDTO
+    const update = test.updatePaymentSession.mock.calls[1]![0]
     expect(update.metadata?.bachs_refunds).toMatchObject({
       ref_1: { status: "success" },
       ref_2: { status: "failed" },

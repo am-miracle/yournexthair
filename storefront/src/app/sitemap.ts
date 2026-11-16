@@ -6,9 +6,8 @@ import { getCanonicalUrl } from "@lib/util/seo"
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes = [
     "/",
-    "/about",
-    "/inspiration",
     "/store",
+    "/custom-order",
     "/privacy-policy",
     "/refund-policy",
     "/cookie-policy",

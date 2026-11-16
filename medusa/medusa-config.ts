@@ -114,6 +114,7 @@ module.exports = defineConfig({
   },
   modules: [
     { resolve: "./src/modules/dhl-operations" },
+    { resolve: "./src/modules/custom-requests" },
     {
       resolve: "@medusajs/medusa/fulfillment",
       options: {

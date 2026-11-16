@@ -100,6 +100,24 @@ const renderTemplate = (
         <Template {...layoutOptions} {...(data as EmailTemplatePropsMap["auth-forgot-password"])} />
       )
     }
+    case "custom-request-received": {
+      const Template = emails["custom-request-received"]
+      return (
+        <Template
+          {...layoutOptions}
+          {...(data as EmailTemplatePropsMap["custom-request-received"])}
+        />
+      )
+    }
+    case "custom-request-confirmation": {
+      const Template = emails["custom-request-confirmation"]
+      return (
+        <Template
+          {...layoutOptions}
+          {...(data as EmailTemplatePropsMap["custom-request-confirmation"])}
+        />
+      )
+    }
   }
 }
 

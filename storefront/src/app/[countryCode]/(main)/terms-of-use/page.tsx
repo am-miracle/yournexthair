@@ -24,7 +24,7 @@ export default function TermsOfUsePage() {
   return (
     <Layout className="pt-30 pb-20 md:pt-47 md:pb-32">
       <LayoutColumn start={{ base: 1, lg: 2, xl: 3 }} end={{ base: 13, lg: 11, xl: 10 }}>
-        <h1 className="text-lg md:text-2xl mb-16 md:mb-25">Terms of Use for YourNextHair</h1>
+        <h1 className="text-lg md:text-2xl mb-16 md:mb-25">Terms of Use for Your Next Hair</h1>
       </LayoutColumn>
       <LayoutColumn
         start={{ base: 1, lg: 2, xl: 3 }}
@@ -63,15 +63,15 @@ export default function TermsOfUsePage() {
           </ol>
         </nav>
         <p>
-          Welcome to YourNextHair. These Terms of Use govern your access to and use of our website,
-          products, and services. By accessing or using our platform, you agree to be bound by these
-          terms and conditions. If you do not agree with any part of these terms, please do not use
-          our website.
+          Welcome to Your Next Hair. These Terms of Use govern your access to and use of our
+          website, products, and services. By accessing or using our platform, you agree to be bound
+          by these terms and conditions. If you do not agree with any part of these terms, please do
+          not use our website.
         </p>
         <h2 id="terms-content">1. Ownership of Content</h2>
         <p>
           All content and materials on our website, including text, graphics, logos, images, videos,
-          and trademarks, are the property of YourNextHair or its licensors and are protected by
+          and trademarks, are the property of Your Next Hair or its licensors and are protected by
           intellectual property laws. You may not use, reproduce, modify, or distribute any of our
           content without our prior written permission.
         </p>
@@ -119,14 +119,14 @@ export default function TermsOfUsePage() {
         </p>
         <h2 id="terms-liability">5. Limitation of Liability</h2>
         <p>
-          To the maximum extent permitted by law, YourNextHair and its affiliates, officers,
+          To the maximum extent permitted by law, Your Next Hair and its affiliates, officers,
           directors, employees, and agents shall not be liable for any direct, indirect, incidental,
           consequential, or special damages arising out of or in connection with your use of our
           website, even if advised of the possibility of such damages.
         </p>
         <h2 id="terms-indemnification">6. Indemnification</h2>
         <p>
-          You agree to indemnify, defend, and hold harmless YourNextHair and its affiliates,
+          You agree to indemnify, defend, and hold harmless Your Next Hair and its affiliates,
           officers, directors, employees, and agents from and against any claims, liabilities,
           damages, losses, and expenses, including reasonable attorney&apos;s fees, arising out of
           or in connection with your use of our website or violation of these Terms of Use.

@@ -57,7 +57,7 @@ const Review = ({ cart }: { cart: StoreCart }) => {
             <LocalizedLink href="/refund-policy" variant="underline">
               Refund Policy
             </LocalizedLink>
-            , and acknowledge that you have read YourNextHair&apos;s{" "}
+            , and acknowledge that you have read Your Next Hair&apos;s{" "}
             <LocalizedLink href="/privacy-policy" variant="underline">
               Privacy Policy
             </LocalizedLink>

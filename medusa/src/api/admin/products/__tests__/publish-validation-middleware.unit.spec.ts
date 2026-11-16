@@ -4,15 +4,19 @@ const createNext = () => jest.fn()
 
 const createReq = ({
   id = "prod_123",
-  body = {} as Record<string, unknown>,
-  product = {} as Record<string, unknown>,
+  body = {},
+  product = {},
+}: {
+  id?: string
+  body?: Record<string, unknown>
+  product?: Record<string, unknown>
 } = {}) => ({
   params: { id },
   body,
   scope: {
-    resolve: jest.fn().mockReturnValue({
+    resolve: jest.fn(() => ({
       retrieveProduct: jest.fn().mockResolvedValue(product),
-    }),
+    })),
   },
 })
 

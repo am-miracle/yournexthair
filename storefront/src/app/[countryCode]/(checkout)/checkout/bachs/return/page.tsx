@@ -27,7 +27,7 @@ export default async function BachsReturnPage({
           us before attempting another payment.
         </p>
         <a href="mailto:yournexthair@gmail.com" className="text-accent underline">
-          Contact YourNextHair
+          Contact Your Next Hair
         </a>
       </div>
     )

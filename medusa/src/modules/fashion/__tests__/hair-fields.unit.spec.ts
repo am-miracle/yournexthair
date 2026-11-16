@@ -153,11 +153,9 @@ describe("getMissingPublishFields", () => {
     it("returns ValidationError objects with correct shape", () => {
       const missing = getMissingPublishFields({}, form)
       for (const err of missing) {
-        expect(err).toMatchObject({
-          field: expect.any(String),
-          label: expect.any(String),
-          rule: "required",
-        })
+        expect(err.field).toEqual(expect.any(String))
+        expect(err.label).toEqual(expect.any(String))
+        expect(err.rule).toBe("required")
       }
     })
   })
