@@ -2,6 +2,7 @@
 
 import { getCheckoutKey } from "@lib/util/checkout-key"
 
+import { FetchError } from "@medusajs/js-sdk"
 import { HttpTypes } from "@medusajs/types"
 import { revalidateTag, updateTag } from "next/cache"
 import { redirect } from "next/navigation"
@@ -20,8 +21,12 @@ import {
 import { getRegion } from "@lib/data/regions"
 import { addressesFormSchema } from "@/hooks/cart"
 
+type AddressesFormValues = z.infer<typeof addressesFormSchema>
+
 const normalizeAddress = (
-  address: z.infer<typeof addressesFormSchema>["shipping_address"],
+  address:
+    | AddressesFormValues["shipping_address"]
+    | Extract<AddressesFormValues, { billing_address: unknown }>["billing_address"],
 ): HttpTypes.StoreAddAddress => ({
   first_name: address.first_name,
   last_name: address.last_name,
@@ -47,8 +52,13 @@ export async function retrieveCart() {
       cache: "no-store",
     })
     .then(({ cart }) => cart)
-    .catch(() => {
-      return null
+    .catch(async (error: unknown) => {
+      // Only a 404 means the cart is gone; anything else must not let callers replace the cookie.
+      if (error instanceof FetchError && error.status === 404) {
+        await removeCartId().catch(() => undefined)
+        return null
+      }
+      throw error
     })
 
   if (cart?.completed_at) {
@@ -64,7 +74,7 @@ export async function retrieveCart() {
 }
 
 export async function getCartQuantity() {
-  const cart = await retrieveCart()
+  const cart = await retrieveCart().catch(() => null)
 
   if (!cart || !cart.items || !cart.items.length) {
     return 0

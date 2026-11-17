@@ -80,6 +80,7 @@ const BillingAddress = ({
         first_name: address?.first_name || "",
         last_name: address?.last_name || "",
         address_1: address?.address_1 || "",
+        address_2: address?.address_2 || "",
         company: address?.company || "",
         postal_code: address?.postal_code || "",
         city: address?.city || "",
@@ -144,6 +145,20 @@ const BillingAddress = ({
             <address className="flex flex-col gap-8 flex-1 not-italic">
               <div className="flex flex-wrap justify-between gap-6">
                 <div className="grow basis-0">
+                  <p className="text-xs text-grayscale-500 mb-1.5">Name</p>
+                  <p>
+                    {[formData.billing_address?.first_name, formData.billing_address?.last_name]
+                      .filter(Boolean)
+                      .join(" ")}
+                  </p>
+                </div>
+                <div className="grow basis-0">
+                  <p className="text-xs text-grayscale-500 mb-1.5">Phone</p>
+                  <p>{formData.billing_address?.phone || "—"}</p>
+                </div>
+              </div>
+              <div className="flex flex-wrap justify-between gap-6">
+                <div className="grow basis-0">
                   <p className="text-xs text-grayscale-500 mb-1.5">Country</p>
                   <p>
                     {cart?.region?.countries?.find(
@@ -172,6 +187,10 @@ const BillingAddress = ({
                 <div className="grow basis-0">
                   <p className="text-xs text-grayscale-500 mb-1.5">City</p>
                   <p>{formData.billing_address?.city}</p>
+                </div>
+                <div className="grow basis-0">
+                  <p className="text-xs text-grayscale-500 mb-1.5">State</p>
+                  <p>{formData.billing_address?.province || "—"}</p>
                 </div>
               </div>
             </address>
@@ -308,6 +327,7 @@ const BillingAddress = ({
           <InputField
             placeholder="Address *"
             name="billing_address.address_1"
+            className="md:col-span-2"
             inputProps={{
               autoComplete: "address-line1",
               "aria-label": "Billing address line 1",
@@ -315,22 +335,13 @@ const BillingAddress = ({
             data-testid="billing-address-input"
           />
           <InputField
-            placeholder="Company"
-            name="billing_address.company"
+            placeholder="Apartment, suite, etc."
+            name="billing_address.address_2"
+            className="md:col-span-2"
             inputProps={{
-              autoComplete: "company",
-              "aria-label": "Billing company",
+              autoComplete: "address-line2",
+              "aria-label": "Billing address line 2",
             }}
-            data-testid="billing-company-input"
-          />
-          <InputField
-            placeholder="Postal code *"
-            name="billing_address.postal_code"
-            inputProps={{
-              autoComplete: "postal-code",
-              "aria-label": "Billing postal code",
-            }}
-            data-testid="billing-postal-input"
           />
           <InputField
             placeholder="City *"
@@ -340,15 +351,6 @@ const BillingAddress = ({
               "aria-label": "Billing city",
             }}
             data-testid="billing-city-input"
-          />
-          <CountrySelectField
-            name="billing_address.country_code"
-            selectProps={{
-              autoComplete: "country",
-              "aria-label": "Billing country",
-              ...withDefinedProp("region", cart?.region),
-            }}
-            data-testid="billing-country-select"
           />
           <InputField
             placeholder="State / Province"
@@ -360,10 +362,38 @@ const BillingAddress = ({
             data-testid="billing-province-input"
           />
           <InputField
+            placeholder="Postal code *"
+            name="billing_address.postal_code"
+            inputProps={{
+              autoComplete: "postal-code",
+              "aria-label": "Billing postal code",
+            }}
+            data-testid="billing-postal-input"
+          />
+          <CountrySelectField
+            name="billing_address.country_code"
+            selectProps={{
+              autoComplete: "country",
+              "aria-label": "Billing country",
+              ...withDefinedProp("region", cart?.region),
+            }}
+            data-testid="billing-country-select"
+          />
+          <InputField
             placeholder="Phone"
             name="billing_address.phone"
+            type="tel"
             inputProps={{ autoComplete: "tel", "aria-label": "Billing phone" }}
             data-testid="billing-phone-input"
+          />
+          <InputField
+            placeholder="Company"
+            name="billing_address.company"
+            inputProps={{
+              autoComplete: "organization",
+              "aria-label": "Billing company",
+            }}
+            data-testid="billing-company-input"
           />
         </div>
       )}

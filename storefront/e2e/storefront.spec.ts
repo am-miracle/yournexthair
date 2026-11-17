@@ -27,6 +27,8 @@ test("guest can buy a product with manual payment", async ({ page }) => {
   await page.getByLabel("Shipping address line 1").fill("12 Aba Road")
   await page.getByLabel("Shipping postal code").fill("500001")
   await page.getByLabel("Shipping city").fill("Port Harcourt")
+  await page.getByLabel("Shipping state or province").fill("Rivers")
+  await page.getByLabel("Shipping phone").fill("+2348000000000")
 
   const country = page.getByRole("button", { name: /shipping country/i })
   if (!(await country.textContent())?.includes("Nigeria")) {

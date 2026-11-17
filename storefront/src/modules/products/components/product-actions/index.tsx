@@ -11,6 +11,7 @@ import { useCountryCode } from "@/hooks/country-code"
 import ProductPrice from "@modules/products/components/product-price"
 import { UiRadioGroup } from "@/components/ui/Radio"
 import { useAddLineItem } from "@/hooks/cart"
+import ErrorMessage from "@modules/checkout/components/error-message"
 import { buildAvailabilityMap } from "./availability"
 
 type ProductActionsProps = {
@@ -95,7 +96,7 @@ function ProductActions({ product, materials, disabled }: ProductActionsProps) {
   )
   const [quantity, setQuantity] = useState(1)
   const countryCode = useCountryCode()
-  const { mutateAsync, isPending } = useAddLineItem()
+  const { mutateAsync, isPending, isError } = useAddLineItem()
 
   // Re-initialise when product changes (component reuse across products)
   const [prevProduct, setPrevProduct] = useState(product)
@@ -165,7 +166,9 @@ function ProductActions({ product, materials, disabled }: ProductActionsProps) {
 
   const handleAddToCart = async (): Promise<void> => {
     if (!selectedVariant?.id) return
-    await mutateAsync({ variantId: selectedVariant.id, quantity, countryCode })
+    await mutateAsync({ variantId: selectedVariant.id, quantity, countryCode }).catch(
+      () => undefined,
+    )
   }
 
   const hasMultipleVariants = (product.variants?.length ?? 0) > 1
@@ -350,6 +353,12 @@ function ProductActions({ product, materials, disabled }: ProductActionsProps) {
         >
           {ctaLabel}
         </Button>
+      </div>
+      <div role="alert">
+        <ErrorMessage
+          error={isError ? "Couldn't add this to your cart. Please try again." : null}
+          data-testid="add-to-cart-error"
+        />
       </div>
     </>
   )

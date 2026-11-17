@@ -15,7 +15,13 @@ import {
 import { listCartShippingMethods } from "@lib/data/fulfillment"
 import { listCartPaymentMethods } from "@lib/data/payment"
 import { HttpTypes } from "@medusajs/types"
-import { useMutation, UseMutationOptions, useQuery, useQueryClient } from "@tanstack/react-query"
+import {
+  QueryClient,
+  useMutation,
+  UseMutationOptions,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query"
 import { useCallback, useEffect, useRef, useState } from "react"
 import { z } from "zod"
 
@@ -61,18 +67,92 @@ export const useCartPaymentMethods = (regionId: string) => {
   })
 }
 
-type UpdateLineItemContext = {
-  previousCart: HttpTypes.StoreCart | null | undefined
+const CART_LINE_MUTATION_KEY = ["cart-line"] as const
+
+type Cart = HttpTypes.StoreCart | null | undefined
+
+const updateCachedCart = (
+  queryClient: QueryClient,
+  update: (cart: HttpTypes.StoreCart) => HttpTypes.StoreCart,
+) => {
+  queryClient.setQueryData<Cart>(["cart"], (old) => (old ? update(old) : old))
 }
 
-const coerceMutationContext = (
-  context: UpdateLineItemContext | void | unknown,
-): UpdateLineItemContext => {
-  if (context && typeof context === "object") {
-    return context as UpdateLineItemContext
-  }
-  return { previousCart: undefined }
+const adjustCachedQuantity = (queryClient: QueryClient, delta: number) => {
+  if (!delta) return
+  queryClient.setQueryData<number>(["cart", "cart-quantity"], (old) =>
+    Math.max(0, (old ?? 0) + delta),
+  )
 }
+
+// Refetching while another line mutation is in flight would overwrite its optimistic state,
+// so only the last one to settle reconciles. The settling mutation still counts as pending here.
+const reconcileCartWhenIdle = async (queryClient: QueryClient) => {
+  if (queryClient.isMutating({ mutationKey: CART_LINE_MUTATION_KEY }) === 1) {
+    await queryClient.invalidateQueries({ exact: false, queryKey: ["cart"] })
+  }
+}
+
+type UpdateLineItemContext = {
+  previousQuantity: number | undefined
+  quantityDelta: number
+}
+
+export const updateLineItemMutation = (
+  queryClient: QueryClient,
+  options?: UseMutationOptions<
+    void,
+    Error,
+    { lineId: string; quantity: number },
+    UpdateLineItemContext
+  >,
+): UseMutationOptions<
+  void,
+  Error,
+  { lineId: string; quantity: number },
+  UpdateLineItemContext
+> => ({
+  ...options,
+  mutationKey: [...CART_LINE_MUTATION_KEY, "update"],
+  mutationFn: (payload) => updateLineItem(payload),
+  onMutate: async (variables, context) => {
+    const { lineId, quantity } = variables
+    await queryClient.cancelQueries({ queryKey: ["cart"] })
+    await options?.onMutate?.(variables, context)
+
+    const previousQuantity = queryClient
+      .getQueryData<Cart>(["cart"])
+      ?.items?.find((item) => item.id === lineId)?.quantity
+
+    updateCachedCart(queryClient, (cart) => ({
+      ...cart,
+      items: (cart.items ?? []).map((item) => (item.id === lineId ? { ...item, quantity } : item)),
+    }))
+
+    const quantityDelta = previousQuantity === undefined ? 0 : quantity - previousQuantity
+    adjustCachedQuantity(queryClient, quantityDelta)
+
+    return { previousQuantity, quantityDelta }
+  },
+  onError: async (error, variables, onMutateResult, context) => {
+    if (onMutateResult?.previousQuantity !== undefined) {
+      const { previousQuantity } = onMutateResult
+      updateCachedCart(queryClient, (cart) => ({
+        ...cart,
+        items: (cart.items ?? []).map((item) =>
+          item.id === variables.lineId ? { ...item, quantity: previousQuantity } : item,
+        ),
+      }))
+      adjustCachedQuantity(queryClient, -onMutateResult.quantityDelta)
+    }
+
+    await options?.onError?.(error, variables, onMutateResult, context)
+  },
+  onSettled: async (...args) => {
+    await reconcileCartWhenIdle(queryClient)
+    await options?.onSettled?.(...args)
+  },
+})
 
 export const useUpdateLineItem = (
   options?: UseMutationOptions<
@@ -83,64 +163,7 @@ export const useUpdateLineItem = (
   >,
 ) => {
   const queryClient = useQueryClient()
-  return useMutation({
-    mutationKey: ["cart-update-line-item"],
-    mutationFn: async (payload: { lineId: string; quantity: number }) => {
-      const response = await updateLineItem({
-        lineId: payload.lineId,
-        quantity: payload.quantity,
-      })
-      return response
-    },
-    ...options,
-    onMutate: async ({ lineId, quantity, ...rest }, ...restArgs) => {
-      await queryClient.cancelQueries({ queryKey: ["cart"] })
-
-      const userContext = await options?.onMutate?.({ lineId, quantity, ...rest }, ...restArgs)
-
-      const previousCart = queryClient.getQueryData<HttpTypes.StoreCart | null>(["cart"])
-
-      queryClient.setQueryData(["cart"], (old: HttpTypes.StoreCart | null | undefined) => {
-        if (!old) return old
-        return {
-          ...old,
-          items: (old.items ?? []).map((cartItem) =>
-            cartItem.id === lineId ? { ...cartItem, quantity } : cartItem,
-          ),
-        }
-      })
-
-      const previousItem = previousCart?.items?.find((i) => i.id === lineId)
-      if (previousItem) {
-        const delta = quantity - previousItem.quantity
-        queryClient.setQueryData(["cart", "cart-quantity"], (old: number | undefined) =>
-          Math.max(0, (old ?? 0) + delta),
-        )
-      }
-
-      return { ...coerceMutationContext(userContext), previousCart }
-    },
-    onError: (error, variables, onMutateResult, context) => {
-      if (onMutateResult?.previousCart) {
-        queryClient.setQueryData(["cart"], onMutateResult.previousCart)
-        const total = (onMutateResult.previousCart.items ?? []).reduce(
-          (acc, i) => acc + i.quantity,
-          0,
-        )
-        queryClient.setQueryData(["cart", "cart-quantity"], total)
-      }
-
-      options?.onError?.(error, variables, onMutateResult, context)
-    },
-    async onSuccess(...args) {
-      await queryClient.invalidateQueries({
-        exact: false,
-        queryKey: ["cart"],
-      })
-
-      await options?.onSuccess?.(...args)
-    },
-  })
+  return useMutation(updateLineItemMutation(queryClient, options))
 }
 
 type LineItemQuantityUpdater = {
@@ -199,7 +222,7 @@ export const useLineItemQuantityUpdater = ({
     lastCommittedRef.current = quantityToCommit
 
     try {
-      await mutateAsync({ lineId, quantity: quantityToCommit })
+      await mutateAsync({ lineId, quantity: quantityToCommit }).catch(() => undefined)
     } finally {
       inFlightRef.current = false
       if (queuedQuantityRef.current !== null) {
@@ -258,98 +281,85 @@ export const useLineItemQuantityUpdater = ({
 }
 
 type DeleteLineItemContext = {
-  previousCart: HttpTypes.StoreCart | null | undefined
+  removedItem: HttpTypes.StoreCartLineItem | undefined
+  removedIndex: number
 }
+
+export const deleteLineItemMutation = (
+  queryClient: QueryClient,
+  options?: UseMutationOptions<void, Error, { lineId: string }, DeleteLineItemContext>,
+): UseMutationOptions<void, Error, { lineId: string }, DeleteLineItemContext> => ({
+  ...options,
+  mutationKey: [...CART_LINE_MUTATION_KEY, "delete"],
+  mutationFn: ({ lineId }) => deleteLineItem(lineId),
+  onMutate: async (variables, context) => {
+    await queryClient.cancelQueries({ queryKey: ["cart"] })
+    await options?.onMutate?.(variables, context)
+
+    const items = queryClient.getQueryData<Cart>(["cart"])?.items ?? []
+    const removedIndex = items.findIndex((item) => item.id === variables.lineId)
+    const removedItem = items[removedIndex]
+
+    updateCachedCart(queryClient, (cart) => ({
+      ...cart,
+      items: (cart.items ?? []).filter((item) => item.id !== variables.lineId),
+    }))
+    adjustCachedQuantity(queryClient, -(removedItem?.quantity ?? 0))
+
+    return { removedItem, removedIndex }
+  },
+  onError: async (error, variables, onMutateResult, context) => {
+    const removedItem = onMutateResult?.removedItem
+    if (removedItem) {
+      updateCachedCart(queryClient, (cart) => {
+        const items = cart.items ?? []
+        if (items.some((item) => item.id === removedItem.id)) return cart
+        const restored = [...items]
+        restored.splice(Math.min(onMutateResult.removedIndex, items.length), 0, removedItem)
+        return { ...cart, items: restored }
+      })
+      adjustCachedQuantity(queryClient, removedItem.quantity)
+    }
+
+    await options?.onError?.(error, variables, onMutateResult, context)
+  },
+  onSettled: async (...args) => {
+    await reconcileCartWhenIdle(queryClient)
+    await options?.onSettled?.(...args)
+  },
+})
 
 export const useDeleteLineItem = (
   options?: UseMutationOptions<void, Error, { lineId: string }, DeleteLineItemContext>,
 ) => {
   const queryClient = useQueryClient()
-
-  return useMutation({
-    mutationKey: ["cart-delete-line-item"],
-    mutationFn: async (payload: { lineId: string }) => {
-      const response = await deleteLineItem(payload.lineId)
-
-      return response
-    },
-    ...options,
-    onMutate: async ({ lineId }) => {
-      await queryClient.cancelQueries({ queryKey: ["cart"] })
-
-      const previousCart = queryClient.getQueryData<HttpTypes.StoreCart | null>(["cart"])
-
-      queryClient.setQueryData(["cart"], (old: HttpTypes.StoreCart | null | undefined) => {
-        if (!old) return old
-        return {
-          ...old,
-          items: (old.items ?? []).filter((item) => item.id !== lineId),
-        }
-      })
-
-      const removedItem = previousCart?.items?.find((item) => item.id === lineId)
-      if (removedItem) {
-        queryClient.setQueryData(["cart", "cart-quantity"], (old: number | undefined) =>
-          Math.max(0, (old ?? 0) - removedItem.quantity),
-        )
-      }
-
-      return { previousCart }
-    },
-    onError: (error, variables, onMutateResult, context) => {
-      if (onMutateResult?.previousCart) {
-        queryClient.setQueryData(["cart"], onMutateResult.previousCart)
-        const total = (onMutateResult.previousCart.items ?? []).reduce(
-          (acc, item) => acc + item.quantity,
-          0,
-        )
-        queryClient.setQueryData(["cart", "cart-quantity"], total)
-      }
-
-      options?.onError?.(error, variables, onMutateResult, context)
-    },
-    async onSuccess(...args) {
-      await queryClient.invalidateQueries({
-        exact: false,
-        queryKey: ["cart"],
-      })
-
-      await options?.onSuccess?.(...args)
-    },
-  })
+  return useMutation(deleteLineItemMutation(queryClient, options))
 }
 
+type AddLineItemVariables = {
+  variantId: string
+  quantity: number
+  countryCode: string | undefined
+}
+
+export const addLineItemMutation = (
+  queryClient: QueryClient,
+  options?: UseMutationOptions<void, Error, AddLineItemVariables, unknown>,
+): UseMutationOptions<void, Error, AddLineItemVariables, unknown> => ({
+  ...options,
+  mutationKey: [...CART_LINE_MUTATION_KEY, "add"],
+  mutationFn: (payload) => addToCart(payload),
+  onSettled: async (...args) => {
+    await reconcileCartWhenIdle(queryClient)
+    await options?.onSettled?.(...args)
+  },
+})
+
 export const useAddLineItem = (
-  options?: UseMutationOptions<
-    void,
-    Error,
-    { variantId: string; quantity: number; countryCode: string | undefined },
-    unknown
-  >,
+  options?: UseMutationOptions<void, Error, AddLineItemVariables, unknown>,
 ) => {
   const queryClient = useQueryClient()
-
-  return useMutation({
-    mutationKey: ["cart-add-line-item"],
-    mutationFn: async (payload: {
-      variantId: string
-      quantity: number
-      countryCode: string | undefined
-    }) => {
-      const response = await addToCart({ ...payload })
-
-      return response
-    },
-    ...options,
-    async onSuccess(...args) {
-      await queryClient.invalidateQueries({
-        exact: false,
-        queryKey: ["cart"],
-      })
-
-      await options?.onSuccess?.(...args)
-    },
-  })
+  return useMutation(addLineItemMutation(queryClient, options))
 }
 
 export const useSetShippingMethod = (
@@ -392,9 +402,9 @@ export const addressesFormSchema = z
       address_2: z.string().optional(),
       city: z.string().min(1),
       postal_code: z.string().min(1),
-      province: z.string().optional(),
+      province: z.string().trim().min(1, "Enter the state for delivery"),
       country_code: z.string().min(2),
-      phone: z.string().optional(),
+      phone: z.string().trim().min(1, "Enter a phone number for delivery updates"),
     }),
   })
   .and(
