@@ -14,7 +14,20 @@ import { Button } from "@/components/Button"
 import { Form } from "@/components/Forms"
 import { useCustomer } from "hooks/customer"
 import { checkoutCurrency } from "@lib/util/checkout-currency"
-import { StoreCart, StoreRegion } from "@medusajs/types"
+import { StoreCart, StoreCartAddress, StoreRegion } from "@medusajs/types"
+
+const toFormAddress = (address?: StoreCartAddress | null) => ({
+  first_name: address?.first_name ?? "",
+  last_name: address?.last_name ?? "",
+  company: address?.company ?? "",
+  province: address?.province ?? "",
+  city: address?.city ?? "",
+  postal_code: address?.postal_code ?? "",
+  country_code: address?.country_code ?? "",
+  address_1: address?.address_1 ?? "",
+  address_2: address?.address_2 ?? "",
+  phone: address?.phone ?? "",
+})
 
 const Addresses = ({
   cart,
@@ -86,46 +99,13 @@ const Addresses = ({
           defaultValues={
             sameAsBilling
               ? {
-                  shipping_address: cart?.shipping_address || {
-                    first_name: "",
-                    last_name: "",
-                    company: "",
-                    province: "",
-                    city: "",
-                    postal_code: "",
-                    country_code: "",
-                    address_1: "",
-                    address_2: "",
-                    phone: "",
-                  },
+                  shipping_address: toFormAddress(cart?.shipping_address),
                   same_as_billing: "on",
                 }
               : {
-                  shipping_address: cart?.shipping_address || {
-                    first_name: "",
-                    last_name: "",
-                    company: "",
-                    province: "",
-                    city: "",
-                    postal_code: "",
-                    country_code: "",
-                    address_1: "",
-                    address_2: "",
-                    phone: "",
-                  },
+                  shipping_address: toFormAddress(cart?.shipping_address),
                   same_as_billing: "off",
-                  billing_address: cart?.billing_address || {
-                    first_name: "",
-                    last_name: "",
-                    company: "",
-                    province: "",
-                    city: "",
-                    postal_code: "",
-                    country_code: "",
-                    address_1: "",
-                    address_2: "",
-                    phone: "",
-                  },
+                  billing_address: toFormAddress(cart?.billing_address),
                 }
           }
         >
