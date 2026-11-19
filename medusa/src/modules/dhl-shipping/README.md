@@ -35,13 +35,15 @@ for an already booked shipment. Existing carts must select a fresh DHL option.
    holidays are not inferred). A failed booking needs staff attention.
 2. Enable DHL at the stock location and link the storefront sales channel.
    Add calculated shipping options using **Live courier delivery** in the approved
-   destination service zones, matching the products' shipping profiles.
+   destination service zones, matching the products' shipping profiles. Name them
+   **DHL Express**; checkout and order pages show the option name, so rename any
+   existing option still called "Courier delivery".
 3. Open **DHL shipping** in Admin. Save the dispatch contact, measured box weight
    and outer dimensions, and tested capacity. No remote packaging registration is
    needed. Optionally restrict the global DHL product code. Otherwise the cheapest
    available standard product in the cart currency is selected.
 4. Set every variant's measured weight in grams and folded dimensions in cm.
-   For international goods set `variant.metadata.hs_code` (6–10 digits) and
+   Nigerian deliveries are domestic and need no customs data. For international goods set `variant.metadata.hs_code` (6–10 digits) and
    `variant.metadata.country_of_origin` (actual two-letter manufacturing country).
    Manufacturing country must not be inferred from the dispatch country. Terminal
    manufacturer profile IDs are no longer used. Destination-specific legal product
@@ -50,9 +52,15 @@ for an already booked shipment. Existing carts must select a fresh DHL option.
    Keep manual delivery/pickup as desired. No database updates happen just by
    changing the provider configuration.
 
+At checkout the shipping step shows DHL's estimated delivery date from the saved
+quote, and re-saves the selected DHL option before payment so the quote is
+checked against the current address.
+
 For repeatable setup run `pnpm setup:dhl-shipping /absolute/path/shipping.json`.
 Required fields: `stock_location_id`, `sales_channel_ids`, `shipping_profile_ids`,
-`countries` (lowercase ISO codes), and `package`:
+`countries` (approved destinations as lowercase ISO codes: `ng` for nationwide
+delivery, which must be in the NGN region, plus international destinations in the
+USD region), and `package`:
 
 ```json
 {
@@ -117,8 +125,7 @@ of tracking before collection never authorizes a second purchase.
 
 ## Acceptance before live use
 
-Run unit tests, then use real sandbox credentials to check: domestic and approved
-international quotes, unsupported addresses, oversized carts, exact checkout
+Run unit tests, then use real sandbox credentials to check: Nigerian (NGN) and approved international quotes, unsupported addresses, oversized carts, exact checkout
 currency/amount/tax treatment, paid full fulfillment, label/invoice downloads,
 tracking, unavailable pickup dates, price increases, replay and ambiguous-request
 reconciliation. Confirm destination-specific customs requirements and account

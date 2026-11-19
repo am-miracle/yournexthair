@@ -13,6 +13,7 @@ import {
   dhlCredentials,
   dhlEnvironment,
 } from "../modules/dhl-shipping/config"
+import { assertVariantMeasurements } from "./lib/variant-measurements"
 
 const schema = z.object({
   stock_location_id: z.string().min(1),
@@ -53,35 +54,27 @@ export default async function setupDhlShipping({ container, args }: ExecArgs) {
   for (const id of config.shipping_profile_ids) {
     await fulfillment.retrieveShippingProfile(id)
   }
-  const countries = new Set(
-    (
-      await container
-        .resolve(Modules.REGION)
-        .listRegions({}, { relations: ["countries"], take: 1000 })
-    ).flatMap((region) => region.countries?.map((country) => country.iso_2) ?? []),
-  )
-  if (config.countries.some((country) => !countries.has(country))) {
-    throw new Error("Each delivery country must belong to an existing store region.")
-  }
-  const variants: Array<{ id: string }> = await db("product_variant as v")
-    .join("product as p", "p.id", "v.product_id")
-    .join("product_shipping_profile as psp", "psp.product_id", "p.id")
-    .whereNull("v.deleted_at")
-    .whereNull("p.deleted_at")
-    .whereNull("psp.deleted_at")
-    .where("p.status", "published")
-    .whereIn("psp.shipping_profile_id", config.shipping_profile_ids)
-    .where(function missingMeasurements() {
-      for (const field of ["weight", "length", "width", "height"]) {
-        this.orWhereNull(`v.${field}`).orWhere(`v.${field}`, "<=", 0)
-      }
-    })
-    .select("v.id")
-  if (variants.length) {
+  const regions = await container
+    .resolve(Modules.REGION)
+    .listRegions({}, { relations: ["countries"], take: 1000 })
+  // Matches the storefront's checkout currency: NGN for Nigeria, USD everywhere else.
+  const inRegion = (country: string) =>
+    regions.some(
+      (region) =>
+        region.currency_code === (country === "ng" ? "ngn" : "usd") &&
+        region.countries?.some((entry) => entry.iso_2 === country),
+    )
+  if (config.countries.some((country) => !inRegion(country))) {
     throw new Error(
-      `Set real gram weights and packed centimetre dimensions for variants: ${variants.map((variant) => variant.id).join(", ")}`,
+      "Nigeria must belong to an existing NGN region and every other delivery country to a USD region.",
     )
   }
+  await assertVariantMeasurements(
+    container,
+    config.shipping_profile_ids,
+    ["weight", "length", "width", "height"],
+    "Set real gram weights and packed centimetre dimensions for variants",
+  )
 
   if (
     !(await db("location_fulfillment_provider")
@@ -164,15 +157,18 @@ export default async function setupDhlShipping({ container, args }: ExecArgs) {
       await createShippingOptionsWorkflow(container).run({
         input: [
           {
-            name: "Courier delivery",
+            name: "DHL Express",
             provider_id: DHL_PROVIDER_ID,
             price_type: "calculated",
             service_zone_id: zone.id,
             shipping_profile_id: profileId,
             type: {
-              label: "Courier delivery",
+              label: "DHL Express",
               code: "dhl-courier",
-              description: "Live courier pickup and delivery.",
+              description:
+                country === "ng"
+                  ? "Door-to-door DHL delivery within Nigeria."
+                  : "Live courier pickup and delivery.",
             },
             data: { id: "dhl-pickup", dhl_shipping: { ...config.package, environment } },
             rules: [
