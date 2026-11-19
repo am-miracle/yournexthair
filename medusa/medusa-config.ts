@@ -1,5 +1,6 @@
 import { defineConfig, loadEnv } from "@medusajs/framework/utils"
 import type { ProductDTO } from "@medusajs/types"
+import { carrierOptions } from "./src/modules/nigeria-shipping/config"
 import { optionalDhlCredentials } from "./src/modules/dhl-shipping/config"
 
 import type { MeilisearchPluginOptions } from "./src/modules/meilisearch/types"
@@ -114,12 +115,17 @@ module.exports = defineConfig({
   },
   modules: [
     { resolve: "./src/modules/dhl-operations" },
+    { resolve: "./src/modules/courier-dispatch" },
     { resolve: "./src/modules/custom-requests" },
     {
       resolve: "@medusajs/medusa/fulfillment",
       options: {
         providers: [
           { resolve: "@medusajs/medusa/fulfillment-manual", id: "manual" },
+          ...(["fez", "gig"] as const).flatMap((id) => {
+            const options = carrierOptions(id)
+            return options ? [{ resolve: "./src/modules/nigeria-shipping", id, options }] : []
+          }),
           ...(dhlCredentials
             ? [
                 {
