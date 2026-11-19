@@ -9,6 +9,7 @@ import { getCollectionsList } from "@lib/data/collections"
 import { getCategoriesList } from "@lib/data/categories"
 import { getProductTypesList } from "@lib/data/product-types"
 import { withDefinedProp } from "@lib/util/optional-props"
+import { withDescendantIds } from "@lib/util/category-tree"
 import PaginatedProducts from "@modules/store/templates/paginated-products"
 import { getRegion } from "@lib/data/regions"
 import { HttpTypes } from "@medusajs/types"
@@ -37,7 +38,7 @@ const StoreTemplate = async ({
       "handle",
       "metadata",
     ] as (keyof HttpTypes.StoreCollection)[]),
-    getCategoriesList(0, 100, ["id", "name", "handle"]),
+    getCategoriesList(0, 100, ["id", "name", "handle", "parent_category_id"]),
     getProductTypesList(0, 100, ["id", "value"]),
     getRegion(countryCode),
   ])
@@ -76,9 +77,12 @@ const StoreTemplate = async ({
             {...withDefinedProp(
               "categoryId",
               category
-                ? categories.product_categories
-                    .filter((c) => category.includes(c.handle))
-                    .map((c) => c.id)
+                ? withDescendantIds(
+                    categories.product_categories,
+                    categories.product_categories
+                      .filter((c) => category.includes(c.handle))
+                      .map((c) => c.id),
+                  )
                 : undefined,
             )}
             {...withDefinedProp(

@@ -22,6 +22,7 @@
     "setup:nigeria-shipping": "medusa exec ./src/scripts/setup-nigeria-shipping.ts",
     "setup:nigeria-vat": "medusa exec ./src/scripts/setup-nigeria-vat.ts",
     "setup:dhl-shipping": "medusa exec ./src/scripts/setup-dhl-shipping.ts",
+    "setup:menu-categories": "medusa exec ./src/scripts/setup-menu-categories.ts",
     "start": "medusa start",
     "dev": "medusa develop",
     "lint": "eslint src medusa-config.ts jest.config.ts instrumentation.ts eslint.config.mjs",

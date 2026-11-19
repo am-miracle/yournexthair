@@ -31,7 +31,7 @@ export function HairConsultation() {
                 href="/custom-order"
                 className="mt-auto w-full rounded-full sm:w-auto sm:self-start"
               >
-                Request a custom order
+                Create your own custom look
               </LocalizedButtonLink>
             </div>
             <div className="flex flex-col rounded-2xl bg-white/80 p-6 md:p-8">

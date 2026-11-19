@@ -2,7 +2,8 @@ import * as React from "react"
 import { HAIR_CONSULTATION_WHATSAPP_URL } from "@lib/consultation"
 import { BrandLogo } from "@/components/BrandLogo"
 import { listRegions } from "@lib/data/regions"
-import { getProductTypesList } from "@lib/data/product-types"
+import { getCategoriesList } from "@lib/data/categories"
+import { buildCategoryTree } from "@lib/util/category-tree"
 import { SearchField } from "@/components/SearchField"
 import { Layout, LayoutColumn } from "@/components/Layout"
 import { LocalizedLink } from "@/components/LocalizedLink"
@@ -19,9 +20,11 @@ type CountryOption = {
 }
 
 export const Header: React.FC = async () => {
-  const [regions, productTypes] = await Promise.all([
+  const [regions, categories] = await Promise.all([
     listRegions(),
-    getProductTypesList(0, 20, ["id", "value"]).catch(() => null),
+    getCategoriesList(0, 100, ["id", "name", "handle", "rank", "parent_category_id"]).catch(
+      () => null,
+    ),
   ])
   const navLinkClass =
     "rounded-full px-3 py-2 text-sm font-medium transition-colors hover:bg-black/5 hover:text-black group-data-[light=true]:md:text-white group-data-[light=true]:md:hover:bg-white/15 group-data-[light=true]:md:hover:text-white group-data-[sticky=true]:md:!text-black group-data-[sticky=true]:md:hover:bg-black/5 group-data-[sticky=true]:md:hover:!text-black"
@@ -61,7 +64,7 @@ export const Header: React.FC = async () => {
                   Shop
                 </LocalizedLink>
                 <LocalizedLink href="/custom-order" className={navLinkClass}>
-                  Custom orders
+                  Custom look
                 </LocalizedLink>
                 <a
                   href={HAIR_CONSULTATION_WHATSAPP_URL}
@@ -92,10 +95,7 @@ export const Header: React.FC = async () => {
                 <React.Suspense>
                   <HeaderDrawer
                     countryOptions={countryOptions}
-                    productTypes={(productTypes?.productTypes ?? []).map(({ id, value }) => ({
-                      id,
-                      value,
-                    }))}
+                    categories={buildCategoryTree(categories?.product_categories ?? [])}
                   />
                 </React.Suspense>
               </div>

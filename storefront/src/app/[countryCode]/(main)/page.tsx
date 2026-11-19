@@ -224,7 +224,7 @@ export default async function Home({ params }: { params: Promise<{ countryCode: 
             </div>
             <div className="mt-10 flex flex-col items-center gap-3 text-center md:mt-14">
               <LocalizedButtonLink href="/custom-order" className="w-full rounded-full sm:w-auto">
-                Request a custom order
+                Create your own custom look
               </LocalizedButtonLink>
               <p className="text-xs text-grayscale-600">
                 Tell us what you want and we’ll send you a quote on WhatsApp.

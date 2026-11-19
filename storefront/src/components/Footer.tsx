@@ -1,6 +1,8 @@
 "use client"
 
 import { HAIR_CONSULTATION_WHATSAPP_URL } from "@lib/consultation"
+import { SOCIAL_LINKS } from "@lib/social-links"
+import { Icon } from "@/components/Icon"
 import { BrandLogo } from "@/components/BrandLogo"
 import { useParams, usePathname } from "next/navigation"
 import { twMerge } from "tailwind-merge"
@@ -31,6 +33,21 @@ export const Footer: React.FC = () => {
                   <BrandLogo className="h-auto w-35" />
                 </LocalizedLink>
                 <p className="text-xs">&copy; {new Date().getFullYear()}, Your Next Hair</p>
+                <ul aria-label="Social" className="mt-5 flex items-center gap-5">
+                  {SOCIAL_LINKS.map((link) => (
+                    <li key={link.name}>
+                      <a
+                        href={link.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={link.label}
+                        className="block"
+                      >
+                        <Icon name={link.icon} className="w-6 h-6" />
+                      </a>
+                    </li>
+                  ))}
+                </ul>
               </div>
               <div className="flex gap-10 xl:gap-18 max-md:text-xs flex-1 justify-between lg:justify-center">
                 <ul aria-label="Company" className="flex flex-col gap-6 md:gap-3.5">
@@ -38,7 +55,7 @@ export const Footer: React.FC = () => {
                     <LocalizedLink href="/store">Shop</LocalizedLink>
                   </li>
                   <li>
-                    <LocalizedLink href="/custom-order">Custom orders</LocalizedLink>
+                    <LocalizedLink href="/custom-order">Create your own custom look</LocalizedLink>
                   </li>
                   <li>
                     <a
@@ -48,38 +65,6 @@ export const Footer: React.FC = () => {
                       aria-label="Book a hair consultation on WhatsApp (opens in a new tab)"
                     >
                       Book a hair consultation
-                    </a>
-                  </li>
-                </ul>
-                <ul aria-label="Social" className="flex flex-col gap-6 md:gap-3.5">
-                  <li>
-                    <a
-                      href="https://www.instagram.com/yournexthair/"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label="Visit Your Next Hair on Instagram"
-                    >
-                      Instagram
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="https://www.facebook.com/1412930315494374"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label="Visit Your Next Hair on Facebook"
-                    >
-                      Facebook
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="https://api.whatsapp.com/send?phone=2348156197614"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label="Chat with Your Next Hair on WhatsApp"
-                    >
-                      WhatsApp
                     </a>
                   </li>
                 </ul>

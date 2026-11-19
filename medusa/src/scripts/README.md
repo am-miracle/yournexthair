@@ -25,6 +25,14 @@ To start charging VAT once registered, set the rate to 7.5% (Nigeria Tax Act 202
 are then VAT-exclusive, so VAT is added at checkout; DHL shipping quotes are
 treated as VAT-inclusive. International carts have no tax rate.
 
+## Menu categories
+
+`pnpm setup:menu-categories` creates or updates the categories that drive the
+storefront menu: **Hair Bundles** (handle `bundles`) with the textures SA Curly
+(Raw Curly), Raw Laos Wavy, Dreamy Curly, Slight Wavy and Deluxe Straight, then
+**Wigs**. Safe to re-run. Assign products to the texture categories in the
+admin; selecting Hair Bundles in the shop includes every texture.
+
 ## International shipping
 
 `pnpm setup:international-shipping 40 [stock_location_id]` creates a flat

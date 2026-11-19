@@ -11,9 +11,54 @@ import { RegionSwitcher } from "@/components/RegionSwitcher"
 import { SearchField } from "@/components/SearchField"
 import { useCartQuantity } from "@/hooks/cart"
 import { useCustomer } from "@/hooks/customer"
+import type { CategoryNode } from "@lib/util/category-tree"
 import { useSearchParams } from "next/navigation"
 
 const rowClass = "flex items-center justify-between gap-4 py-3.5"
+
+const categoryHref = (category: CategoryNode) =>
+  `/store?category=${encodeURIComponent(category.handle)}`
+
+const CategoryGroup: React.FC<{ category: CategoryNode; onNavigate: () => void }> = ({
+  category,
+  onNavigate,
+}) => {
+  const [isOpen, setIsOpen] = React.useState(false)
+  const listId = `menu-category-${category.id}`
+
+  return (
+    <div>
+      <button
+        type="button"
+        aria-expanded={isOpen}
+        aria-controls={listId}
+        onClick={() => setIsOpen((open) => !open)}
+        className={`${rowClass} w-full text-left`}
+      >
+        Shop {category.name}
+        <Icon name={isOpen ? "chevron-up" : "chevron-down"} className="w-5" />
+      </button>
+      <ul
+        id={listId}
+        hidden={!isOpen}
+        className="mb-2 flex flex-col border-l border-grayscale-200 pl-4 text-base"
+      >
+        <li>
+          <LocalizedLink href={categoryHref(category)} className={rowClass} onClick={onNavigate}>
+            All {category.name.toLowerCase()}
+          </LocalizedLink>
+        </li>
+        {category.children.map((child) => (
+          <li key={child.id}>
+            <LocalizedLink href={categoryHref(child)} className={rowClass} onClick={onNavigate}>
+              {child.name}
+            </LocalizedLink>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
 
 export const HeaderDrawer: React.FC<{
   countryOptions: {
@@ -21,8 +66,8 @@ export const HeaderDrawer: React.FC<{
     region: string
     label: string
   }[]
-  productTypes: { id: string; value: string }[]
-}> = ({ countryOptions, productTypes }) => {
+  categories: CategoryNode[]
+}> = ({ countryOptions, categories }) => {
   const [isMenuOpenState, setIsMenuOpen] = React.useState(false)
   const { data: cartQuantity } = useCartQuantity()
   const { data: customer } = useCustomer()
@@ -67,21 +112,22 @@ export const HeaderDrawer: React.FC<{
                 <LocalizedLink href="/" className={rowClass} onClick={closeMenu}>
                   Home
                 </LocalizedLink>
-                <LocalizedLink href="/store" className={rowClass} onClick={closeMenu}>
-                  Shop all hair
-                </LocalizedLink>
-                {productTypes.map((productType) => (
-                  <LocalizedLink
-                    key={productType.id}
-                    href={`/store?type=${encodeURIComponent(productType.value)}`}
-                    className={rowClass}
-                    onClick={closeMenu}
-                  >
-                    Shop {productType.value}
-                  </LocalizedLink>
-                ))}
+                {categories.map((category) =>
+                  category.children.length ? (
+                    <CategoryGroup key={category.id} category={category} onNavigate={closeMenu} />
+                  ) : (
+                    <LocalizedLink
+                      key={category.id}
+                      href={categoryHref(category)}
+                      className={rowClass}
+                      onClick={closeMenu}
+                    >
+                      Shop {category.name}
+                    </LocalizedLink>
+                  ),
+                )}
                 <LocalizedLink href="/custom-order" className={rowClass} onClick={closeMenu}>
-                  Request a custom order
+                  Create your own custom look
                 </LocalizedLink>
                 <a
                   href={HAIR_CONSULTATION_WHATSAPP_URL}

@@ -6,7 +6,7 @@ import { Layout, LayoutColumn } from "@/components/Layout"
 import { CustomOrderForm } from "@modules/custom-order/components/CustomOrderForm"
 
 export const metadata: Metadata = {
-  title: "Request a custom order",
+  title: "Create your own custom look",
   description:
     "Tell us about the custom raw or premium virgin hair wig you want and we'll send you a quote on WhatsApp.",
   alternates: { canonical: getCanonicalPath("/custom-order") },
@@ -56,10 +56,10 @@ export default async function CustomOrderPage({
         <LayoutColumn end={{ base: 13, lg: 6 }}>
           <div className="lg:sticky lg:top-32">
             <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-accent">
-              Custom orders
+              Custom look
             </p>
             <h1 id="custom-order-heading" className="mb-4 text-xl md:text-2xl">
-              Request a custom order
+              Create your own custom look
             </h1>
             <p className="mb-10 max-w-xl text-grayscale-700 md:text-md">
               Tell us what you have in mind. We’ll review your requirements and contact you on
