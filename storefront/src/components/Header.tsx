@@ -2,6 +2,7 @@ import * as React from "react"
 import { HAIR_CONSULTATION_WHATSAPP_URL } from "@lib/consultation"
 import { BrandLogo } from "@/components/BrandLogo"
 import { listRegions } from "@lib/data/regions"
+import { getProductTypesList } from "@lib/data/product-types"
 import { SearchField } from "@/components/SearchField"
 import { Layout, LayoutColumn } from "@/components/Layout"
 import { LocalizedLink } from "@/components/LocalizedLink"
@@ -18,7 +19,10 @@ type CountryOption = {
 }
 
 export const Header: React.FC = async () => {
-  const regions = await listRegions()
+  const [regions, productTypes] = await Promise.all([
+    listRegions(),
+    getProductTypesList(0, 20, ["id", "value"]).catch(() => null),
+  ])
   const navLinkClass =
     "rounded-full px-3 py-2 text-sm font-medium transition-colors hover:bg-black/5 hover:text-black group-data-[light=true]:md:text-white group-data-[light=true]:md:hover:bg-white/15 group-data-[light=true]:md:hover:text-white group-data-[sticky=true]:md:!text-black group-data-[sticky=true]:md:hover:bg-black/5 group-data-[sticky=true]:md:hover:!text-black"
 
@@ -53,6 +57,12 @@ export const Header: React.FC = async () => {
                 aria-label="Primary"
                 className="hidden items-center rounded-full border border-transparent bg-white/0 p-1 transition-colors md:flex group-data-[light=true]:md:border-white/25 group-data-[light=true]:md:bg-white/10 group-data-[sticky=true]:md:border-grayscale-200 group-data-[sticky=true]:md:bg-grayscale-50"
               >
+                <LocalizedLink href="/store" className={navLinkClass}>
+                  Shop
+                </LocalizedLink>
+                <LocalizedLink href="/custom-order" className={navLinkClass}>
+                  Custom orders
+                </LocalizedLink>
                 <a
                   href={HAIR_CONSULTATION_WHATSAPP_URL}
                   target="_blank"
@@ -62,9 +72,6 @@ export const Header: React.FC = async () => {
                 >
                   Consultation
                 </a>
-                <LocalizedLink href="/store" className={navLinkClass}>
-                  Shop
-                </LocalizedLink>
               </nav>
               <div className="hidden items-center gap-2 md:flex lg:gap-3">
                 <RegionSwitcher
@@ -83,7 +90,13 @@ export const Header: React.FC = async () => {
                 <LoginLink className="h-10 w-10 rounded-full p-0 cursor-pointer" />
                 <CartDrawer />
                 <React.Suspense>
-                  <HeaderDrawer countryOptions={countryOptions} />
+                  <HeaderDrawer
+                    countryOptions={countryOptions}
+                    productTypes={(productTypes?.productTypes ?? []).map(({ id, value }) => ({
+                      id,
+                      value,
+                    }))}
+                  />
                 </React.Suspense>
               </div>
             </div>

@@ -12,8 +12,10 @@ import { ChevronRight } from "@/components/icons/ChevronRight"
 import { ChevronUp } from "@/components/icons/ChevronUp"
 import { Close } from "@/components/icons/Close"
 import { CreditCard } from "@/components/icons/CreditCard"
+import { Facebook } from "@/components/icons/Facebook"
 import { Heart } from "@/components/icons/Heart"
 import { Info } from "@/components/icons/Info"
+import { Instagram } from "@/components/icons/Instagram"
 import { Loader } from "@/components/icons/Loader"
 import { MapPin } from "@/components/icons/MapPin"
 import { Menu } from "@/components/icons/Menu"
@@ -27,6 +29,7 @@ import { Trash } from "@/components/icons/Trash"
 import { Truck } from "@/components/icons/Truck"
 import { Undo } from "@/components/icons/Undo"
 import { User } from "@/components/icons/User"
+import { Whatsapp } from "@/components/icons/Whatsapp"
 
 export type IconNames =
   | "arrow-left"
@@ -41,8 +44,10 @@ export type IconNames =
   | "chevron-up"
   | "close"
   | "credit-card"
+  | "facebook"
   | "heart"
   | "info"
+  | "instagram"
   | "loader"
   | "map-pin"
   | "menu"
@@ -56,6 +61,7 @@ export type IconNames =
   | "truck"
   | "undo"
   | "user"
+  | "whatsapp"
 
 const baseClasses = "w-4 h-auto shrink-0"
 
@@ -103,8 +109,10 @@ export const Icon: React.FC<IconProps> = ({
     {name === "chevron-up" && <ChevronUp {...rest} className={twMerge(baseClasses, className)} />}
     {name === "close" && <Close {...rest} className={twMerge(baseClasses, className)} />}
     {name === "credit-card" && <CreditCard {...rest} className={twMerge(baseClasses, className)} />}
+    {name === "facebook" && <Facebook {...rest} className={twMerge(baseClasses, className)} />}
     {name === "heart" && <Heart {...rest} className={twMerge(baseClasses, className)} />}
     {name === "info" && <Info {...rest} className={twMerge(baseClasses, className)} />}
+    {name === "instagram" && <Instagram {...rest} className={twMerge(baseClasses, className)} />}
     {name === "loader" && <Loader {...rest} className={twMerge(baseClasses, className)} />}
     {name === "map-pin" && <MapPin {...rest} className={twMerge(baseClasses, className)} />}
     {name === "menu" && <Menu {...rest} className={twMerge(baseClasses, className)} />}
@@ -118,5 +126,6 @@ export const Icon: React.FC<IconProps> = ({
     {name === "truck" && <Truck {...rest} className={twMerge(baseClasses, className)} />}
     {name === "undo" && <Undo {...rest} className={twMerge(baseClasses, className)} />}
     {name === "user" && <User {...rest} className={twMerge(baseClasses, className)} />}
+    {name === "whatsapp" && <Whatsapp {...rest} className={twMerge(baseClasses, className)} />}
   </div>
 )

@@ -198,7 +198,7 @@ export default async function Home({ params }: { params: Promise<{ countryCode: 
               Our hair extensions and wigs are made to fulfill our client’s order requirements.
             </p>
             <div className="grid gap-5 md:grid-cols-3 md:gap-8">
-              <div className="rounded-2xl border border-accent/15 bg-white/80 p-6 md:p-8">
+              <div className="rounded-2xl bg-white/80 p-6 md:p-8">
                 <h3 className="mb-3 text-sm font-medium">In stock</h3>
                 <p className="text-base leading-relaxed text-grayscale-700">
                   Your next hair Wig is made to order with the purpose of fulfilling the
@@ -207,14 +207,14 @@ export default async function Home({ params }: { params: Promise<{ countryCode: 
                   you.
                 </p>
               </div>
-              <div className="rounded-2xl border border-accent/15 bg-white/80 p-6 md:p-8">
+              <div className="rounded-2xl bg-white/80 p-6 md:p-8">
                 <h3 className="mb-3 text-sm font-medium">Custom premium virgin hair</h3>
                 <p className="text-base leading-relaxed text-grayscale-700">
                   Custom order for our premium virgin hair will follow our standard time frame of
                   6-7 weeks allowing our team create your custom wig for you.
                 </p>
               </div>
-              <div className="rounded-2xl border border-accent/15 bg-white/80 p-6 md:p-8">
+              <div className="rounded-2xl bg-white/80 p-6 md:p-8">
                 <h3 className="mb-3 text-sm font-medium">Custom raw hair</h3>
                 <p className="text-base leading-relaxed text-grayscale-700">
                   Custom order for our Raw hair will follow our standard time frame of 9 -12 weeks
