@@ -1,5 +1,5 @@
 import { HttpTypes } from "@medusajs/types"
-import { useEffect, useMemo } from "react"
+import { useEffect, useMemo, useState } from "react"
 import * as ReactAria from "react-aria-components"
 
 import compareAddresses from "@lib/util/compare-addresses"
@@ -62,7 +62,6 @@ const isShippingAddressEmpty = (formData: CheckoutAddressFormValues) => {
     !formData?.shipping_address?.company &&
     !formData?.shipping_address?.postal_code &&
     !formData?.shipping_address?.city &&
-    !formData?.shipping_address?.country_code &&
     !formData?.shipping_address?.province &&
     !formData?.shipping_address?.phone
   )
@@ -74,13 +73,16 @@ const ShippingAddress = ({
   cart,
   checked,
   onChange,
+  countries,
 }: {
+  countries: NonNullable<HttpTypes.StoreRegion["countries"]>
   customer: HttpTypes.StoreCustomer | null
   cart: HttpTypes.StoreCart | null
   checked: boolean
   onChange: () => void
 }) => {
   const countryCode = useCountryCode()
+  const [editingAddress, setEditingAddress] = useState(false)
 
   const { setValue, control } = useFormContext<CheckoutAddressFormValues>()
 
@@ -92,18 +94,12 @@ const ShippingAddress = ({
   const showPhoneInput =
     !currentShippingAddress.phone || Boolean(dirtyFields.shipping_address?.phone)
 
-  const countriesInRegion = useMemo(
-    () => cart?.region?.countries?.map((c) => c.iso_2),
-    [cart?.region],
-  )
+  const supportedCountries = useMemo(() => new Set(countries.map((c) => c.iso_2)), [countries])
 
-  // check if customer has saved addresses that are in the current region
-  const addressesInRegion = useMemo(
+  const savedAddresses = useMemo(
     () =>
-      customer?.addresses.filter(
-        (a) => a.country_code && countriesInRegion?.includes(a.country_code),
-      ),
-    [customer?.addresses, countriesInRegion],
+      customer?.addresses.filter((a) => a.country_code && supportedCountries.has(a.country_code)),
+    [customer?.addresses, supportedCountries],
   )
 
   const populateShippingAddress = (address?: CheckoutAddressFields) => {
@@ -124,20 +120,17 @@ const ShippingAddress = ({
   }
 
   useEffect(() => {
-    // Ensure cart is not null and has a shipping_address before setting form data
-    if (cart) {
-      if (cart.shipping_address) {
+    if (cart && !editingAddress && !dirtyFields.shipping_address) {
+      if (cart.shipping_address?.address_1) {
         populateShippingAddress(cart.shipping_address)
       } else if (
-        // If customer has saved addresses in the region and form data is empty
-        // set the first address in the region as the form data
         customer &&
-        addressesInRegion &&
-        addressesInRegion.length &&
+        savedAddresses &&
+        savedAddresses.length &&
         isShippingAddressEmpty(formData)
       ) {
         const defaultShippingAddress =
-          addressesInRegion.find((a) => a.is_default_shipping) || addressesInRegion[0]!
+          savedAddresses.find((a) => a.is_default_shipping) || savedAddresses[0]!
 
         populateShippingAddress({
           first_name: defaultShippingAddress.first_name ?? "",
@@ -154,11 +147,14 @@ const ShippingAddress = ({
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cart, customer, addressesInRegion])
+  }, [cart, customer, savedAddresses])
 
   return (
     <>
-      {customer && (addressesInRegion?.length || 0) > 0 && !isShippingAddressEmpty(formData) ? (
+      {!editingAddress &&
+      customer &&
+      (savedAddresses?.length || 0) > 0 &&
+      currentShippingAddress.address_1 ? (
         <>
           <div className="w-full border border-grayscale-200 rounded-xs p-4 flex flex-wrap gap-8 max-lg:flex-col mb-8">
             <div className="flex flex-1 gap-8">
@@ -182,9 +178,8 @@ const ShippingAddress = ({
                   <div className="grow basis-0">
                     <p className="text-xs text-grayscale-500 mb-1.5">Country</p>
                     <p>
-                      {cart?.region?.countries?.find(
-                        (c) => c.iso_2 === currentShippingAddress.country_code,
-                      )?.display_name || currentShippingAddress.country_code}
+                      {countries.find((c) => c.iso_2 === currentShippingAddress.country_code)
+                        ?.display_name || currentShippingAddress.country_code}
                     </p>
                   </div>
                   <div className="grow basis-0">
@@ -228,7 +223,7 @@ const ShippingAddress = ({
                       className="flex flex-col gap-4 mb-10"
                       aria-label="Saved shipping addresses"
                       onChange={(value) => {
-                        const selectedAddress = addressesInRegion?.find((a) => a.id === value)
+                        const selectedAddress = savedAddresses?.find((a) => a.id === value)
                         if (selectedAddress) {
                           populateShippingAddress({
                             address_1: selectedAddress.address_1 ?? "",
@@ -245,7 +240,7 @@ const ShippingAddress = ({
                         }
                       }}
                       value={
-                        addressesInRegion?.find((a) =>
+                        savedAddresses?.find((a) =>
                           compareAddresses(
                             {
                               first_name: a.first_name ?? "",
@@ -275,7 +270,7 @@ const ShippingAddress = ({
                         )?.id ?? null
                       }
                     >
-                      {addressesInRegion?.map((address) => (
+                      {savedAddresses?.map((address) => (
                         <UiRadio
                           variant="outline"
                           value={address.id}
@@ -292,7 +287,7 @@ const ShippingAddress = ({
                               address.address_1,
                               address.address_2,
                               [address.postal_code, address.city].filter(Boolean).join(" "),
-                              cart?.region?.countries?.find((c) => c.iso_2 === address.country_code)
+                              countries.find((c) => c.iso_2 === address.country_code)
                                 ?.display_name || address.country_code,
                             ]
                               .filter(Boolean)
@@ -324,6 +319,9 @@ const ShippingAddress = ({
                 </UiModal>
               </UiModalOverlay>
             </UiDialogTrigger>
+            <Button variant="link" size="sm" onPress={() => setEditingAddress(true)}>
+              Enter a different address
+            </Button>
           </div>
           {(showProvinceInput || showPhoneInput) && (
             <div className="mb-8">
@@ -404,7 +402,7 @@ const ShippingAddress = ({
             selectProps={{
               autoComplete: "country",
               "aria-label": "Shipping country",
-              ...withDefinedProp("region", cart?.region),
+              countries,
             }}
             data-testid="shipping-country-select"
           />

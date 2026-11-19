@@ -434,7 +434,7 @@ export type AddressesFormValues = z.infer<typeof addressesFormSchema>
 
 export const useSetShippingAddress = (
   options?: UseMutationOptions<
-    { success: boolean; error: string | null },
+    { success: boolean; error: string | null; countryCode?: string },
     Error,
     AddressesFormValues,
     unknown

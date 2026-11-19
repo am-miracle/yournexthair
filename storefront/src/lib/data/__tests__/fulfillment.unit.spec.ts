@@ -37,3 +37,20 @@ it("blocks delivery when all quotes fail or return an invalid amount", async () 
     .mockResolvedValueOnce({ shipping_option: { amount: null } })
   await expect(listCartShippingMethods("cart_1")).rejects.toThrow("delivery quote")
 })
+
+it("prices FEZ and GIG independently and excludes the old manual Nigeria option", async () => {
+  fetchMock
+    .mockResolvedValueOnce({
+      shipping_options: [
+        { id: "legacy", type: { code: "nigeria-delivery" }, price_type: "flat", amount: 2000 },
+        { id: "fez", name: "FEZ Delivery", price_type: "calculated" },
+        { id: "gig", name: "GIG Logistics", price_type: "calculated" },
+      ],
+    })
+    .mockResolvedValueOnce({ shipping_option: { id: "fez", name: "FEZ Delivery", amount: 3500 } })
+    .mockResolvedValueOnce({ shipping_option: { id: "gig", name: "GIG Logistics", amount: 4200 } })
+  await expect(listCartShippingMethods("cart_1")).resolves.toEqual([
+    { id: "fez", name: "FEZ Delivery", amount: 3500 },
+    { id: "gig", name: "GIG Logistics", amount: 4200 },
+  ])
+})

@@ -1,6 +1,7 @@
 "use server"
 
 import { getCheckoutKey } from "@lib/util/checkout-key"
+import { checkoutCurrency } from "@lib/util/checkout-currency"
 
 import { FetchError } from "@medusajs/js-sdk"
 import { HttpTypes } from "@medusajs/types"
@@ -326,15 +327,46 @@ export async function setAddresses(formData: z.infer<typeof addressesFormSchema>
       throw new Error("No existing cart found when setting addresses")
     }
 
-    await updateCart({
-      shipping_address: normalizeAddress(formData.shipping_address),
+    const shippingAddress = normalizeAddress(formData.shipping_address)
+    const countryCode = formData.shipping_address.country_code.trim().toLowerCase()
+    const region = await getRegion(countryCode)
+    if (!countryCode || !region || region.currency_code !== checkoutCurrency(countryCode)) {
+      throw new Error("Delivery is unavailable for the selected country.")
+    }
+
+    shippingAddress.country_code = countryCode
+    if (countryCode === "ng" && shippingAddress.province) {
+      const state = shippingAddress.province.trim().toLowerCase().replace(/\s+/g, " ")
+      shippingAddress.province = ["abuja", "federal capital territory", "abuja fct"].includes(state)
+        ? "fct"
+        : state.replace(/ state$/, "")
+    }
+
+    const { cart } = await sdk.store.cart.retrieve(
+      cartId,
+      { fields: "id,region_id" },
+      await getAuthHeaders(),
+    )
+    const addressUpdate = {
+      shipping_address: shippingAddress,
       billing_address:
         formData.same_as_billing === "on"
-          ? normalizeAddress(formData.shipping_address)
+          ? shippingAddress
           : normalizeAddress(formData.billing_address),
-    })
+    }
+    // Medusa replaces the supplied shipping address with the country when moving
+    // into a single-country region. Save the complete address in that region.
+    if (region.id !== cart.region_id && region.countries?.length === 1) {
+      await updateCart({ region_id: region.id })
+      await updateCart(addressUpdate)
+    } else {
+      await updateCart({
+        ...addressUpdate,
+        ...(region.id !== cart.region_id && { region_id: region.id }),
+      })
+    }
     updateTag("shipping")
-    return { success: true, error: null }
+    return { success: true, error: null, countryCode }
   } catch (e) {
     return {
       success: false,

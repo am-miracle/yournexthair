@@ -9,6 +9,7 @@ import { Button } from "@/components/Button"
 import { UiRadio, UiRadioBox, UiRadioGroup, UiRadioLabel } from "@/components/ui/Radio"
 import { useCartShippingMethods, useSetShippingMethod } from "hooks/cart"
 import { StoreCart } from "@medusajs/types"
+import { DHL_PROVIDER_ID } from "@lib/constants"
 
 const Shipping = ({ cart }: { cart: StoreCart }) => {
   const [error, setError] = useState<string | null>(null)
@@ -33,18 +34,41 @@ const Shipping = ({ cart }: { cart: StoreCart }) => {
     refetch: refetchShippingMethods,
   } = useCartShippingMethods(cart.id)
 
-  const { mutate, isPending } = useSetShippingMethod({ cartId: cart.id })
+  const { mutate, mutateAsync, isPending } = useSetShippingMethod({ cartId: cart.id })
   const selectedShippingMethod = availableShippingMethods?.find(
     (method) => method.id === cart.shipping_methods?.[0]?.shipping_option_id,
   )
   const selectedShippingMethodId: string | null = selectedShippingMethod?.id ?? null
   const shippingMethodOptions = availableShippingMethods ?? []
 
-  const handleSubmit = () => {
-    router.push(pathname + "?step=payment", { scroll: false })
+  const quoteData = cart.shipping_methods?.[0]?.data?.dhl_quote as
+    | { delivery_time?: unknown }
+    | undefined
+  const estimatedDate =
+    selectedShippingMethod?.provider_id === DHL_PROVIDER_ID &&
+    typeof quoteData?.delivery_time === "string"
+      ? Date.parse(quoteData.delivery_time)
+      : NaN
+  const deliveryDate = Number.isFinite(estimatedDate)
+    ? new Intl.DateTimeFormat("en", { dateStyle: "medium", timeZone: "UTC" }).format(estimatedDate)
+    : null
+
+  const handleSubmit = async () => {
+    if (!selectedShippingMethod) return
+    setError(null)
+    try {
+      // Revalidate the saved DHL quote against the current address before payment.
+      if (selectedShippingMethod.provider_id === DHL_PROVIDER_ID) {
+        await mutateAsync({ shippingMethodId: selectedShippingMethod.id })
+      }
+      router.push(pathname + "?step=payment", { scroll: false })
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "Could not confirm the shipping quote.")
+    }
   }
 
   const set = (id: string) => {
+    setError(null)
     mutate({ shippingMethodId: id }, { onError: (err) => setError(err.message) })
   }
 
@@ -109,13 +133,17 @@ const Shipping = ({ cart }: { cart: StoreCart }) => {
                   <UiRadioLabel className="ml-auto group-data-[selected=true]:font-normal">
                     {convertToLocale({
                       amount: option.amount!,
-                      currency_code: cart?.currency_code,
+                      currency_code: cart.currency_code,
+                      locale: cart.currency_code === "ngn" ? "en-NG" : "en-US",
                     })}
                   </UiRadioLabel>
                 </UiRadio>
               ))}
             </UiRadioGroup>
 
+            {deliveryDate && (
+              <p className="text-grayscale-500 text-sm mb-4">Estimated delivery: {deliveryDate}</p>
+            )}
             {cart.shipping_address?.country_code &&
               cart.shipping_address.country_code.toLowerCase() !== "ng" && (
                 <p className="text-grayscale-500 text-xs mb-8">

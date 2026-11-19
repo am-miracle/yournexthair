@@ -13,6 +13,8 @@ export const paymentInfoMap: Record<string, { title: string; icon: React.JSX.Ele
   },
 }
 
+export const DHL_PROVIDER_ID = "dhl_dhl"
+
 export const isBachs = (providerId?: string) => providerId?.startsWith("pp_bachs")
 
 export const isManual = (providerId?: string) => providerId?.startsWith("pp_system_default")

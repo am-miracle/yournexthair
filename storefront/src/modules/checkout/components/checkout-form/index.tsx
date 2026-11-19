@@ -1,4 +1,5 @@
 "use client"
+import type { StoreRegion } from "@medusajs/types"
 import React from "react"
 import { useRouter } from "next/navigation"
 
@@ -15,9 +16,11 @@ import { Icon } from "@/components/Icon"
 export const CheckoutForm = ({
   countryCode,
   step,
+  countries,
 }: {
   countryCode: string
   step: string | undefined
+  countries: NonNullable<StoreRegion["countries"]>
 }) => {
   const { data: cart, isPending } = useCart({ enabled: true })
   const router = useRouter()
@@ -43,7 +46,7 @@ export const CheckoutForm = ({
   return (
     <Wrapper cart={cart}>
       <Email countryCode={countryCode} cart={cart} />
-      <Addresses cart={cart} />
+      <Addresses cart={cart} countries={countries} />
       <Shipping cart={cart} />
       <Payment cart={cart} />
       <Review cart={cart} />

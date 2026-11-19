@@ -16,20 +16,18 @@ export type CountrySelectProps = ReactAria.SelectProps<
   Exclude<HttpTypes.StoreRegion["countries"], undefined>[number]
 > & {
   region?: HttpTypes.StoreRegion
+  countries?: NonNullable<HttpTypes.StoreRegion["countries"]>
 }
 
 const CountrySelect: React.FC<CountrySelectProps> = ({
   placeholder = "Country",
   region,
+  countries,
   ...props
 }) => {
   const countryOptions = useMemo(() => {
-    if (!region) {
-      return []
-    }
-
     return (
-      region.countries?.flatMap((country) => {
+      (countries ?? region?.countries)?.flatMap((country) => {
         if (!country?.iso_2 || !country.display_name) {
           return []
         }
@@ -42,7 +40,7 @@ const CountrySelect: React.FC<CountrySelectProps> = ({
         ]
       }) ?? []
     )
-  }, [region])
+  }, [countries, region])
 
   return (
     <ReactAria.Select aria-label="Select country" {...props} placeholder={placeholder}>

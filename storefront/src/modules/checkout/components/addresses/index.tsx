@@ -13,9 +13,16 @@ import ShippingAddress from "@modules/checkout/components/shipping-address"
 import { Button } from "@/components/Button"
 import { Form } from "@/components/Forms"
 import { useCustomer } from "hooks/customer"
-import { StoreCart } from "@medusajs/types"
+import { checkoutCurrency } from "@lib/util/checkout-currency"
+import { StoreCart, StoreRegion } from "@medusajs/types"
 
-const Addresses = ({ cart }: { cart: StoreCart }) => {
+const Addresses = ({
+  cart,
+  countries,
+}: {
+  cart: StoreCart
+  countries: NonNullable<StoreRegion["countries"]>
+}) => {
   const searchParams = useSearchParams()
   const router = useRouter()
   const pathname = usePathname()
@@ -40,8 +47,8 @@ const Addresses = ({ cart }: { cart: StoreCart }) => {
   const onSubmit = (values: AddressesFormValues) => {
     mutate(values, {
       onSuccess: (data) => {
-        if (isOpen && data.success) {
-          router.push(pathname + "?step=shipping", { scroll: false })
+        if (isOpen && data.success && data.countryCode) {
+          router.push(`/${data.countryCode}/checkout?step=shipping`, { scroll: false })
         }
       },
     })
@@ -126,6 +133,8 @@ const Addresses = ({ cart }: { cart: StoreCart }) => {
             const shippingData = watch("shipping_address")
             const isDisabled =
               !customer?.addresses?.length && !Object.values(shippingData).some((value) => value)
+            const destination = shippingData.country_code
+            const currency = destination ? checkoutCurrency(destination) : null
             return (
               <>
                 <ShippingAddress
@@ -133,9 +142,18 @@ const Addresses = ({ cart }: { cart: StoreCart }) => {
                   checked={sameAsBilling}
                   onChange={toggleSameAsBilling}
                   cart={cart}
+                  countries={countries}
                 />
 
                 {!sameAsBilling && <BillingAddress cart={cart} customer={customer || null} />}
+
+                {currency && (
+                  <p role="status" className="mt-4 text-sm">
+                    Your order will be charged in {currency.toUpperCase()}.
+                    {currency !== cart.currency_code &&
+                      " Your cart totals will update when you continue."}
+                  </p>
+                )}
 
                 <SubmitButton className="mt-8" isLoading={isPending} isDisabled={isDisabled}>
                   Next
