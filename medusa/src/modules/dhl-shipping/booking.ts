@@ -19,15 +19,34 @@ export type BookingStore = {
 
 export async function bookDelivery(input: {
   store: BookingStore
-  client: Pick<DhlClient, "getRates" | "createShipment" | "getShipment">
+  client: Pick<DhlClient, "getRates" | "createShipment" | "getShipment" | "requestPickup">
   body: ShipmentBody
   reference: string
   currency: string
   productCode: string
   localProductCode?: string | undefined
   maximumAmount: number
-}): Promise<DhlShipment> {
+}): Promise<DhlShipment & { pickup_error?: string }> {
   const { store, client } = input
+  // The waybill stays valid if pickup scheduling fails; only the pickup is retried later.
+  const ensurePickup = async (shipment: DhlShipment) => {
+    if (shipment.dispatch_confirmation_number) {
+      return shipment
+    }
+    try {
+      const updated = {
+        ...shipment,
+        dispatch_confirmation_number: await client.requestPickup(input.body, input.productCode),
+      }
+      await store.transition("booked", "booked", { result: updated })
+      return updated
+    } catch (error) {
+      return {
+        ...shipment,
+        pickup_error: `Waybill ${shipment.shipment_id} is booked, but DHL pickup could not be scheduled (${error instanceof Error ? error.message : "unknown error"}). Retry the booking or schedule collection in MyDHL.`,
+      }
+    }
+  }
   const booking = await store.read()
   if (booking.state === "creating") {
     throw new Error(
@@ -43,17 +62,17 @@ export async function bookDelivery(input: {
     if (saved.shipment_id !== booking.shipment_id) {
       throw new Error("DHL booking identity mismatch.")
     }
+    let current = saved
     try {
       const remote = await client.getShipment(booking.shipment_id)
       if (remote && remote.status !== saved.status) {
-        const updated = { ...saved, status: remote.status }
-        await store.transition("booked", "booked", { result: updated })
-        return updated
+        current = { ...saved, status: remote.status }
+        await store.transition("booked", "booked", { result: current })
       }
     } catch {
       /* Newly created labels may not yet be trackable. Preserve the successful booking. */
     }
-    return saved
+    return ensurePickup(current)
   }
   if (booking.state !== "pending") {
     throw new Error("This DHL booking needs operator attention.")
@@ -86,5 +105,5 @@ export async function bookDelivery(input: {
     shipment_id: shipment.shipment_id,
     result: shipment,
   })
-  return shipment
+  return ensurePickup(shipment)
 }

@@ -33,6 +33,7 @@ function fixture() {
       ]),
     createShipment: jest.fn().mockResolvedValue(shipment),
     getShipment: jest.fn(),
+    requestPickup: jest.fn().mockResolvedValue("PRG123"),
   }
   return {
     booking,
@@ -50,12 +51,25 @@ function fixture() {
     },
   }
 }
-it("books once and reuses the saved waybill on replay", async () => {
+it("books once, schedules one pickup and reuses the saved waybill on replay", async () => {
   const f = fixture()
-  expect(await bookDelivery(f.input)).toEqual(f.shipment)
-  expect(await bookDelivery(f.input)).toEqual(f.shipment)
+  const booked = { ...f.shipment, dispatch_confirmation_number: "PRG123" }
+  expect(await bookDelivery(f.input)).toEqual(booked)
+  expect(await bookDelivery(f.input)).toEqual(booked)
   expect(f.client.createShipment).toHaveBeenCalledTimes(1)
-  expect(f.booking.state).toBe("booked")
+  expect(f.client.requestPickup).toHaveBeenCalledTimes(1)
+  expect(f.booking).toMatchObject({ state: "booked", result: booked })
+})
+it("keeps the waybill when pickup fails and retries only the pickup", async () => {
+  const f = fixture()
+  f.client.requestPickup.mockRejectedValueOnce(new Error("pickup unavailable"))
+  const first = await bookDelivery(f.input)
+  expect(first.pickup_error).toContain("Waybill 1234567890 is booked")
+  expect(f.booking).toMatchObject({ state: "booked", shipment_id: "1234567890" })
+
+  expect(await bookDelivery(f.input)).toMatchObject({ dispatch_confirmation_number: "PRG123" })
+  expect(f.client.createShipment).toHaveBeenCalledTimes(1)
+  expect(f.client.requestPickup).toHaveBeenCalledTimes(2)
 })
 it("never repeats shipment creation after a timeout", async () => {
   const f = fixture()

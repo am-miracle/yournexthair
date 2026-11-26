@@ -221,6 +221,9 @@ export async function processDhlBooking(
         booking_required: false,
         dhl_shipment_id: shipment.shipment_id,
         dhl_shipment_status: shipment.status,
+        ...(shipment.dispatch_confirmation_number
+          ? { dhl_pickup_confirmation: shipment.dispatch_confirmation_number }
+          : {}),
       },
       ...(labelsChanged
         ? {
@@ -238,6 +241,9 @@ export async function processDhlBooking(
           }
         : {}),
     })
+    if (shipment.pickup_error) {
+      await operations.updateBookings({ id: bookingId, last_error: shipment.pickup_error })
+    }
   } catch (error) {
     // Persist a useful error without DHL response bodies, customer details or credentials.
     await operations.updateBookings({

@@ -89,17 +89,27 @@ settings again and reviewing the enabled options.
 Quotes use `POST /rates`; they never create shipments. Total parcel weight includes
 empty packaging and all quantities. Oversized and partially configured orders fail
 explicitly. Shipping prices are main currency units and treated as tax inclusive;
-confirm tax treatment against your DHL account invoices. Only totals in the exact
-cart currency are offered. No implicit exchange rate is used. If DHL only quotes
-NGN for your account, USD checkout needs a separate manual option until an explicit
-currency conversion policy is implemented. API failures never become free shipping.
+confirm tax treatment against your DHL account invoices. API failures never become
+free shipping.
+
+DHL Nigeria bills and quotes in NGN only, including international services. USD carts
+are charged DHL's NGN bill converted at `DHL_NGN_PER_USD` (naira per US dollar) plus
+`DHL_FX_MARGIN_PERCENT` (default 5) and rounded up to the cent. Without
+`DHL_NGN_PER_USD`, USD carts get no DHL quote. Update the rate when the naira moves;
+the margin absorbs movement between checkout and booking, which re-quotes and stops
+for review if DHL's converted price exceeds what the customer paid. Customs values
+are always declared in NGN at the same rate, as DHL Nigeria requires.
 
 Creating a complete fulfillment for a fully captured, unrefunded order triggers a
 fresh rate for the selected global/local product. An increase above the amount paid
 requires review; customers are never charged automatically. One fulfillment books
 one tested box. Split shipments and automatic returns are unsupported.
 
-`POST /shipments` creates the waybill and requests pickup. The fulfillment ID is
+`POST /shipments` creates the waybill with a label, waybill document and, for
+international parcels, a commercial invoice. DHL Nigeria requires pickups to be booked
+separately, so a successful waybill is followed by `POST /pickups` for collection from
+the stock location. If pickup scheduling fails, the waybill is kept, the booking shows
+the error, and the next run retries only the pickup. The fulfillment ID is
 sent as a `CU` customer reference. The booking ledger uses a unique fulfillment key
 and an atomic transition before creation. A timeout or ambiguous failure leaves the
 booking in `creating`; automatic workers NEVER repeat creation. Locate the waybill

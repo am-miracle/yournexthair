@@ -1,6 +1,6 @@
 import { MedusaError } from "@medusajs/framework/utils"
 import { z } from "zod"
-import { dhlCredentials, dhlEnvironment } from "./config"
+import { dhlCredentials, dhlEnvironment, ngnExchange, type NgnExchange } from "./config"
 import { documentsSchema } from "./documents"
 import type { buildQuoteRequest } from "./quote"
 
@@ -22,6 +22,8 @@ export const rateSchema = z.object({
   local_product_code: z.string().optional(),
   carrier_name: z.string().min(1),
   delivery_time: z.string().optional(),
+  billed_amount: z.number().optional(),
+  billed_currency: z.string().optional(),
 })
 export type DhlRate = z.infer<typeof rateSchema>
 export const shipmentSchema = z.object({
@@ -70,11 +72,41 @@ function contact(address: ShipmentBody["pickup_address"] | ShipmentBody["deliver
     },
   }
 }
+const cents = (amount: number) => Math.round(amount * 100) / 100
+
 export class DhlClient {
   private readonly baseUrl: string
 
-  constructor(private readonly credentials = dhlCredentials()) {
+  constructor(
+    private readonly credentials = dhlCredentials(),
+    private readonly exchange: NgnExchange | undefined = ngnExchange(),
+  ) {
     this.baseUrl = dhlApiUrl()
+  }
+
+  // DHL Nigeria declares customs values in the account currency (NGN).
+  private toNgn(amount: number, currency: string) {
+    if (currency === "NGN") {
+      return cents(amount)
+    }
+    if (currency === "USD" && this.exchange) {
+      return cents(amount * this.exchange.ngn_per_usd)
+    }
+    throw new MedusaError(
+      MedusaError.Types.INVALID_DATA,
+      "International DHL pricing is not configured. Please contact the store.",
+    )
+  }
+
+  private declaredItems(body: ShipmentBody) {
+    const items = body.parcel.items.map((item) => ({
+      ...item,
+      unit_ngn: this.toNgn(item.value / item.quantity, body.currency),
+    }))
+    return {
+      items,
+      total_ngn: cents(items.reduce((sum, item) => sum + item.unit_ngn * item.quantity, 0)),
+    }
   }
 
   rateRequest(body: ShipmentBody, plannedDate = plannedShippingDate()) {
@@ -90,8 +122,8 @@ export class DhlClient {
       monetaryAmount: [
         {
           typeCode: "declaredValue",
-          value: body.parcel.items.reduce((sum, item) => sum + item.value, 0),
-          currency: body.currency,
+          value: this.declaredItems(body).total_ngn,
+          currency: "NGN",
         },
       ],
       estimatedDeliveryDate: { isRequested: true, typeCode: "QDDC" },
@@ -126,16 +158,29 @@ export class DhlClient {
       .parse(await this.request("/rates", this.rateRequest(body, plannedDate)))
     return response.products.flatMap((product) => {
       // Never convert currencies or confuse a breakdown line with the shipment total.
-      const price =
+      const priceIn = (currency: string) =>
         product.totalPrice.find(
-          (entry) => entry.priceCurrency === body.currency && entry.currencyType === "BILLC",
-        ) ?? product.totalPrice.find((entry) => entry.priceCurrency === body.currency)
-      if (!price) {
+          (entry) => entry.priceCurrency === currency && entry.currencyType === "BILLC",
+        ) ?? product.totalPrice.find((entry) => entry.priceCurrency === currency)
+      const price = priceIn(body.currency)
+      const billed = price ? undefined : priceIn("NGN")
+      // DHL Nigeria quotes international services in NGN only. USD carts pay the NGN bill
+      // converted at the configured rate plus a margin for movement before booking.
+      const converted =
+        billed && body.currency === "USD" && this.exchange
+          ? Math.ceil(
+              (billed.price / this.exchange.ngn_per_usd) *
+                (1 + this.exchange.margin_percent / 100) *
+                100,
+            ) / 100
+          : undefined
+      if (!price && converted === undefined) {
         return []
       }
       const rate = rateSchema.safeParse({
-        amount: price.price,
-        currency: price.priceCurrency,
+        amount: price?.price ?? converted,
+        currency: price?.priceCurrency ?? body.currency,
+        ...(billed ? { billed_amount: billed.price, billed_currency: billed.priceCurrency } : {}),
         product_code: product.productCode,
         local_product_code: product.localProductCode,
         carrier_name: `DHL ${product.productName}`,
@@ -158,9 +203,11 @@ export class DhlClient {
       throw new Error("DHL fulfillment references must contain 1–35 characters.")
     }
     const international = body.pickup_address.country !== body.delivery_address.country
+    const declared = this.declaredItems(body)
     return {
       plannedShippingDateAndTime: plannedDate,
-      pickup: { isRequested: true, closeTime: "17:00" },
+      // DHL Nigeria requires pickups to be booked through the separate Pickup API.
+      pickup: { isRequested: false },
       productCode,
       ...(localProductCode ? { localProductCode } : {}),
       accounts: [{ typeCode: "shipper", number: this.credentials.account_number }],
@@ -170,11 +217,26 @@ export class DhlClient {
       },
       customerReferences: [{ value: reference, typeCode: "CU" }],
       outputImageProperties: {
+        allDocumentsInOneImage: true,
         encodingFormat: "pdf",
         imageOptions: [
-          { typeCode: "label", isRequested: true },
+          { typeCode: "label", templateName: "ECOM26_84_A4_001" },
+          {
+            typeCode: "waybillDoc",
+            templateName: "ARCH_8X4_A4_002",
+            isRequested: true,
+            hideAccountNumber: true,
+          },
           ...(international
-            ? [{ typeCode: "invoice", isRequested: true, invoiceType: "commercial" }]
+            ? [
+                {
+                  typeCode: "invoice",
+                  templateName: "COMMERCIAL_INVOICE_P_10",
+                  invoiceType: "commercial",
+                  languageCode: "eng",
+                  isRequested: true,
+                },
+              ]
             : []),
         ],
       },
@@ -182,8 +244,8 @@ export class DhlClient {
         packages: [{ weight: body.parcel.weight, dimensions: body.parcel.dimensions }],
         isCustomsDeclarable: international,
         description: body.parcel.description,
-        declaredValue: body.parcel.items.reduce((sum, item) => sum + item.value, 0),
-        declaredValueCurrency: body.currency,
+        declaredValue: declared.total_ngn,
+        declaredValueCurrency: "NGN",
         incoterm: "DAP",
         unitOfMeasurement: "metric",
         ...(international
@@ -192,12 +254,18 @@ export class DhlClient {
                 invoice: { number: reference, date: plannedDate.slice(0, 10) },
                 exportReasonType: "permanent",
                 exportReason: "Sale of hair products",
-                lineItems: body.parcel.items.map((item, index) => ({
+                shipmentType: "commercial",
+                placeOfIncoterm: body.delivery_address.city,
+                lineItems: declared.items.map((item, index) => ({
                   number: index + 1,
                   description: item.description,
-                  price: item.value / item.quantity,
+                  price: item.unit_ngn,
                   quantity: { value: item.quantity, unitOfMeasurement: "PCS" },
-                  commodityCodes: [{ typeCode: "outbound", value: item.hs_code }],
+                  commodityCodes: [
+                    { typeCode: "outbound", value: item.hs_code },
+                    { typeCode: "inbound", value: item.hs_code },
+                  ],
+                  exportReasonType: "permanent",
                   manufacturerCountry: item.country_of_origin,
                   weight: {
                     netValue: item.weight * item.quantity,
@@ -238,6 +306,39 @@ export class DhlClient {
       dispatch_confirmation_number: result.dispatchConfirmationNumber,
       extras: trackingDetails(result.shipmentTrackingNumber),
     })
+  }
+
+  pickupRequest(body: ShipmentBody, productCode: string, plannedDate = plannedShippingDate()) {
+    const international = body.pickup_address.country !== body.delivery_address.country
+    return {
+      plannedPickupDateAndTime: plannedDate,
+      closeTime: "17:00",
+      location: "reception",
+      locationType: "business",
+      accounts: [{ typeCode: "shipper", number: this.credentials.account_number }],
+      customerDetails: {
+        shipperDetails: contact(body.pickup_address),
+        receiverDetails: contact(body.delivery_address),
+      },
+      shipmentDetails: [
+        {
+          productCode,
+          isCustomsDeclarable: international,
+          ...(international
+            ? { declaredValue: this.declaredItems(body).total_ngn, declaredValueCurrency: "NGN" }
+            : {}),
+          unitOfMeasurement: "metric",
+          packages: [{ weight: body.parcel.weight, dimensions: body.parcel.dimensions }],
+        },
+      ],
+    }
+  }
+
+  async requestPickup(body: ShipmentBody, productCode: string, plannedDate?: string) {
+    const result = z
+      .object({ dispatchConfirmationNumbers: z.array(z.string().min(1)).min(1) })
+      .parse(await this.request("/pickups", this.pickupRequest(body, productCode, plannedDate)))
+    return result.dispatchConfirmationNumbers[0]!
   }
 
   async getShipment(shipmentId: string) {

@@ -27,6 +27,16 @@ export function dhlEnvironment(value = process.env.DHL_ENVIRONMENT ?? "sandbox")
   return value
 }
 
+export type NgnExchange = { ngn_per_usd: number; margin_percent: number }
+
+export function ngnExchange(): NgnExchange | undefined {
+  const rate = Number(process.env.DHL_NGN_PER_USD)
+  const margin = Number(process.env.DHL_FX_MARGIN_PERCENT ?? 5)
+  return Number.isFinite(rate) && rate > 0 && Number.isFinite(margin) && margin >= 0 && margin <= 50
+    ? { ngn_per_usd: rate, margin_percent: margin }
+    : undefined
+}
+
 export function optionalDhlCredentials() {
   const username = process.env.DHL_API_USERNAME
   const password = process.env.DHL_API_PASSWORD
