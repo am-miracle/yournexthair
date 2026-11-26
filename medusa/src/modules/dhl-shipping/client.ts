@@ -110,24 +110,36 @@ export class DhlClient {
   }
 
   rateRequest(body: ShipmentBody, plannedDate = plannedShippingDate()) {
+    const nigeriaDomestic =
+      body.pickup_address.country === "NG" && body.delivery_address.country === "NG"
     return {
       customerDetails: {
-        shipperDetails: postal(body.pickup_address),
-        receiverDetails: postal(body.delivery_address),
+        shipperDetails: {
+          ...postal(body.pickup_address),
+          ...(nigeriaDomestic ? { countyName: body.pickup_address.state } : {}),
+        },
+        receiverDetails: {
+          ...postal(body.delivery_address),
+          ...(nigeriaDomestic ? { countyName: body.delivery_address.state } : {}),
+        },
       },
       accounts: [{ typeCode: "shipper", number: this.credentials.account_number }],
       plannedShippingDateAndTime: plannedDate,
       unitOfMeasurement: "metric",
       isCustomsDeclarable: body.pickup_address.country !== body.delivery_address.country,
-      monetaryAmount: [
-        {
-          typeCode: "declaredValue",
-          value: this.declaredItems(body).total_ngn,
-          currency: "NGN",
-        },
-      ],
-      estimatedDeliveryDate: { isRequested: true, typeCode: "QDDC" },
-      returnStandardProductsOnly: true,
+      ...(nigeriaDomestic
+        ? { productCode: "N", nextBusinessDay: true }
+        : {
+            monetaryAmount: [
+              {
+                typeCode: "declaredValue",
+                value: this.declaredItems(body).total_ngn,
+                currency: "NGN",
+              },
+            ],
+            estimatedDeliveryDate: { isRequested: true, typeCode: "QDDC" },
+            returnStandardProductsOnly: true,
+          }),
       packages: [{ weight: body.parcel.weight, dimensions: body.parcel.dimensions }],
     }
   }

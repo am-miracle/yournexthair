@@ -41,11 +41,19 @@ it("uses Basic auth and parses shipment totals rather than price breakdowns", as
   expect(options?.headers).toMatchObject({
     Authorization: `Basic ${Buffer.from("api-user:api-password").toString("base64")}`,
   })
-  expect(JSON.parse(options?.body as string)).toMatchObject({
+  const request = JSON.parse(options?.body as string)
+  expect(request).toMatchObject({
     accounts: [{ number: "123456789", typeCode: "shipper" }],
     isCustomsDeclarable: false,
+    productCode: "N",
+    nextBusinessDay: true,
+    customerDetails: {
+      shipperDetails: { countyName: "Rivers" },
+      receiverDetails: { countyName: "Rivers" },
+    },
     packages: [{ weight: 0.6 }],
   })
+  expect(request).not.toHaveProperty("monetaryAmount")
 })
 it("includes actual origin, line quantities, unit values and invoice for international goods", () => {
   const request = new DhlClient(credentials).shipmentRequest(

@@ -108,7 +108,7 @@ export default async function setupDhlShipping({ container, args }: ExecArgs) {
         type: "shipping",
         service_zones: [
           {
-            name: `Courier delivery: ${country.toUpperCase()}`,
+            name: `DHL ${environment} delivery: ${country.toUpperCase()} — ${location.id}`,
             geo_zones: [{ type: "country", country_code: country }],
           },
         ],
