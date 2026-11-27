@@ -100,7 +100,12 @@ const BachsPaymentButton = ({
   )
 
   const getCheckoutUrl = async () => {
-    if (paymentSession && !isExpired(paymentSession.data?.expires_at)) {
+    // A link made for another site address would return the customer without their cart cookie.
+    if (
+      paymentSession &&
+      !isExpired(paymentSession.data?.expires_at) &&
+      paymentSession.data?.return_origin === window.location.origin
+    ) {
       return paymentSession.data?.checkout_url
     }
 

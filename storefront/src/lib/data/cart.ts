@@ -6,6 +6,7 @@ import { checkoutCurrency } from "@lib/util/checkout-currency"
 import { FetchError } from "@medusajs/js-sdk"
 import { HttpTypes } from "@medusajs/types"
 import { revalidateTag, updateTag } from "next/cache"
+import { headers } from "next/headers"
 import { redirect } from "next/navigation"
 import { z } from "zod"
 
@@ -227,6 +228,16 @@ export async function setShippingMethod({
     .catch(medusaError)
 }
 
+// The payment provider returns customers here; the backend only accepts allowed storefront origins.
+async function requestOrigin() {
+  const requestHeaders = await headers()
+  const origin = requestHeaders.get("origin")
+  if (origin) return origin
+  const host = requestHeaders.get("x-forwarded-host") ?? requestHeaders.get("host")
+  if (!host) return undefined
+  return `${requestHeaders.get("x-forwarded-proto") ?? "https"}://${host}`
+}
+
 export async function initiatePaymentSession(provider_id: unknown) {
   const cart = await retrieveCart()
 
@@ -240,6 +251,7 @@ export async function initiatePaymentSession(provider_id: unknown) {
 
   const address = cart.billing_address ?? cart.shipping_address
   const customerName = [address?.first_name, address?.last_name].filter(Boolean).join(" ")
+  const returnOrigin = await requestOrigin()
 
   return sdk.store.payment
     .initiatePaymentSession(
@@ -250,6 +262,7 @@ export async function initiatePaymentSession(provider_id: unknown) {
           email: cart.email,
           country_code: cart.shipping_address?.country_code,
           ...(customerName ? { customer_name: customerName } : {}),
+          ...(returnOrigin ? { return_origin: returnOrigin } : {}),
         },
       },
       {},

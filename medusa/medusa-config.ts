@@ -151,6 +151,7 @@ module.exports = defineConfig({
                     api_key: process.env.BACHS_SECRET_KEY,
                     webhook_secret: requireSecret("BACHS_WEBHOOK_SECRET"),
                     storefront_url: requireSecret("STOREFRONT_URL"),
+                    allowed_origins: process.env.STORE_CORS ?? "",
                     ...(process.env.BACHS_API_URL ? { base_url: process.env.BACHS_API_URL } : {}),
                   },
                 },

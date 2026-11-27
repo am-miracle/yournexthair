@@ -5,6 +5,8 @@ const options = {
   api_key: "sk_sandbox_123",
   webhook_secret: "whsec_test",
   storefront_url: "https://shop.example.com/",
+  allowed_origins:
+    "https://shop.example.com,https://www.shop.example.com,/^https:\\/\\/shop-git-[a-z0-9-]+\\.vercel\\.app$/",
 }
 
 const sessionData: BachsSessionData = {
@@ -43,6 +45,40 @@ describe("BachsPaymentService", () => {
   const service = new BachsPaymentService({}, options)
 
   afterEach(() => fetchMock.mockReset())
+
+  it.each([
+    [
+      "an allowed storefront address",
+      "https://www.shop.example.com",
+      "https://www.shop.example.com",
+    ],
+    [
+      "an allowed preview pattern",
+      "https://shop-git-develop.vercel.app",
+      "https://shop-git-develop.vercel.app",
+    ],
+    ["an unknown site", "https://evil.example.net", "https://shop.example.com"],
+    ["no address", undefined, "https://shop.example.com"],
+  ])("returns customers from %s to the right site", async (_label, returnOrigin, expected) => {
+    fetchMock.mockResolvedValueOnce(
+      jsonResponse({ checkout_id: "chk_1", checkout_url: "https://checkout.bachs.io/chk_1" }),
+    )
+    const result = await service.initiatePayment({
+      amount: 50000,
+      currency_code: "ngn",
+      data: {
+        session_id: "payses_1",
+        email: "jane@example.com",
+        country_code: "ng",
+        ...(returnOrigin ? { return_origin: `${returnOrigin}/ng/checkout?step=review` } : {}),
+      },
+    })
+    expect(JSON.parse(fetchMock.mock.calls[0]![1]?.body as string)).toMatchObject({
+      success_url: `${expected}/ng/checkout/bachs/return`,
+      cancel_url: `${expected}/ng/checkout?step=payment`,
+    })
+    expect(result.data).toMatchObject({ return_origin: expected })
+  })
 
   it("creates a hosted checkout in main currency units", async () => {
     fetchMock.mockResolvedValueOnce(

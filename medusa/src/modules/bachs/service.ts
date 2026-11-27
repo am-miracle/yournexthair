@@ -1,6 +1,7 @@
 import {
   AbstractPaymentProvider,
   MathBN,
+  parseCorsOrigins,
   MedusaError,
   PaymentActions,
   PaymentSessionStatus,
@@ -39,6 +40,7 @@ export type BachsOptions = {
   api_key: string
   webhook_secret: string
   storefront_url: string
+  allowed_origins?: string
   base_url?: string
 }
 
@@ -53,6 +55,7 @@ export type BachsSessionData = {
   email: string
   customer_name: string
   country_code: string
+  return_origin?: string
   payment_id?: string
   refund_id?: string
   refund_status?: string
@@ -63,6 +66,7 @@ type InitiateData = {
   email?: unknown
   customer_name?: unknown
   country_code?: unknown
+  return_origin?: unknown
 }
 
 const SUCCESS_EVENTS = new Set(["collection.succeeded", "checkout.completed"])
@@ -80,6 +84,8 @@ export class BachsPaymentService extends AbstractPaymentProvider<BachsOptions> {
 
   protected readonly client: BachsClient
   protected readonly logger: Logger | undefined
+  protected readonly storefrontOrigin: string
+  protected readonly allowedOrigins: (string | RegExp)[]
 
   static validateOptions(options: Record<string, unknown>) {
     for (const key of ["api_key", "webhook_secret", "storefront_url"]) {
@@ -95,6 +101,8 @@ export class BachsPaymentService extends AbstractPaymentProvider<BachsOptions> {
   constructor(container: { logger?: Logger }, options: BachsOptions) {
     super(container, options)
     this.logger = container.logger
+    this.storefrontOrigin = new URL(options.storefront_url).origin
+    this.allowedOrigins = parseCorsOrigins(options.allowed_origins ?? "")
     this.client = new BachsClient(
       options.api_key,
       resolveBachsBaseUrl(options.api_key, options.base_url),
@@ -132,6 +140,7 @@ export class BachsPaymentService extends AbstractPaymentProvider<BachsOptions> {
       email,
       customer_name: asString(input.customer_name) ?? email.split("@")[0] ?? email,
       country_code: countryCode,
+      return_origin: this.returnOrigin(input.return_origin),
       amount: toDecimalString(amount),
       currency: currency_code.toUpperCase(),
     })
@@ -157,6 +166,7 @@ export class BachsPaymentService extends AbstractPaymentProvider<BachsOptions> {
       email: current.email,
       customer_name: current.customer_name,
       country_code: current.country_code,
+      return_origin: this.returnOrigin(current.return_origin),
       amount: nextAmount,
       currency: nextCurrency,
     })
@@ -302,11 +312,30 @@ export class BachsPaymentService extends AbstractPaymentProvider<BachsOptions> {
     }
   }
 
+  private returnOrigin(value: unknown): string {
+    const candidate = asString(value)
+    if (!candidate) {
+      return this.storefrontOrigin
+    }
+    let origin: string
+    try {
+      origin = new URL(candidate).origin
+    } catch {
+      return this.storefrontOrigin
+    }
+    const allowed = this.allowedOrigins.some((entry) =>
+      typeof entry === "string" ? entry.replace(/\/+$/, "") === origin : entry.test(origin),
+    )
+    return allowed && (origin.startsWith("https://") || origin.startsWith("http://localhost"))
+      ? origin
+      : this.storefrontOrigin
+  }
+
   private async createCheckout(
     input: Omit<BachsSessionData, "checkout_id" | "checkout_url" | "expires_at" | "reference">,
   ): Promise<BachsSessionData> {
     const reference = `${input.session_id}_${input.currency}_${input.amount}`
-    const storefrontUrl = this.config.storefront_url.replace(/\/+$/, "")
+    const storefrontUrl = input.return_origin ?? this.storefrontOrigin
     const checkout = await this.client.createCheckoutSession(
       {
         pricing: { currency: input.currency, amount: input.amount },
