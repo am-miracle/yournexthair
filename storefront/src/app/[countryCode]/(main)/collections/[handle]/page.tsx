@@ -21,26 +21,33 @@ type Props = {
 }
 
 export async function generateStaticParams() {
-  const { collections } = await getCollectionsList()
+  try {
+    const { collections } = await getCollectionsList()
 
-  if (!collections) {
+    if (!collections) {
+      return []
+    }
+
+    const countryCodes = await listStaticCountryCodes()
+
+    const collectionHandles = collections.map((collection: StoreCollection) => collection.handle)
+
+    return countryCodes
+      ?.map((countryCode: string) =>
+        collectionHandles.map((handle: string | undefined) => ({
+          countryCode,
+          handle,
+        })),
+      )
+      .flat()
+  } catch (error) {
+    console.error(
+      `Failed to generate static paths for collection pages: ${
+        error instanceof Error ? error.message : "Unknown error"
+      }.`,
+    )
     return []
   }
-
-  const countryCodes = await listStaticCountryCodes()
-
-  const collectionHandles = collections.map((collection: StoreCollection) => collection.handle)
-
-  const staticParams = countryCodes
-    ?.map((countryCode: string) =>
-      collectionHandles.map((handle: string | undefined) => ({
-        countryCode,
-        handle,
-      })),
-    )
-    .flat()
-
-  return staticParams
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

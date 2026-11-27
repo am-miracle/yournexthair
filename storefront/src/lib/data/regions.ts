@@ -62,9 +62,17 @@ const getRegionData = cache(async () => {
 })
 
 export const listStaticCountryCodes = cache(async () => {
-  const { canonicalCountryCodes } = await getRegionData()
-
-  return canonicalCountryCodes
+  try {
+    const { canonicalCountryCodes } = await getRegionData()
+    return canonicalCountryCodes
+  } catch (error) {
+    console.error(
+      `Failed to list country codes for static pages: ${
+        error instanceof Error ? error.message : "Unknown error"
+      }.`,
+    )
+    return [] as string[]
+  }
 })
 
 export const getRegion = async function (countryCode: string) {
