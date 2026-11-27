@@ -4,7 +4,15 @@ import * as ReactAria from "react-aria-components"
 
 import compareAddresses from "@lib/util/compare-addresses"
 import { UpsertAddressForm } from "@modules/account/components/UpsertAddressForm"
-import { CountrySelectField, InputField } from "@/components/Forms"
+import { InputField } from "@/components/Forms"
+import { AddressFields, StateField } from "@modules/checkout/components/address-fields"
+import {
+  isNigeria,
+  isValidPhone,
+  nigerianStateValue,
+  normalizePhone,
+  provinceLabel,
+} from "@lib/util/address"
 import { UiDialogTrigger, UiDialog, UiCloseButton } from "@/components/Dialog"
 import { UiModalOverlay, UiModal } from "@/components/ui/Modal"
 import { UiRadio, UiRadioBox, UiRadioLabel } from "@/components/ui/Radio"
@@ -89,10 +97,15 @@ const ShippingAddress = ({
   const formData = useWatch<CheckoutAddressFormValues>({ control })
   const currentShippingAddress = formData.shipping_address ?? EMPTY_CHECKOUT_ADDRESS
   const { dirtyFields } = useFormState({ control, name: "shipping_address" })
+  const shippingCountry = currentShippingAddress.country_code
   const showProvinceInput =
-    !currentShippingAddress.province || Boolean(dirtyFields.shipping_address?.province)
+    !currentShippingAddress.province ||
+    Boolean(dirtyFields.shipping_address?.province) ||
+    (isNigeria(shippingCountry) && !nigerianStateValue(currentShippingAddress.province))
   const showPhoneInput =
-    !currentShippingAddress.phone || Boolean(dirtyFields.shipping_address?.phone)
+    !currentShippingAddress.phone ||
+    Boolean(dirtyFields.shipping_address?.phone) ||
+    !isValidPhone(normalizePhone(currentShippingAddress.phone, shippingCountry), shippingCountry)
 
   const supportedCountries = useMemo(() => new Set(countries.map((c) => c.iso_2)), [countries])
 
@@ -198,7 +211,7 @@ const ShippingAddress = ({
                 <div className="flex flex-wrap justify-between gap-6">
                   <div className="grow basis-0">
                     <p className="text-xs text-grayscale-500 mb-1.5">Postal Code</p>
-                    <p>{currentShippingAddress.postal_code}</p>
+                    <p>{currentShippingAddress.postal_code || "—"}</p>
                   </div>
                   <div className="grow basis-0">
                     <p className="text-xs text-grayscale-500 mb-1.5">City</p>
@@ -206,7 +219,12 @@ const ShippingAddress = ({
                   </div>
                   <div className="grow basis-0">
                     <p className="text-xs text-grayscale-500 mb-1.5">State</p>
-                    <p>{currentShippingAddress.province || "—"}</p>
+                    <p>
+                      {provinceLabel(
+                        currentShippingAddress.province,
+                        currentShippingAddress.country_code,
+                      ) || "—"}
+                    </p>
                   </div>
                 </div>
               </address>
@@ -327,16 +345,7 @@ const ShippingAddress = ({
             <div className="mb-8">
               <p className="mb-4">This address is missing details we need for delivery.</p>
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                {showProvinceInput && (
-                  <InputField
-                    placeholder="State / Province *"
-                    name="shipping_address.province"
-                    inputProps={{
-                      autoComplete: "address-level1",
-                      "aria-label": "Shipping state or province",
-                    }}
-                  />
-                )}
+                {showProvinceInput && <StateField prefix="shipping_address" isRequired />}
                 {showPhoneInput && (
                   <InputField
                     placeholder="Phone *"
@@ -350,75 +359,8 @@ const ShippingAddress = ({
           )}
         </>
       ) : (
-        <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-2">
-          <InputField
-            placeholder="First name *"
-            name="shipping_address.first_name"
-            inputProps={{ autoComplete: "given-name", "aria-label": "Shipping first name" }}
-            data-testid="shipping-first-name-input"
-          />
-          <InputField
-            placeholder="Last name *"
-            name="shipping_address.last_name"
-            inputProps={{ autoComplete: "family-name", "aria-label": "Shipping last name" }}
-            data-testid="shipping-last-name-input"
-          />
-          <InputField
-            placeholder="Address *"
-            name="shipping_address.address_1"
-            className="md:col-span-2"
-            inputProps={{ autoComplete: "address-line1", "aria-label": "Shipping address line 1" }}
-            data-testid="shipping-address-input"
-          />
-          <InputField
-            placeholder="Apartment, suite, etc."
-            name="shipping_address.address_2"
-            className="md:col-span-2"
-            inputProps={{ autoComplete: "address-line2", "aria-label": "Shipping address line 2" }}
-          />
-          <InputField
-            placeholder="City *"
-            name="shipping_address.city"
-            inputProps={{ autoComplete: "address-level2", "aria-label": "Shipping city" }}
-            data-testid="shipping-city-input"
-          />
-          <InputField
-            placeholder="State / Province *"
-            name="shipping_address.province"
-            inputProps={{
-              autoComplete: "address-level1",
-              "aria-label": "Shipping state or province",
-            }}
-            data-testid="shipping-province-input"
-          />
-          <InputField
-            placeholder="Postal code *"
-            name="shipping_address.postal_code"
-            inputProps={{ autoComplete: "postal-code", "aria-label": "Shipping postal code" }}
-            data-testid="shipping-postal-code-input"
-          />
-          <CountrySelectField
-            name="shipping_address.country_code"
-            selectProps={{
-              autoComplete: "country",
-              "aria-label": "Shipping country",
-              countries,
-            }}
-            data-testid="shipping-country-select"
-          />
-          <InputField
-            placeholder="Phone *"
-            name="shipping_address.phone"
-            type="tel"
-            inputProps={{ autoComplete: "tel", "aria-label": "Shipping phone" }}
-            data-testid="shipping-phone-input"
-          />
-          <InputField
-            placeholder="Company"
-            name="shipping_address.company"
-            inputProps={{ autoComplete: "organization", "aria-label": "Shipping company" }}
-            data-testid="shipping-company-input"
-          />
+        <div className="mb-8">
+          <AddressFields prefix="shipping_address" countries={countries} requireContact />
         </div>
       )}
       <div>

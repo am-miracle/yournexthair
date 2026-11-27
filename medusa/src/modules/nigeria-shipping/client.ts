@@ -20,7 +20,7 @@ const addressSchema = z.object({
   address_2: z.string().nullish(),
   city: required,
   province: required,
-  postal_code: required,
+  postal_code: z.string().nullish(),
   phone: required,
 })
 

@@ -225,6 +225,8 @@ export interface InputFieldProps {
     React.ComponentProps<typeof Input>,
     "name" | "id" | "type" | keyof ControllerRenderProps
   >
+  maxLength?: number
+  hint?: string
 }
 
 export const InputField: React.FC<InputFieldProps> = ({
@@ -233,10 +235,15 @@ export const InputField: React.FC<InputFieldProps> = ({
   type,
   inputProps,
   placeholder,
+  maxLength,
+  hint,
 }) => {
   const { field, fieldState } = useController<{ __name__: string }, "__name__">({
     name: name as "__name__",
   })
+  const length = typeof field.value === "string" ? field.value.length : 0
+  const showCounter = maxLength !== undefined && length >= maxLength - 10
+  const hintId = `${name}-hint`
 
   return (
     <div className={className}>
@@ -246,9 +253,21 @@ export const InputField: React.FC<InputFieldProps> = ({
         value={field.value ?? ""}
         id={name}
         aria-invalid={Boolean(fieldState.error)}
+        {...(hint && !fieldState.error ? { "aria-describedby": hintId } : {})}
+        {...withDefinedProp("maxLength", maxLength)}
         {...withDefinedProp("placeholder", placeholder)}
         {...withDefinedProp("type", type)}
       />
+      {(hint || showCounter) && !fieldState.error && (
+        <div className="flex justify-between gap-4 pt-2 text-xs text-grayscale-500">
+          <span id={hintId}>{hint}</span>
+          {showCounter && (
+            <span aria-live="polite">
+              {length}/{maxLength}
+            </span>
+          )}
+        </div>
+      )}
       {fieldState.error && (
         <div className="pt-2 text-red-900 text-small-regular">
           <span>{fieldState.error.message}</span>

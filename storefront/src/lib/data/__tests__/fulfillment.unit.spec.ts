@@ -54,3 +54,13 @@ it("prices FEZ and GIG independently and excludes the old manual Nigeria option"
     { id: "gig", name: "GIG Logistics", amount: 4200 },
   ])
 })
+
+it("shows the courier's address message when every quote is rejected as invalid", async () => {
+  const invalid = Object.assign(new Error("Check the postal code in your delivery address."), {
+    status: 400,
+  })
+  fetchMock
+    .mockResolvedValueOnce({ shipping_options: [{ id: "dhl", price_type: "calculated" }] })
+    .mockRejectedValueOnce(invalid)
+  await expect(listCartShippingMethods("cart_1")).rejects.toThrow("Check the postal code")
+})

@@ -2,7 +2,8 @@ import { useEffect, useMemo } from "react"
 import * as ReactAria from "react-aria-components"
 
 import { HttpTypes } from "@medusajs/types"
-import { CountrySelectField, InputField } from "@/components/Forms"
+import { AddressFields } from "@modules/checkout/components/address-fields"
+import { provinceLabel } from "@lib/util/address"
 import { Icon } from "@/components/Icon"
 import { UiCloseButton, UiDialog, UiDialogTrigger } from "@/components/Dialog"
 import { Button } from "@/components/Button"
@@ -12,7 +13,6 @@ import compareAddresses from "@lib/util/compare-addresses"
 import { UiRadio, UiRadioBox, UiRadioLabel } from "@/components/ui/Radio"
 import { UpsertAddressForm } from "@modules/account/components/UpsertAddressForm"
 import { useCountryCode } from "@/hooks/country-code"
-import { twMerge } from "tailwind-merge"
 import { useFormContext } from "react-hook-form"
 
 type CheckoutAddressFields = Pick<
@@ -182,7 +182,7 @@ const BillingAddress = ({
               <div className="flex flex-wrap justify-between gap-6">
                 <div className="grow basis-0">
                   <p className="text-xs text-grayscale-500 mb-1.5">Postal Code</p>
-                  <p>{formData.billing_address?.postal_code}</p>
+                  <p>{formData.billing_address?.postal_code || "—"}</p>
                 </div>
                 <div className="grow basis-0">
                   <p className="text-xs text-grayscale-500 mb-1.5">City</p>
@@ -190,7 +190,12 @@ const BillingAddress = ({
                 </div>
                 <div className="grow basis-0">
                   <p className="text-xs text-grayscale-500 mb-1.5">State</p>
-                  <p>{formData.billing_address?.province || "—"}</p>
+                  <p>
+                    {provinceLabel(
+                      formData.billing_address?.province,
+                      formData.billing_address?.country_code,
+                    ) || "—"}
+                  </p>
                 </div>
               </div>
             </address>
@@ -305,96 +310,8 @@ const BillingAddress = ({
           </UiDialogTrigger>
         </div>
       ) : (
-        <div className={twMerge("mt-8 grid grid-cols-1 gap-4 md:grid-cols-2")}>
-          <InputField
-            placeholder="First name *"
-            name="billing_address.first_name"
-            inputProps={{
-              autoComplete: "given-name",
-              "aria-label": "Billing first name",
-            }}
-            data-testid="billing-first-name-input"
-          />
-          <InputField
-            placeholder="Last name *"
-            name="billing_address.last_name"
-            inputProps={{
-              autoComplete: "family-name",
-              "aria-label": "Billing last name",
-            }}
-            data-testid="billing-last-name-input"
-          />
-          <InputField
-            placeholder="Address *"
-            name="billing_address.address_1"
-            className="md:col-span-2"
-            inputProps={{
-              autoComplete: "address-line1",
-              "aria-label": "Billing address line 1",
-            }}
-            data-testid="billing-address-input"
-          />
-          <InputField
-            placeholder="Apartment, suite, etc."
-            name="billing_address.address_2"
-            className="md:col-span-2"
-            inputProps={{
-              autoComplete: "address-line2",
-              "aria-label": "Billing address line 2",
-            }}
-          />
-          <InputField
-            placeholder="City *"
-            name="billing_address.city"
-            inputProps={{
-              autoComplete: "address-level2",
-              "aria-label": "Billing city",
-            }}
-            data-testid="billing-city-input"
-          />
-          <InputField
-            placeholder="State / Province"
-            name="billing_address.province"
-            inputProps={{
-              autoComplete: "address-level1",
-              "aria-label": "Billing state or province",
-            }}
-            data-testid="billing-province-input"
-          />
-          <InputField
-            placeholder="Postal code *"
-            name="billing_address.postal_code"
-            inputProps={{
-              autoComplete: "postal-code",
-              "aria-label": "Billing postal code",
-            }}
-            data-testid="billing-postal-input"
-          />
-          <CountrySelectField
-            name="billing_address.country_code"
-            selectProps={{
-              autoComplete: "country",
-              "aria-label": "Billing country",
-              ...withDefinedProp("region", cart?.region),
-            }}
-            data-testid="billing-country-select"
-          />
-          <InputField
-            placeholder="Phone"
-            name="billing_address.phone"
-            type="tel"
-            inputProps={{ autoComplete: "tel", "aria-label": "Billing phone" }}
-            data-testid="billing-phone-input"
-          />
-          <InputField
-            placeholder="Company"
-            name="billing_address.company"
-            inputProps={{
-              autoComplete: "organization",
-              "aria-label": "Billing company",
-            }}
-            data-testid="billing-company-input"
-          />
+        <div className="mt-8">
+          <AddressFields prefix="billing_address" {...withDefinedProp("region", cart?.region)} />
         </div>
       )}
     </>

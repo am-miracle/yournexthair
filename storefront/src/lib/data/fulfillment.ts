@@ -38,6 +38,17 @@ export const listCartShippingMethods = async function (cartId: string) {
         result.status === "fulfilled" ? [result.value] : [],
       )
       if (!available.length && priced.some((result) => result.status === "rejected")) {
+        // 400s carry customer-facing messages, e.g. a postal code the courier rejected.
+        const invalidAddress = priced.find(
+          (result): result is PromiseRejectedResult =>
+            result.status === "rejected" &&
+            (result.reason as { status?: number })?.status === 400 &&
+            result.reason instanceof Error &&
+            Boolean(result.reason.message),
+        )
+        if (invalidAddress) {
+          throw new Error((invalidAddress.reason as Error).message)
+        }
         throw new Error(
           "We couldn’t get a delivery quote. Please try again or contact us for delivery assistance.",
         )

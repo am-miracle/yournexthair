@@ -96,16 +96,16 @@ function dhlAddress(address: Address | null | undefined, label: string, requireN
       `${label} needs a street address, city, state and country before shipping can be quoted.`,
     )
   }
+  const country = address.country_code.toUpperCase()
   if (
     !address.phone?.trim() ||
-    !address.postal_code?.trim() ||
+    (country !== "NG" && !address.postal_code?.trim()) ||
     (requireName && (!address.first_name?.trim() || !address.last_name?.trim()))
   ) {
     return invalid(
       `${label} needs a contact name, phone number and postal code before shipping can be quoted.`,
     )
   }
-  const country = address.country_code.toUpperCase()
   const province = address.province.trim()
   const state =
     country === "NG"

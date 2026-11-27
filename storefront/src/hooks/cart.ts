@@ -14,6 +14,7 @@ import {
 } from "@lib/data/cart"
 import { listCartShippingMethods } from "@lib/data/fulfillment"
 import { listCartPaymentMethods } from "@lib/data/payment"
+import { isNigeria, isValidPhone, nigerianStateValue, normalizePhone } from "@lib/util/address"
 import { HttpTypes } from "@medusajs/types"
 import {
   QueryClient,
@@ -392,20 +393,55 @@ export const useSetShippingMethod = (
   })
 }
 
+const checkoutAddressSchema = (requireContact: boolean) =>
+  z
+    .object({
+      first_name: z.string().trim().min(1, "Enter a first name"),
+      last_name: z.string().trim().min(1, "Enter a last name"),
+      company: z.string().optional(),
+      address_1: z.string().trim().min(1, "Enter a street address"),
+      address_2: z.string().optional(),
+      city: z.string().trim().min(1, "Enter a city"),
+      postal_code: z.string().trim().optional(),
+      country_code: z.string().min(2, "Select a country"),
+      province: requireContact
+        ? z.string().trim().min(1, "Select the state for delivery")
+        : z.string().optional(),
+      phone: requireContact
+        ? z.string().trim().min(1, "Enter a phone number for delivery updates")
+        : z.string().optional(),
+    })
+    .superRefine((address, ctx) => {
+      if (!isNigeria(address.country_code) && !address.postal_code) {
+        ctx.addIssue({ code: "custom", path: ["postal_code"], message: "Enter a postal code" })
+      }
+      const province = address.province?.trim() ?? ""
+      if (isNigeria(address.country_code) && province && !nigerianStateValue(province)) {
+        ctx.addIssue({ code: "custom", path: ["province"], message: "Select your state" })
+      }
+      const phone = address.phone?.trim() ?? ""
+      if (
+        phone &&
+        !isValidPhone(normalizePhone(phone, address.country_code), address.country_code)
+      ) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["phone"],
+          message: isNigeria(address.country_code)
+            ? "Enter a valid Nigerian phone number, e.g. 0803 123 4567"
+            : "Enter a valid phone number with the country code",
+        })
+      }
+    })
+    .transform((address) =>
+      address.phone?.trim()
+        ? { ...address, phone: normalizePhone(address.phone, address.country_code) }
+        : address,
+    )
+
 export const addressesFormSchema = z
   .object({
-    shipping_address: z.object({
-      first_name: z.string().min(1),
-      last_name: z.string().min(1),
-      company: z.string().optional(),
-      address_1: z.string().min(1),
-      address_2: z.string().optional(),
-      city: z.string().min(1),
-      postal_code: z.string().min(1),
-      province: z.string().trim().min(1, "Enter the state for delivery"),
-      country_code: z.string().min(2),
-      phone: z.string().trim().min(1, "Enter a phone number for delivery updates"),
-    }),
+    shipping_address: checkoutAddressSchema(true),
   })
   .and(
     z.discriminatedUnion("same_as_billing", [
@@ -414,18 +450,7 @@ export const addressesFormSchema = z
       }),
       z.object({
         same_as_billing: z.literal("off").optional(),
-        billing_address: z.object({
-          first_name: z.string().min(1),
-          last_name: z.string().min(1),
-          company: z.string().optional(),
-          address_1: z.string().min(1),
-          address_2: z.string().optional(),
-          city: z.string().min(1),
-          postal_code: z.string().min(1),
-          province: z.string().optional(),
-          country_code: z.string().min(2),
-          phone: z.string().optional(),
-        }),
+        billing_address: checkoutAddressSchema(false),
       }),
     ]),
   )

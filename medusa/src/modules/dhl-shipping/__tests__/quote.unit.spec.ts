@@ -65,6 +65,25 @@ describe("DHL shipping parcel", () => {
       items: [{ quantity: 2, weight: 0.25, value: 240000 }],
     })
   })
+  it("quotes Nigerian addresses without a postal code but requires one abroad", () => {
+    const { body } = buildQuoteRequest(option, {
+      ...context,
+      shipping_address: { ...address, city: "Lagos", province: "ng-la", postal_code: "" },
+    })
+    expect(body.delivery_address.zip).toBe("")
+    expect(() =>
+      buildQuoteRequest(option, {
+        ...context,
+        shipping_address: {
+          ...address,
+          country_code: "gb",
+          city: "London",
+          province: "London",
+          postal_code: null,
+        },
+      }),
+    ).toThrow("postal code")
+  })
   it("rejects missing variant weight instead of treating it as free shipping", () => {
     expect(() =>
       buildQuoteRequest(option, {

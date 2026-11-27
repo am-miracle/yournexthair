@@ -49,13 +49,45 @@ export function plannedShippingDate(now = new Date()) {
   }
   return `${date.toISOString().slice(0, 10)}T10:00:00GMT+01:00`
 }
+const DHL_FIELD_LENGTH = 45
+
+export function addressLines(line1: string, line2 = "") {
+  const lines = [line1.trim(), line2.trim()].filter(Boolean)
+  if (lines.every((line) => line.length <= DHL_FIELD_LENGTH)) {
+    return lines
+  }
+  const wrapped: string[] = []
+  let current = ""
+  for (const word of lines.join(", ").split(/\s+/)) {
+    for (const piece of word.match(new RegExp(`.{1,${DHL_FIELD_LENGTH}}`, "g")) ?? []) {
+      const next = current ? `${current} ${piece}` : piece
+      if (next.length <= DHL_FIELD_LENGTH) {
+        current = next
+      } else {
+        wrapped.push(current)
+        current = piece
+      }
+    }
+  }
+  wrapped.push(current)
+  if (wrapped.length > 3) {
+    throw new MedusaError(
+      MedusaError.Types.INVALID_DATA,
+      "The delivery address is too long for the courier. Shorten it to 135 characters or fewer.",
+    )
+  }
+  return wrapped
+}
+
 function postal(address: ShipmentBody["pickup_address"] | ShipmentBody["delivery_address"]) {
+  const [addressLine1, addressLine2, addressLine3] = addressLines(address.line1, address.line2)
   return {
     postalCode: address.zip,
-    cityName: address.city,
+    cityName: address.city.slice(0, DHL_FIELD_LENGTH),
     countryCode: address.country,
-    addressLine1: address.line1,
-    ...(address.line2 ? { addressLine2: address.line2 } : {}),
+    addressLine1: addressLine1 ?? "",
+    ...(addressLine2 ? { addressLine2 } : {}),
+    ...(addressLine3 ? { addressLine3 } : {}),
     ...(address.country !== "NG"
       ? { provinceCode: address.state.replace(/^[A-Za-z]{2}-/, "").toUpperCase() }
       : {}),
@@ -432,6 +464,12 @@ export class DhlClient {
       const reason = await dhlErrorReason(response)
       if (reason) {
         logger.warn(`DHL ${method} ${path} rejected (${response.status}): ${reason}`)
+      }
+      if (reason && /post(al)?\s?code/i.test(reason)) {
+        throw new MedusaError(
+          MedusaError.Types.INVALID_DATA,
+          "The courier couldn't recognise the postal code. Check the postal code in your delivery address.",
+        )
       }
       throw new MedusaError(
         MedusaError.Types.UNEXPECTED_STATE,

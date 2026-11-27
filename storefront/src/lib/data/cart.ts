@@ -33,7 +33,7 @@ const normalizeAddress = (
   last_name: address.last_name,
   address_1: address.address_1,
   city: address.city,
-  postal_code: address.postal_code,
+  postal_code: address.postal_code ?? "",
   country_code: address.country_code,
   company: address.company?.trim() ? address.company : null,
   address_2: address.address_2?.trim() ? address.address_2 : null,

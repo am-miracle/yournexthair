@@ -14,6 +14,7 @@ import { Button } from "@/components/Button"
 import { Form } from "@/components/Forms"
 import { useCustomer } from "hooks/customer"
 import { checkoutCurrency } from "@lib/util/checkout-currency"
+import { cityLine } from "@lib/util/address"
 import { StoreCart, StoreCartAddress, StoreRegion } from "@medusajs/types"
 
 const toFormAddress = (address?: StoreCartAddress | null) => ({
@@ -156,9 +157,7 @@ const Addresses = ({
                 .filter(Boolean)
                 .join(" ")}
               <br />
-              {[cart.shipping_address.postal_code, cart.shipping_address.city]
-                .filter(Boolean)
-                .join(" ")}
+              {cityLine(cart.shipping_address)}
               <br />
               {cart.shipping_address.country_code?.toUpperCase()}
               <br />
@@ -181,9 +180,7 @@ const Addresses = ({
                       .filter(Boolean)
                       .join(" ")}
                     <br />
-                    {[cart.billing_address?.postal_code, cart.billing_address?.city]
-                      .filter(Boolean)
-                      .join(" ")}
+                    {cityLine(cart.billing_address)}
                     <br />
                     {cart.billing_address?.country_code?.toUpperCase()}
                   </>

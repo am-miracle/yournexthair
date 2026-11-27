@@ -22,19 +22,19 @@ test("guest can buy a product with manual payment", async ({ page }) => {
   await page.getByRole("button", { name: "Next" }).click()
   await page.waitForURL(/step=delivery/)
 
-  await page.getByLabel("Shipping first name").fill("Ada")
-  await page.getByLabel("Shipping last name").fill("Obi")
-  await page.getByLabel("Shipping address line 1").fill("12 Aba Road")
-  await page.getByLabel("Shipping postal code").fill("500001")
-  await page.getByLabel("Shipping city").fill("Port Harcourt")
-  await page.getByLabel("Shipping state or province").fill("Rivers")
-  await page.getByLabel("Shipping phone").fill("+2348000000000")
-
   const country = page.getByRole("button", { name: /shipping country/i })
   if (!(await country.textContent())?.includes("Nigeria")) {
     await country.click()
     await page.getByRole("option", { name: "Nigeria" }).click()
   }
+
+  await page.getByLabel("Shipping first name").fill("Ada")
+  await page.getByLabel("Shipping last name").fill("Obi")
+  await page.getByLabel("Shipping address line 1").fill("12 Aba Road")
+  await page.getByLabel("Shipping city").fill("Port Harcourt")
+  await page.getByRole("button", { name: /shipping state/i }).click()
+  await page.getByRole("option", { name: "Rivers" }).click()
+  await page.getByLabel("Shipping phone").fill("0800 000 0000")
 
   await page.getByRole("button", { name: "Next" }).click()
   await page.waitForURL(/step=shipping/)

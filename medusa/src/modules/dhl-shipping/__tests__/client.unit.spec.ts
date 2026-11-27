@@ -1,4 +1,4 @@
-import { DhlClient, dhlApiUrl, plannedShippingDate } from "../client"
+import { DhlClient, addressLines, dhlApiUrl, plannedShippingDate } from "../client"
 import { credentials, parcel } from "./fixtures"
 import { logger } from "@medusajs/framework/logger"
 jest.mock("@medusajs/framework/logger", () => ({ logger: { warn: jest.fn() } }))
@@ -198,7 +198,7 @@ it("logs DHL's validation reason without exposing it to checkout", async () => {
       JSON.stringify({
         title: "Unprocessable Entity",
         detail: "Multiple problems found, see Additional Details",
-        additionalDetails: ["postalCode is invalid"],
+        additionalDetails: ["addressLine1 is too long"],
       }),
       { status: 422 },
     ),
@@ -207,9 +207,45 @@ it("logs DHL's validation reason without exposing it to checkout", async () => {
     /^DHL shipping request failed \(422\)\. Contact the store\.$/,
   )
   expect(warn).toHaveBeenCalledWith(
-    "DHL POST /rates rejected (422): Unprocessable Entity | Multiple problems found, see Additional Details | postalCode is invalid",
+    "DHL POST /rates rejected (422): Unprocessable Entity | Multiple problems found, see Additional Details | addressLine1 is too long",
   )
 })
 it("plans pickup on a weekday in Nigerian local time", () => {
   expect(plannedShippingDate(new Date("2026-11-13T12:00:00Z"))).toBe("2026-11-16T10:00:00GMT+01:00")
+})
+it("tells the customer to check the postal code when DHL rejects it", async () => {
+  jest
+    .spyOn(global, "fetch")
+    .mockResolvedValue(
+      new Response(JSON.stringify({ detail: "420506: Invalid Postcode Format." }), { status: 400 }),
+    )
+  await expect(new DhlClient(credentials).getRates(parcel(true))).rejects.toThrow(
+    "Check the postal code in your delivery address.",
+  )
+})
+describe("addressLines", () => {
+  it("keeps lines that already fit", () => {
+    expect(addressLines("12 Aba Road", "Flat 2")).toEqual(["12 Aba Road", "Flat 2"])
+  })
+  it("wraps a long address across DHL's three 45-character lines", () => {
+    const lines = addressLines(
+      "Plot 15, Block 4, Admiralty Way, Lekki Phase 1, Eti-Osa LGA",
+      "Behind the filling station",
+    )
+    expect(lines.length).toBeLessThanOrEqual(3)
+    expect(lines.every((line) => line.length <= 45)).toBe(true)
+    expect(lines.join(" ")).toBe(
+      "Plot 15, Block 4, Admiralty Way, Lekki Phase 1, Eti-Osa LGA, Behind the filling station",
+    )
+  })
+  it("rejects an address that cannot fit", () => {
+    expect(() => addressLines("word ".repeat(40))).toThrow("too long")
+  })
+})
+it("sends long delivery addresses as separate DHL address lines", () => {
+  const body = parcel()
+  body.delivery_address.line1 = "Plot 15, Block 4, Admiralty Way, Lekki Phase 1, Eti-Osa LGA"
+  const receiver = new DhlClient(credentials).rateRequest(body).customerDetails.receiverDetails
+  expect(receiver.addressLine1.length).toBeLessThanOrEqual(45)
+  expect(receiver).toHaveProperty("addressLine2")
 })
