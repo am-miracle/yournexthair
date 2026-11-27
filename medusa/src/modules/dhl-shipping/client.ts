@@ -1,3 +1,4 @@
+import { logger } from "@medusajs/framework/logger"
 import { MedusaError } from "@medusajs/framework/utils"
 import { z } from "zod"
 import { dhlCredentials, dhlEnvironment, ngnExchange, type NgnExchange } from "./config"
@@ -73,6 +74,22 @@ function contact(address: ShipmentBody["pickup_address"] | ShipmentBody["deliver
   }
 }
 const cents = (amount: number) => Math.round(amount * 100) / 100
+
+const errorBodySchema = z.object({
+  title: z.string().optional(),
+  detail: z.string().optional(),
+  additionalDetails: z.array(z.string()).optional(),
+  reasons: z.array(z.object({ msg: z.string() })).optional(),
+})
+async function dhlErrorReason(response: Response) {
+  const body = errorBodySchema.safeParse(await response.json().catch(() => undefined))
+  if (!body.success) {
+    return undefined
+  }
+  const { title, detail, additionalDetails = [], reasons = [] } = body.data
+  const parts = [title, detail, ...additionalDetails, ...reasons.map((reason) => reason.msg)]
+  return parts.filter(Boolean).join(" | ").slice(0, 500) || undefined
+}
 
 export class DhlClient {
   private readonly baseUrl: string
@@ -409,8 +426,13 @@ export class DhlClient {
         "DHL request outcome is unavailable. Check booking status before retrying.",
       )
     }
-    // Upstream bodies may contain personal information. Never surface them in logs or checkout.
+    // Upstream bodies may contain personal information: never surface them at checkout, and
+    // log only DHL's short validation reason.
     if (!response.ok) {
+      const reason = await dhlErrorReason(response)
+      if (reason) {
+        logger.warn(`DHL ${method} ${path} rejected (${response.status}): ${reason}`)
+      }
       throw new MedusaError(
         MedusaError.Types.UNEXPECTED_STATE,
         `DHL shipping request failed (${response.status}). Contact the store.`,

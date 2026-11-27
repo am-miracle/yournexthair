@@ -1,5 +1,7 @@
 import { DhlClient, dhlApiUrl, plannedShippingDate } from "../client"
 import { credentials, parcel } from "./fixtures"
+import { logger } from "@medusajs/framework/logger"
+jest.mock("@medusajs/framework/logger", () => ({ logger: { warn: jest.fn() } }))
 jest.mock("@medusajs/framework/utils", () => ({
   MedusaError: class extends Error {
     static Types: Record<string, string> = {
@@ -187,6 +189,25 @@ it("redacts upstream response bodies", async () => {
     .mockResolvedValue(new Response("private address and credential", { status: 400 }))
   await expect(new DhlClient(credentials).getRates(parcel())).rejects.toThrow(
     "DHL shipping request failed (400)",
+  )
+})
+it("logs DHL's validation reason without exposing it to checkout", async () => {
+  const warn = jest.mocked(logger.warn)
+  jest.spyOn(global, "fetch").mockResolvedValue(
+    new Response(
+      JSON.stringify({
+        title: "Unprocessable Entity",
+        detail: "Multiple problems found, see Additional Details",
+        additionalDetails: ["postalCode is invalid"],
+      }),
+      { status: 422 },
+    ),
+  )
+  await expect(new DhlClient(credentials).getRates(parcel())).rejects.toThrow(
+    /^DHL shipping request failed \(422\)\. Contact the store\.$/,
+  )
+  expect(warn).toHaveBeenCalledWith(
+    "DHL POST /rates rejected (422): Unprocessable Entity | Multiple problems found, see Additional Details | postalCode is invalid",
   )
 })
 it("plans pickup on a weekday in Nigerian local time", () => {
