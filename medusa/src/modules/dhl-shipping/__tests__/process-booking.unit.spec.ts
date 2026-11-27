@@ -4,6 +4,7 @@ import { DhlClient } from "../client"
 
 jest.mock("../../dhl-operations", () => ({ DHL_OPERATIONS: "dhlOperations" }))
 jest.mock("@medusajs/framework/utils", () => ({
+  MathBN: jest.requireActual("@medusajs/framework/utils").MathBN,
   ContainerRegistrationKeys: { PG_CONNECTION: "db", QUERY: "query" },
   Modules: { FULFILLMENT: "fulfillment", STOCK_LOCATION: "stock_location" },
   MedusaError: class extends Error {

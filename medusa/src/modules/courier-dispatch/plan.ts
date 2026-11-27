@@ -1,4 +1,5 @@
 import { z } from "zod"
+import { toAmount } from "../../utils/amount"
 import { DHL_PROVIDER_ID } from "../dhl-shipping/config"
 import { type Carrier, carrierForProvider } from "../nigeria-shipping/config"
 
@@ -9,8 +10,8 @@ export const HOLD_MINUTES = 15
 export const MAX_ATTEMPTS = 6
 export const retryDelayMinutes = (attempts: number) => Math.min(2 ** attempts, 60)
 
-const amount = z.coerce.number()
-const amountOrZero = z.preprocess((value) => value ?? 0, z.coerce.number())
+const amount = z.preprocess(toAmount, z.number())
+const amountOrZero = z.preprocess((value) => toAmount(value ?? 0), z.number())
 export const orderSchema = z.object({
   id: z.string(),
   status: z.string(),

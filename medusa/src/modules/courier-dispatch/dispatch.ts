@@ -6,6 +6,7 @@ import { CarrierCache, cachingModuleStore } from "../nigeria-shipping/cache"
 import { domesticParcel, NigeriaCarrier, parcelSettings } from "../nigeria-shipping/client"
 import { type Carrier, carrierOptions } from "../nigeria-shipping/config"
 import { COURIER_DISPATCH } from "."
+import { toAmount } from "../../utils/amount"
 import { type DispatchOrder, orderSchema, planDispatch } from "./plan"
 import type CourierDispatchService from "./service"
 
@@ -129,7 +130,7 @@ async function bookNigeriaCarrier(
     fulfillment.items.length === items.length &&
     items.every((item) =>
       fulfillment.items.some(
-        (entry) => entry.line_item_id === item.id && Number(entry.quantity) === item.quantity,
+        (entry) => entry.line_item_id === item.id && toAmount(entry.quantity) === item.quantity,
       ),
     )
   if (!coversParcel) {

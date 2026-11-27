@@ -6,6 +6,7 @@ import type DhlOperationsService from "../dhl-operations/service"
 import { DhlClient } from "./client"
 import { bookDelivery, type Booking } from "./booking"
 import { buildQuoteRequest, type ShippingContext } from "./quote"
+import { toAmount } from "../../utils/amount"
 import { DHL_PROVIDER_ID, dhlEnvironment } from "./config"
 
 const quoteSchema = z.object({
@@ -149,8 +150,8 @@ export async function processDhlBooking(
       order.payment_collections.some(
         (payment) =>
           payment.status !== "completed" ||
-          Number(payment.refunded_amount) > 0 ||
-          Number(payment.captured_amount) < Number(payment.amount),
+          toAmount(payment.refunded_amount ?? 0) > 0 ||
+          toAmount(payment.captured_amount ?? 0) < toAmount(payment.amount),
       )
     ) {
       throw new Error("Courier booking is waiting for full payment capture.")
@@ -171,8 +172,8 @@ export async function processDhlBooking(
       items.length !== fulfillment.items.length ||
       items.some(
         (item) =>
-          Number(item.quantity) !==
-          Number(fulfillment.items.find((entry) => entry.line_item_id === item.id)?.quantity),
+          toAmount(item.quantity) !==
+          toAmount(fulfillment.items.find((entry) => entry.line_item_id === item.id)?.quantity),
       )
     ) {
       throw new Error("Automatic booking requires the complete shippable order in one fulfillment.")
@@ -188,8 +189,8 @@ export async function processDhlBooking(
       shipping_address: fulfillment.delivery_address,
       items: items.map((item) => ({
         ...item,
-        quantity: Number(item.quantity),
-        unit_price: Number(item.unit_price),
+        quantity: toAmount(item.quantity),
+        unit_price: toAmount(item.unit_price),
       })),
     })
     const shipment = await bookDelivery({
@@ -200,7 +201,7 @@ export async function processDhlBooking(
       currency: order.currency_code.toUpperCase(),
       productCode: quote.product_code,
       localProductCode: quote.local_product_code,
-      maximumAmount: Math.min(Number(method.amount), quote.amount),
+      maximumAmount: Math.min(toAmount(method.amount), quote.amount),
     })
     // Keep labels private: DHL returns base64 documents, not public URLs.
     // Staff download them through the authenticated DHL bookings route.

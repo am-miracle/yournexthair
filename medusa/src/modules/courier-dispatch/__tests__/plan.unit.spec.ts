@@ -1,4 +1,5 @@
-import { type DispatchOrder, planDispatch, retryDelayMinutes } from "../plan"
+import { BigNumber } from "@medusajs/framework/utils"
+import { type DispatchOrder, orderSchema, planDispatch, retryDelayMinutes } from "../plan"
 
 const fez = { id: "so_fez", provider_id: "nigeria_fez" }
 const dhl = { id: "so_dhl", provider_id: "dhl_dhl" }
@@ -119,4 +120,36 @@ it.each([
 
 it("backs off exponentially up to an hour", () => {
   expect([1, 2, 3, 5, 6, 10].map(retryDelayMinutes)).toEqual([2, 4, 8, 32, 60, 60])
+})
+
+it("reads Medusa BigNumber quantities and amounts from the order query", () => {
+  const parsed = orderSchema.parse({
+    ...order(),
+    items: [
+      {
+        id: "item_1",
+        quantity: new BigNumber(2),
+        unit_price: { value: "5000", precision: 20 },
+        requires_shipping: true,
+        variant: null,
+      },
+    ],
+    payment_collections: [
+      {
+        status: "completed",
+        amount: new BigNumber(14000),
+        captured_amount: new BigNumber(14000),
+        refunded_amount: null,
+      },
+    ],
+  })
+  expect(parsed.items[0]).toMatchObject({ quantity: 2, unit_price: 5000 })
+  expect(parsed.payment_collections[0]).toMatchObject({
+    captured_amount: 14000,
+    refunded_amount: 0,
+  })
+  expect(planDispatch(parsed, fez, { dhlAutoBooking: false })).toMatchObject({
+    action: "fulfill",
+    items: [{ id: "item_1", quantity: 2 }],
+  })
 })
